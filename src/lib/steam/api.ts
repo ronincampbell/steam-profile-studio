@@ -10,6 +10,7 @@
  * repeat requests without running the function at all.
  */
 import "server-only";
+import { getCache } from "@vercel/functions";
 import { cacheLife } from "next/cache";
 import {
   normalizeEquipped,
@@ -20,7 +21,7 @@ import {
   type RawRewardItem,
 } from "./normalize";
 import { pointsShopAppUrl } from "./pointsShop";
-import { parseProfilePage } from "./showcases/parse";
+import { createShowcaseLoader } from "./showcases/resilient";
 import type { ProfileShowcases } from "./showcases/types";
 import { ITEM_TYPES, type CataloguePage, type ItemType, type Profile, type ShopItem } from "./types";
 
@@ -122,37 +123,27 @@ export async function getProfile(steamId: string): Promise<Profile | null> {
  *
  * Showcases aren't in the Web API, so this loads
  * steamcommunity.com/profiles/<id>/ (English labels) and parses the HTML; see
- * reference/html/SHOWCASES.md. Cached like a profile (about 10 minutes):
- * Steam's community site starts answering 429 after a handful of quick
- * requests, so each profile costs it at most one page load per 10 minutes.
+ * reference/html/SHOWCASES.md. Steam's community site starts answering 429
+ * after 2–4 quick requests, so this goes through the rate-limit-proof loader
+ * in showcases/resilient.ts (6-hour memory, a week-long shared copy in
+ * Vercel's Runtime Cache, last-good fallback, combined duplicate requests,
+ * retry with backoff) instead of `use cache`, which can't
+ * keep an old answer when a refresh fails.
  *
- * Never throws: when Steam is down or rate limiting, this answers
- * `unavailable` and caches that for seconds only. (An error thrown inside a
- * "use cache" function reaches the caller as a generic error, so the route
- * couldn't tell it apart from a bug.)
+ * Throws SteamBusyError only when Steam failed and there's no earlier copy.
  */
-export async function getShowcases(steamId: string): Promise<ProfileShowcases> {
-  "use cache";
+const showcaseLoader = createShowcaseLoader({
+  // Vercel's Runtime Cache: one copy shared by every server instance. Ronin
+  // okayed it on 21 Nov 2026 for the Hobby plan's free allowance only (Vercel's
+  // docs, read via search, say Hobby pauses it when that runs out, not bills).
+  // Outside Vercel, getCache() falls back to memory. Set
+  // SHOWCASE_SHARED_CACHE=off in Vercel's env vars to turn it off.
+  shared:
+    process.env.SHOWCASE_SHARED_CACHE === "off" ? undefined : getCache({ namespace: "showcases-v1" }),
+});
 
-  let html: string | null = null;
-  try {
-    const res = await fetch(`https://steamcommunity.com/profiles/${steamId}/?l=english`, {
-      headers: { Accept: "text/html", "Accept-Language": "en-US,en;q=0.9" },
-      signal: AbortSignal.timeout(10_000),
-    });
-    if (res.ok) html = await res.text();
-  } catch {
-    // Treated as unavailable below.
-  }
-  if (html === null) {
-    cacheLife("seconds");
-    return { steamId, visibility: "unavailable", showcases: [] };
-  }
-
-  cacheLife("profile");
-  const page = parseProfilePage(html);
-  if (page.isPrivate) return { steamId, visibility: "private", showcases: [] };
-  return { steamId, visibility: "public", showcases: page.showcases, sidebar: page.sidebar };
+export function getShowcases(steamId: string): Promise<ProfileShowcases> {
+  return showcaseLoader.get(steamId);
 }
 
 /* ---------- Catalogue ---------- */

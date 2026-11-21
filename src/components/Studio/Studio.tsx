@@ -21,6 +21,7 @@ import { buildLook, PLACEHOLDER_PROFILE, type CustomArt, type Slot, type TryOn }
 import type { Cosmetic, ItemType, ShopItem } from "@/lib/steam/types";
 import { CustomArtPicker } from "./CustomArtPicker";
 import { FitToWidth } from "./FitToWidth";
+import { ShowcasesNotice } from "./ShowcasesNotice";
 import { ShowcaseList } from "./ShowcaseList";
 import { SlotBar } from "./SlotBar";
 import { useProfile, type ProfileState } from "./useProfile";
@@ -46,7 +47,8 @@ export function Studio() {
   const profile = state.status === "ready" ? state.profile : PLACEHOLDER_PROFILE;
   const look = useMemo(() => buildLook(profile, tryOn, custom), [profile, tryOn, custom]);
   const steamId = state.status === "ready" ? state.profile.steamId : null;
-  const showcases = useShowcases(steamId);
+  const showcasesState = useShowcases(steamId);
+  const showcases = showcasesState.showcases;
 
   // Showcase edits live only in this tab. They belong to one profile: loading
   // another starts again from that profile's own showcases.
@@ -122,6 +124,7 @@ export function Studio() {
           </button>
         </form>
         <StatusLine state={state} />
+        {state.status === "ready" && <ShowcasesNotice state={showcasesState} />}
       </header>
 
       <FitToWidth>

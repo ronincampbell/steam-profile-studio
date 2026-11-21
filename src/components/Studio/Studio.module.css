@@ -80,6 +80,13 @@
   color: #8f98a0;
 }
 
+/* Showcases from a cached copy, or Steam busy: amber, like Steam's own warnings. */
+.notice {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #e5b143;
+}
+
 .srOnly {
   position: absolute;
   width: 1px;
