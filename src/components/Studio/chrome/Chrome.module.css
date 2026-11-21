@@ -1,0 +1,521 @@
+/*
+ * The app's own chrome: header, menus and panels. None of this is Steam's
+ * design; it only borrows Steam's blue so the two sit well together.
+ *
+ * Rule for every layout: nothing here takes space in the page except the
+ * 104px header (Steam's own header height), so the preview below lands where
+ * Steam draws the profile. Menus and panels float over it.
+ */
+
+.chrome {
+  --c-bg: #0b0e13;
+  --c-surface: rgba(16, 21, 29, 0.92);
+  --c-surface-solid: #121821;
+  --c-raised: #1a222e;
+  --c-line: rgba(255, 255, 255, 0.08);
+  --c-line-strong: rgba(255, 255, 255, 0.14);
+  --c-text: #e8eef4;
+  --c-muted: #8a97a6;
+  --c-accent: #66c0f4;
+  --c-accent-2: #9b7bff;
+  --c-shadow: 0 18px 48px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --c-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --c-glass: blur(18px) saturate(140%);
+
+  min-height: 100vh;
+  background: var(--c-bg);
+}
+
+.chrome :is(button, a, input, select):focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* ---------- Header (104px) ---------- */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: 104px;
+  padding: 0 32px;
+  font-family: var(--c-font);
+  color: var(--c-text);
+  background:
+    radial-gradient(600px 160px at 12% -40%, rgba(102, 192, 244, 0.16), transparent 70%),
+    radial-gradient(500px 140px at 88% -60%, rgba(155, 123, 255, 0.12), transparent 70%),
+    linear-gradient(180deg, #121821 0%, #0b0e13 100%);
+  /* A shadow, not a border, so the header stays exactly 104px. */
+  box-shadow: inset 0 -1px 0 var(--c-line);
+}
+
+/* Two rows sharing columns: logo | search | Copy link, then who's being
+   previewed | the menu. Sharing columns lets the menu start where the
+   search bar does. */
+.headerGrid {
+  width: 100%;
+  max-width: 1360px;
+  height: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: 60px 44px;
+  align-items: center;
+  column-gap: 28px;
+}
+
+/* The line between the two rows. */
+.rowRule {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  align-self: start;
+  height: 1px;
+  background: var(--c-line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.wordmark {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.wordmarkTop {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+.wordmarkMain {
+  margin-top: 4px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+.search {
+  justify-self: center;
+  width: 100%;
+  max-width: 680px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px 0 16px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--c-line-strong);
+  border-radius: 999px;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    box-shadow 0.15s;
+}
+.search:focus-within {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(102, 192, 244, 0.7);
+  box-shadow: 0 0 0 4px rgba(102, 192, 244, 0.14);
+}
+
+.searchIcon {
+  flex: none;
+  color: var(--c-muted);
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--c-text);
+  background: none;
+  border: none;
+  outline: none;
+}
+.searchInput::placeholder {
+  color: #6f7c8b;
+}
+
+.searchButton {
+  flex: none;
+  height: 30px;
+  padding: 0 18px;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #06121b;
+  background: linear-gradient(135deg, #8fd3ff, var(--c-accent) 45%, #4a9fe0);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.searchButton:hover {
+  filter: brightness(1.1);
+}
+.searchButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.ghostButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--c-text);
+  background: transparent;
+  border: 1px solid var(--c-line-strong);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.ghostButton:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.iconButton {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: var(--c-muted);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.iconButton:hover {
+  color: var(--c-text);
+  background: rgba(255, 255, 255, 0.07);
+}
+.iconButton[aria-pressed="true"] {
+  color: var(--c-accent);
+  background: rgba(102, 192, 244, 0.12);
+}
+
+/* ---------- Panels (every layout) ---------- */
+
+.panelHead {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 16px 14px 18px;
+  border-bottom: 1px solid var(--c-line);
+  font-family: var(--c-font);
+}
+
+.panelIcon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: var(--c-accent);
+  background: linear-gradient(135deg, rgba(102, 192, 244, 0.18), rgba(155, 123, 255, 0.14));
+  border-radius: 10px;
+}
+
+.panelTitles {
+  flex: 1;
+  min-width: 0;
+}
+
+.panelTitle {
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--c-text);
+}
+
+.panelHint {
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--c-muted);
+}
+
+.panelBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 18px 24px;
+  container: panel / inline-size;
+  scrollbar-width: thin;
+  scrollbar-color: #334152 transparent;
+}
+.panelBody[hidden] {
+  display: none;
+}
+
+/* What each panel says when it has nothing to show yet. */
+.empty {
+  padding: 28px 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--c-muted);
+}
+
+/* ---------- Toolbar ---------- */
+
+.toolbarZone {
+  display: contents;
+}
+
+/* The menu's cell spans the same column as the search bar, so the menu
+   can be pushed right by the gap between the column and the (centred,
+   at most 680px) search bar. The first button's icon then sits on the
+   search bar's left edge. The menu may run on past the column's right,
+   into the empty space under Copy link. */
+.toolCell {
+  grid-row: 2;
+  grid-column: 2;
+  align-self: stretch;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.subject {
+  grid-row: 2;
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.subject img {
+  border-radius: 4px;
+}
+.subject strong {
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.tools {
+  --tool-pad: 9px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: max-content;
+  height: 100%;
+  /* Less the first button's own left padding, so its icon is on the edge. */
+  margin-left: calc(max(0px, (100cqw - 680px) / 2) - var(--tool-pad));
+}
+
+.toolItem {
+  display: contents;
+}
+
+.toolRule {
+  width: 1px;
+  height: 18px;
+  margin: 0 6px;
+  background: var(--c-line-strong);
+}
+
+.toolButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 100%;
+  padding: 0 var(--tool-pad);
+  font: inherit;
+  font-size: 13px;
+  color: var(--c-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.toolButton:hover {
+  color: var(--c-text);
+}
+
+/* How many slots you're trying something on in (on "Wearing now"). */
+.count {
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 17px;
+  text-align: center;
+  color: #06121b;
+  background: var(--c-accent);
+  border-radius: 999px;
+}
+.toolButton[aria-expanded="true"] {
+  color: #ffffff;
+}
+.toolButton[aria-expanded="true"]::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--c-accent), var(--c-accent-2));
+  border-radius: 2px;
+}
+
+/* Opens under its button: ToolbarLayout sets --drop-left (the panel's left
+   edge) and --caret-x (where the pointer sits, from that edge). */
+.dropPanel {
+  position: fixed;
+  z-index: 39;
+  top: 114px;
+  left: var(--drop-left, 16px);
+  width: min(640px, calc(100vw - 32px));
+  max-height: calc(100vh - 130px);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--c-font);
+  background: var(--c-surface);
+  backdrop-filter: var(--c-glass);
+  border: 1px solid var(--c-line-strong);
+  border-radius: 14px;
+  box-shadow: var(--c-shadow);
+  opacity: 0;
+  translate: 0 -8px;
+  pointer-events: none;
+  transition:
+    opacity 0.16s ease,
+    translate 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dropOpen {
+  opacity: 1;
+  translate: 0 0;
+  pointer-events: auto;
+}
+/* Moving from one open panel to another: glide across to the new button. */
+.dropSliding,
+.dropSliding .caret {
+  transition:
+    opacity 0.16s ease,
+    translate 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+    left 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* The pointer up to the open button. A square turned 45°, with the panel's
+   top and left borders, half hidden behind the panel. */
+.caret {
+  position: absolute;
+  top: -7px;
+  left: calc(var(--caret-x, 32px) - 6px);
+  width: 12px;
+  height: 12px;
+  background: #151b24;
+  border-top: 1px solid var(--c-line-strong);
+  border-left: 1px solid var(--c-line-strong);
+  border-radius: 3px 0 0 0;
+  rotate: 45deg;
+}
+
+/* ---------- Notices ---------- */
+
+.toasts {
+  position: fixed;
+  z-index: 60;
+  right: 20px;
+  bottom: 20px;
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+  max-width: min(420px, calc(100vw - 40px));
+  font-family: var(--c-font);
+  pointer-events: none;
+}
+.toasts > * {
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  background: var(--c-surface);
+  backdrop-filter: var(--c-glass);
+  border: 1px solid var(--c-line-strong);
+  border-radius: 12px;
+  box-shadow: var(--c-shadow);
+  pointer-events: auto;
+}
+
+/* ---------- Smaller screens ---------- */
+
+/* Below this the menu's labels don't fit beside the logo: icons only
+   (each button has its name as a tooltip). */
+@media (max-width: 1440px) {
+  .header {
+    padding: 0 20px;
+  }
+  .headerGrid {
+    column-gap: 16px;
+  }
+  .wordmark,
+  .subject span {
+    display: none;
+  }
+  .tools {
+    --tool-pad: 8px;
+  }
+  .toolButton {
+    font-size: 0;
+    gap: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  /* The preview is scaled down here, so pixel matching doesn't apply: let
+     the header grow to fit. */
+  .header {
+    height: auto;
+    padding: 12px 16px;
+  }
+  .headerGrid {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: 48px 44px;
+  }
+  .headerGrid > .ghostButton {
+    display: none;
+  }
+  /* The header is taller here, so the toolbar's panel comes up from the bottom instead. */
+  .dropPanel {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    max-height: 75vh;
+    border-radius: 16px 16px 0 0;
+  }
+  .caret {
+    display: none;
+  }
+  .toolRule {
+    margin: 0 2px;
+  }
+}

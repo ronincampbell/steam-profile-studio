@@ -6,7 +6,7 @@
  * The pasted profile lives in the URL (?profile=…), so a link to the page
  * shows the same profile to whoever opens it.
  */
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ArtworkPanel } from "@/components/ArtworkWorkflow/ArtworkPanel";
 import { otherShowcases, useArtworkPlanner } from "@/components/ArtworkWorkflow/useArtworkPlanner";
@@ -22,6 +22,9 @@ import {
 } from "@/lib/studio/showcaseEditor";
 import { buildLook, PLACEHOLDER_PROFILE, type CustomArt, type Slot, type TryOn } from "@/lib/studio/look";
 import type { Cosmetic, ItemType, ShopItem } from "@/lib/steam/types";
+import type { PanelId } from "./chrome/menu";
+import { ToolbarLayout } from "./chrome/ToolbarLayout";
+import chrome from "./chrome/Chrome.module.css";
 import { CustomArtPicker } from "./CustomArtPicker";
 import { FitToWidth } from "./FitToWidth";
 import { ShowcasesNotice } from "./ShowcasesNotice";
@@ -113,71 +116,43 @@ export function Studio() {
     const q = draft.trim();
     if (!q) return;
     setTryOn({});
-    router.replace(`${pathname}?profile=${encodeURIComponent(q)}`, { scroll: false });
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("profile", q);
+    router.replace(`${pathname}?${params}`, { scroll: false });
   }
 
-  return (
-    <div className={styles.studio}>
-      <header className={styles.topBar}>
-        <h1 className={styles.title}>Steam Profile Studio</h1>
-        <form className={styles.form} onSubmit={submit}>
-          <label className={styles.srOnly} htmlFor="profile-input">
-            Steam profile
-          </label>
-          <input
-            id="profile-input"
-            className={styles.input}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder="Paste a Steam profile link, custom URL name or SteamID"
-            autoComplete="off"
-            spellCheck={false}
+  function renderPanel(id: PanelId): ReactNode {
+    switch (id) {
+      case "wearing":
+        return (
+          <SlotBar
+            profile={profile}
+            tryOn={tryOn}
+            custom={custom}
+            onRemove={(slot) => setTryOn((prev) => ({ ...prev, [slot]: null }))}
+            onReset={(slot) =>
+              setTryOn((prev) => {
+                const next = { ...prev };
+                delete next[slot];
+                return next;
+              })
+            }
           />
-          <button className={styles.button} type="submit" disabled={state.status === "loading"}>
-            {state.status === "loading" ? "Loading…" : "Load profile"}
-          </button>
-        </form>
-        <StatusLine state={state} />
-        {state.status === "ready" && <ShowcasesNotice state={showcasesState} />}
-      </header>
-
-      <FitToWidth>
-        <ProfilePreview
-          look={look}
-          showcases={state.status === "ready" ? showcases : undefined}
-          showcaseItems={previewItems}
-          showcaseEditing={
-            // While planning artwork its own position picker moves it, so drag editing is off.
-            showcaseList && !planner.state.enabled
-              ? {
-                  onMove: (from, to) => editShowcases((l) => moveShowcase(l, from, to)),
-                  onRemove: (id) => editShowcases((l) => removeShowcase(l, id)),
-                }
-              : undefined
-          }
-        />
-      </FitToWidth>
-
-      <div className={styles.controls}>
-        <SlotBar
-          profile={profile}
-          tryOn={tryOn}
-          custom={custom}
-          onRemove={(slot) => setTryOn({ ...tryOn, [slot]: null })}
-          onReset={(slot) => {
-            const next = { ...tryOn };
-            delete next[slot];
-            setTryOn(next);
-          }}
-        />
-        <CustomArtPicker custom={custom} onChange={setCustom} />
-        <ArtworkPanel
-          planner={planner}
-          source={artworkSource}
-          backgroundName={backgroundName}
-          otherShowcases={otherShowcases(baseItems ?? []).map((i) => i.showcase.title)}
-        />
-        {showcaseList && (
+        );
+      case "art":
+        return <CustomArtPicker custom={custom} onChange={setCustom} />;
+      case "artwork":
+        return (
+          <ArtworkPanel
+            inPanel
+            planner={planner}
+            source={artworkSource}
+            backgroundName={backgroundName}
+            otherShowcases={otherShowcases(baseItems ?? []).map((i) => i.showcase.title)}
+          />
+        );
+      case "showcases":
+        return showcaseList ? (
           <ShowcaseList
             list={showcaseList}
             profileShowcases={profileShowcases}
@@ -187,10 +162,50 @@ export function Studio() {
             onAdd={(type) => editShowcases((l) => addShowcase(l, type, profileShowcases, { name: profile.name }))}
             onReset={() => setShowcaseEdits(null)}
           />
-        )}
-      </div>
+        ) : (
+          <p className={chrome.empty}>
+            {state.status === "ready"
+              ? "Fetching this profile's showcases from Steam…"
+              : "Load a public profile to rearrange its showcases."}
+          </p>
+        );
+      default:
+        return <ItemBrowser inPanel type={id} onTypeChange={() => {}} current={current} onApply={apply} />;
+    }
+  }
 
-      <ItemBrowser current={current} onApply={apply} />
+  return (
+    <div className={chrome.chrome}>
+      <ToolbarLayout
+        form={{ draft, onDraftChange: setDraft, onSubmit: submit, loading: state.status === "loading" }}
+        subject={state.status === "ready" ? { name: profile.name, avatar: profile.avatar } : null}
+        renderPanel={renderPanel}
+        badges={{ wearing: Object.keys(tryOn).length, art: (custom.background ? 1 : 0) + (custom.avatar ? 1 : 0) }}
+        notices={
+          <>
+            <StatusLine state={state} />
+            {state.status === "ready" && <ShowcasesNotice state={showcasesState} />}
+          </>
+        }
+        preview={
+          <FitToWidth>
+            <ProfilePreview
+              look={look}
+              showcases={state.status === "ready" ? showcases : undefined}
+              showcaseItems={previewItems}
+              showcaseEditing={
+                // While planning artwork its own position picker moves it, so drag editing is off.
+                showcaseList && !planner.state.enabled
+                  ? {
+                      onMove: (from, to) => editShowcases((l) => moveShowcase(l, from, to)),
+                      onRemove: (id) => editShowcases((l) => removeShowcase(l, id)),
+                    }
+                  : undefined
+              }
+            />
+          </FitToWidth>
+        }
+      />
     </div>
   );
 }

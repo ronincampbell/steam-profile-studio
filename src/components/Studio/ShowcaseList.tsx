@@ -41,7 +41,6 @@ export function ShowcaseList({ list, profileShowcases, edited, onMove, onRemove,
   return (
     <section className={styles.showcasePanel} aria-label="Showcases">
       <div className={styles.showcasePanelHead}>
-        <span className={styles.customTitle}>Showcases</span>
         <span className={styles.customNote}>
           Drag to reorder, here or on the preview. Changes stay in this browser tab only.
         </span>

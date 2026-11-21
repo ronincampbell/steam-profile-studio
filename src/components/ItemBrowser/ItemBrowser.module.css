@@ -4,6 +4,11 @@
   padding: 24px 16px 64px;
 }
 
+.inPanel {
+  max-width: none;
+  padding: 0;
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -184,4 +189,9 @@
 }
 .more:disabled {
   opacity: 0.6;
+}
+
+/* Inside the app's menus the type tabs live in the menu, so search fills the row. */
+.search:only-child {
+  flex: 1 1 auto;
 }

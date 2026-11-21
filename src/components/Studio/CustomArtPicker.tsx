@@ -48,7 +48,6 @@ export function CustomArtPicker({ custom, onChange }: Props) {
 
   return (
     <div className={styles.custom}>
-      <span className={styles.customTitle}>Your own art</span>
       <FileButton label="Background image or video" accept={BACKGROUND_TYPES} onPick={pickBackground} />
       {custom.background && (
         <button className={styles.linkButton} onClick={() => onChange({ ...custom, background: undefined })}>
