@@ -24,9 +24,11 @@ interface Props {
   backgroundName: string;
   /** Titles of the other showcases on the preview, in order, for the position picker. */
   otherShowcases: string[];
+  /** Drawn inside a menu panel that already has a title and a box: drop ours. */
+  inPanel?: boolean;
 }
 
-export function ArtworkPanel({ planner, source, backgroundName, otherShowcases }: Props) {
+export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, inPanel = false }: Props) {
   const { state, update, slots } = planner;
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -37,9 +39,9 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases }
 
   if (!state.enabled) {
     return (
-      <section className={styles.panel} aria-labelledby="artwork-title">
+      <section className={`${styles.panel} ${inPanel ? styles.bare : ""}`} aria-labelledby="artwork-title">
         <div className={styles.head}>
-          <h2 id="artwork-title" className={styles.title}>
+          <h2 id="artwork-title" className={inPanel ? styles.srOnly : styles.title}>
             Artwork that lines up with your background
           </h2>
           <button className={styles.primaryButton} onClick={() => update({ enabled: true })} disabled={!source}>
@@ -100,9 +102,9 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases }
   }
 
   return (
-    <section className={styles.panel} aria-labelledby="artwork-title">
+    <section className={`${styles.panel} ${inPanel ? styles.bare : ""}`} aria-labelledby="artwork-title">
       <div className={styles.head}>
-        <h2 id="artwork-title" className={styles.title}>
+        <h2 id="artwork-title" className={inPanel ? styles.srOnly : styles.title}>
           Artwork that lines up with your background
         </h2>
         <span className={styles.note}>for &ldquo;{backgroundName}&rdquo;</span>

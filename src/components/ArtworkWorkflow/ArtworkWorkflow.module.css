@@ -314,3 +314,19 @@
   overflow-x: auto;
   white-space: nowrap;
 }
+
+/* Inside a menu panel, which has its own title and box. */
+.bare {
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
