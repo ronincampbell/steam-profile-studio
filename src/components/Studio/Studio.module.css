@@ -214,3 +214,78 @@
   font-size: 12px;
   color: #6b7785;
 }
+
+/* ---------- Showcases panel ---------- */
+
+.showcasePanel {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.showcasePanelHead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  align-items: baseline;
+}
+
+.showcasePanelHead .customNote {
+  flex-basis: auto;
+  flex-grow: 1;
+}
+
+.showcaseRow {
+  grid-template-columns: 16px minmax(0, 1fr) auto auto;
+  /* The drop line is a shadow, so rows don't move while you drag. */
+  position: relative;
+}
+
+.rowHandle {
+  color: #6b7785;
+  cursor: grab;
+  user-select: none;
+  text-align: center;
+}
+
+.rowHandle:hover {
+  color: #ffffff;
+}
+
+.rowDragging {
+  opacity: 0.4;
+}
+
+.rowDropBefore {
+  box-shadow: inset 0 3px 0 #66c0f4;
+}
+
+.rowDropAfter {
+  box-shadow: inset 0 -3px 0 #66c0f4;
+}
+
+.slotActions button:disabled {
+  color: #4b5866;
+  cursor: default;
+  text-decoration: none;
+}
+
+.select {
+  padding: 6px 8px;
+  font: inherit;
+  color: #ffffff;
+  background: #1b2431;
+  border: 1px solid #263041;
+  border-radius: 3px;
+}
+
+.fileButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+@media (max-width: 600px) {
+  .showcaseRow {
+    grid-template-columns: 16px minmax(0, 1fr) auto;
+  }
+}
