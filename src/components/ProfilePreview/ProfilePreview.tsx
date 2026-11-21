@@ -22,6 +22,7 @@ import { themeCssVars } from "@/lib/steam/themes";
 import type { Video } from "@/lib/steam/types";
 import type { ProfileShowcases } from "@/lib/steam/showcases/types";
 import { Showcases, type ShowcaseEditing, type ShowcaseItem } from "@/components/Showcases/Showcases";
+import { CommentsBox, RecentActivityBox } from "./Activity";
 import { HeaderFavoriteBadge, Sidebar } from "./Sidebar";
 import styles from "./ProfilePreview.module.css";
 
@@ -74,6 +75,7 @@ export function ProfilePreview({
     showcaseItems ?? showcases?.showcases.map((showcase, i) => ({ id: String(i), showcase, source: "profile" as const }));
   const bg = look.background;
   const sidebar = showcases?.sidebar;
+  const note = showcasesNote(showcases, items, Boolean(showcaseItems));
   const hasVideo = Boolean(bg?.video?.webm || bg?.video?.mp4);
   const imageRatio = useImageRatio(bg?.image);
   const [videoRatio, setVideoRatio] = useState<{
@@ -176,7 +178,9 @@ export function ProfilePreview({
             {/* div.profile_leftcol: showcases. */}
             <div className={styles.leftcol}>
               {items?.length ? <Showcases items={items} editing={showcaseEditing} /> : null}
-              <div className={styles.contentNote}>{showcasesNote(showcases, items, Boolean(showcaseItems))}</div>
+              {note && <div className={styles.contentNote}>{note}</div>}
+              {showcases?.recentActivity && <RecentActivityBox activity={showcases.recentActivity} />}
+              {showcases?.comments && <CommentsBox comments={showcases.comments} />}
             </div>
             <div className={styles.clearBoth} />
           </div>
@@ -190,13 +194,13 @@ function showcasesNote(
   showcases: ProfileShowcases | null | undefined,
   items: ShowcaseItem[] | undefined,
   edited: boolean,
-): string {
+): string | null {
   // While Steam hasn't sent the showcases (busy or private), the editor's list
   // is empty only because nothing arrived, so say why instead.
   const waiting = showcases?.visibility === "unavailable" || showcases?.visibility === "private";
   if (edited && items && !(waiting && !items.length)) {
     if (!items.length) return "No showcases. Add one from Showcases in the toolbar above.";
-    if (showcases?.visibility === "public") return "Recent activity and comments aren't part of the preview yet.";
+    if (showcases?.visibility === "public") return null;
   }
   if (showcases === undefined) return "Paste a profile to see its showcases.";
   if (showcases === null) return "Loading showcases…";
@@ -206,8 +210,8 @@ function showcasesNote(
     case "unavailable":
       return "Steam is busy, so the showcases will appear once it answers.";
     default:
-      return showcases.showcases.length
-        ? "Recent activity and comments aren't part of the preview yet."
+      return showcases.showcases.length || showcases.recentActivity || showcases.comments
+        ? null
         : "This profile has no showcases.";
   }
 }

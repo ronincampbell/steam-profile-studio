@@ -11,6 +11,7 @@
 import { parse, type HTMLElement } from "node-html-parser";
 import { classes, hasClass, text } from "./dom";
 import { parseMoreShowcase } from "./parseMore";
+import { parseComments, parseRecentActivity } from "./activity";
 import { parseSidebar } from "./sidebar";
 import type {
   AchievementShowcase,
@@ -20,7 +21,9 @@ import type {
   CompletionRibbonGroup,
   FavoriteGuideShowcase,
   GameCollectorShowcase,
+  ProfileComments,
   ProfileSidebar,
+  RecentActivity,
   ReplayShowcase,
   Showcase,
   ShowcaseStat,
@@ -37,6 +40,9 @@ export interface ParsedProfilePage {
   showcases: Showcase[];
   /** The right-hand column and favourite badge; missing when the page has none (private). */
   sidebar?: ProfileSidebar;
+  /** Recent Activity and comments, under the showcases. Missing on private pages. */
+  recentActivity?: RecentActivity;
+  comments?: ProfileComments;
 }
 
 export function parseProfilePage(html: string): ParsedProfilePage {
@@ -44,14 +50,17 @@ export function parseProfilePage(html: string): ParsedProfilePage {
   const isProfilePage = Boolean(root.querySelector(".profile_page"));
   const isPrivate = Boolean(root.querySelector("body.private_profile, div.profile_page.private_profile"));
   const sidebar = isPrivate ? undefined : parseSidebar(root);
+  const recentActivity = isPrivate ? undefined : parseRecentActivity(root);
+  const comments = isPrivate ? undefined : parseComments(root);
+  const extras = { sidebar, recentActivity, comments };
   const area = root.querySelector(".profile_customization_area");
-  if (!area) return { isProfilePage, isPrivate, showcases: [], sidebar };
+  if (!area) return { isProfilePage, isPrivate, showcases: [], ...extras };
 
   const showcases = area.children
     .filter((el) => hasClass(el, "profile_customization"))
     .map(parseShowcase)
     .filter((s): s is Showcase => s !== null);
-  return { isProfilePage, isPrivate, showcases, sidebar };
+  return { isProfilePage, isPrivate, showcases, ...extras };
 }
 
 function parseShowcase(el: HTMLElement): Showcase | null {
