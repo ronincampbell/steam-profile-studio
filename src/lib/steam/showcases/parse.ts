@@ -10,9 +10,14 @@
  */
 import { parse, type HTMLElement } from "node-html-parser";
 import type {
+  AchievementShowcase,
   ArtworkShowcase,
   BadgeCollectorShowcase,
+  CompletionistShowcase,
+  CompletionRibbonGroup,
+  FavoriteGuideShowcase,
   GameCollectorShowcase,
+  ReplayShowcase,
   Showcase,
   ShowcaseStat,
 } from "./types";
@@ -30,10 +35,23 @@ export function parseProfilePage(html: string): ParsedProfilePage {
   if (!area) return { isPrivate, showcases: [] };
 
   const showcases = area.children
-    .filter((el) => el.classList.contains("profile_customization"))
+    .filter((el) => hasClass(el, "profile_customization"))
     .map(parseShowcase)
     .filter((s): s is Showcase => s !== null);
   return { isPrivate, showcases };
+}
+
+/**
+ * An element's classes. Read from the class attribute rather than
+ * node-html-parser's classList, which can pick up `class="…"` text from
+ * inside other attributes (Steam's data-tooltip-html holds whole HTML snippets).
+ */
+function classes(el: HTMLElement | null | undefined): string[] {
+  return (el?.getAttribute("class") ?? "").split(/\s+/).filter(Boolean);
+}
+
+function hasClass(el: HTMLElement | null | undefined, name: string): boolean {
+  return classes(el).includes(name);
 }
 
 /** Whitespace-collapsed text of an element ("\n\t\tGame Collector\t" → "Game Collector"). */
@@ -46,17 +64,21 @@ function parseShowcase(el: HTMLElement): Showcase | null {
   const block = el.querySelector(".profile_customization_block");
   if (!block) return null;
 
-  if (el.classList.contains("myart") && block.querySelector(".screenshot_showcase")) {
+  if (hasClass(el, "myart") && block.querySelector(".screenshot_showcase")) {
     return parseArtwork(block, title);
   }
   if (block.querySelector(".gamecollector_showcase")) return parseGameCollector(block, title);
   if (block.querySelector(".badge_showcase")) return parseBadgeCollector(block, title);
+  if (block.querySelector(".favoriteguide_showcase")) return parseFavoriteGuide(block, title);
+  if (block.querySelector(".showcase_achievementscompletionist_games")) return parseCompletionist(block, title);
+  if (hasClass(el, "replay_showcase") && block.querySelector(".replay")) return parseReplay(el, block, title);
+  if (block.querySelector(".achievement_showcase")) return parseAchievement(block, title);
 
   // Not drawn yet: keep its title so the page order stays right, and record
   // which showcase it was. Steam Replay's block holds a link, not a div.
-  const rootClass = el.classList.contains("replay_showcase")
+  const rootClass = hasClass(el, "replay_showcase")
     ? "replay_showcase"
-    : (block.querySelector("div")?.classList.value[0] ?? "unknown");
+    : (classes(block.querySelector("div"))[0] ?? "unknown");
   return { kind: "unsupported", title, rootClass };
 }
 
@@ -66,6 +88,8 @@ function parseStats(scope: HTMLElement | null): ShowcaseStat[] {
     const stat: ShowcaseStat = { value: text(s.querySelector(".value")), label: text(s.querySelector(".label")) };
     const href = s.tagName === "A" ? s.getAttribute("href") : undefined;
     if (href) stat.href = href;
+    const tooltip = s.getAttribute("data-tooltip-text");
+    if (tooltip) stat.tooltip = tooltip;
     return stat;
   });
 }
@@ -122,6 +146,155 @@ function parseBadgeCollector(block: HTMLElement, title: string): BadgeCollectorS
         .map((line) => line.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim())
         .filter(Boolean);
       return [{ href: slot.querySelector("a")?.getAttribute("href") ?? "", image: src, tooltip }];
+    }),
+    stats: parseStats(block.querySelector(".showcase_stats_row")),
+  };
+}
+
+function parseFavoriteGuide(block: HTMLElement, title: string): FavoriteGuideShowcase {
+  const item = block.querySelector(".workshop_showcase_item");
+  const link = item?.querySelector("a.ugc");
+  const image = link?.querySelector("img")?.getAttribute("src");
+  if (!item || !link || !image) return { kind: "favoriteGuide", title, guide: null };
+
+  const contributors = item.querySelector(".guide_showcase_contributors");
+  const authors = (contributors?.querySelectorAll("a") ?? []).map((a) => ({
+    name: text(a),
+    href: a.getAttribute("href") ?? "",
+  }));
+  // The text before the first author link: "Created by - ".
+  const creditPrefix = parse((contributors?.innerHTML ?? "").split(/<a\b/i)[0]).text.replace(/\s+/g, " ").trimStart();
+
+  const starsEl = item.querySelector(".workshop_showcase_stars");
+  const starsImage = starsEl?.querySelector("img")?.getAttribute("src");
+  const appEl = item.querySelector(".workshop_showcase_app");
+  const appLinks = appEl?.querySelectorAll("a") ?? [];
+  const appIcon = appEl?.querySelector("img")?.getAttribute("src");
+  const publishedFileId = link.getAttribute("data-publishedfileid");
+
+  return {
+    kind: "favoriteGuide",
+    title,
+    guide: {
+      href: link.getAttribute("href") ?? "",
+      image,
+      ...(publishedFileId ? { publishedFileId } : {}),
+      name: text(item.querySelector(".showcase_item_detail_title")),
+      creditPrefix,
+      authors,
+      ...(starsEl && starsImage ? { stars: { image: starsImage, text: text(starsEl) } } : {}),
+      ...(appEl && appIcon
+        ? { app: { name: text(appLinks[appLinks.length - 1]), href: appLinks[0]?.getAttribute("href") ?? "", icon: appIcon } }
+        : {}),
+      description: text(item.querySelector(".guide_showcase_item_description")),
+    },
+  };
+}
+
+function parseRibbons(scope: HTMLElement | null): CompletionRibbonGroup[] {
+  if (!scope) return [];
+  return scope.querySelectorAll(".showcase_completion_ribbon_group").map((g) => {
+    const variant =
+      classes(g).find((c) => c !== "showcase_completion_ribbon_group") ?? "base";
+    const group: CompletionRibbonGroup = { variant, trophies: g.querySelectorAll(".showcase_completion_ribbon").length };
+    const count = text(g.querySelector(".showcase_completion_ribbon_count"));
+    if (count) group.count = count;
+    return group;
+  });
+}
+
+function parseCompletionist(block: HTMLElement, title: string): CompletionistShowcase {
+  return {
+    kind: "completionist",
+    title,
+    games: block.querySelectorAll(".showcase_achievementscompletionist_game").flatMap((slot) => {
+      const a = slot.querySelector("a");
+      const image = slot.querySelector("img.game_capsule")?.getAttribute("src");
+      if (!a || !image) return [];
+      const counts = slot.querySelector(".showcase_achievementscompletionist_game_counts");
+      const subtitle = text(counts?.querySelector(".subtitle"));
+      return [
+        {
+          href: a.getAttribute("href") ?? "",
+          image,
+          adultContent: hasClass(slot, "app_has_adult_content"),
+          ribbons: parseRibbons(slot.querySelector(".showcase_achievementscompletionist_game_ribbons")),
+          achievements: text(counts?.querySelector(".num_achievements")),
+          ...(subtitle ? { subtitle } : {}),
+        },
+      ];
+    }),
+    stats: parseStats(block.querySelector(".showcase_stats_row")),
+  };
+}
+
+function parseReplay(el: HTMLElement, block: HTMLElement, title: string): ReplayShowcase {
+  const replay = block.querySelector(".replay")!;
+  const yearClass = classes(replay).find((c) => c.startsWith("replay_background_gradient_"));
+  const year = Number(yearClass?.slice("replay_background_gradient_".length) ?? el.id.match(/(\d{4})$/)?.[1]);
+  const bgImages = replay.querySelectorAll(".background_img_ctn img");
+  const size =
+    classes(bgImages[0]).find((c) => c.endsWith("_background")) ?? "xsmall_capsule_background";
+  const big = replay.querySelector(".big_stat");
+  const href = block.querySelector("a")?.getAttribute("href");
+
+  return {
+    kind: "replay",
+    title,
+    year,
+    ...(href ? { href } : {}),
+    background: { size, images: bgImages.map((i) => i.getAttribute("src") ?? "").filter(Boolean) },
+    gamesPlayed: {
+      value: text(big),
+      highNum: Boolean(hasClass(big, "high_num")),
+      label: text(replay.querySelector(".games_played_title")),
+    },
+    stats: replay.querySelectorAll(".stat_ctn").map((s) => {
+      const mid = s.querySelector(".mid_stat");
+      const key = classes(s).find((c) => c !== "stat_ctn") ?? "";
+      const size = classes(mid).find((c) => c !== "mid_stat") ?? "normal";
+      // The label is the stat's own text after the number.
+      const label = s.childNodes
+        .filter((n) => n !== mid)
+        .map((n) => n.text)
+        .join("")
+        .replace(/\s+/g, " ")
+        .trim();
+      return { key, value: text(mid), size, label };
+    }),
+    mostPlayed: replay.querySelectorAll(".most_played_app").flatMap((app) => {
+      const image = app.querySelector("img")?.getAttribute("src");
+      return image ? [{ image, percent: text(app.querySelector(".most_played_percent")) }] : [];
+    }),
+  };
+}
+
+function parseAchievement(block: HTMLElement, title: string): AchievementShowcase {
+  return {
+    kind: "achievement",
+    title,
+    achievements: block.querySelectorAll(".showcase_achievement").flatMap((slot) => {
+      const a = slot.querySelector("a");
+      const image = a?.querySelector("img")?.getAttribute("src");
+      if (!a || !image) return [];
+      // The hover card is HTML inside data-tooltip-html: name, description,
+      // game and rarity are only there.
+      const tip = parse(slot.getAttribute("data-tooltip-html") ?? "");
+      const field = (sel: string) => text(tip.querySelector(sel)) || undefined;
+      const game = tip.querySelector(".achievement_tooltip_capsule")?.getAttribute("alt");
+      const out: AchievementShowcase["achievements"][number] = {
+        href: a.getAttribute("href") ?? "",
+        image,
+        rare: hasClass(slot, "rare"),
+      };
+      const name = field(".achievement_tooltip_name");
+      const description = field(".achievement_tooltip_desc");
+      const percent = field(".achievement_tooltip_percent");
+      if (name) out.name = name;
+      if (description) out.description = description;
+      if (game) out.game = game;
+      if (percent) out.percent = percent;
+      return [out];
     }),
     stats: parseStats(block.querySelector(".showcase_stats_row")),
   };
