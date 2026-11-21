@@ -10,7 +10,6 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@vercel/functions": "3.10.6",
     "next": "16.4.6",
     "node-html-parser": "^7.1.0",
     "react": "19.3.0",

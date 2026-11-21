@@ -7,9 +7,7 @@
  *   2. profile background: image, or a looping muted video if animated
  *   3. avatar: static, or the animated avatar's GIF
  *   4. avatar frame (animated APNG; static PNG for reduced-motion users)
- *   5. name, real name + country, level badge and favourite badge
- * then the page content: showcases on the left, the right-hand column
- * (status, badges, counts, groups, friends) on the right.
+ *   5. name, real name + country, level badge
  *
  * Class names in the CSS module follow Steam's (profile_header_bg_texture →
  * headerBgTexture and so on) so values can be checked against Steam's CSS.
@@ -21,8 +19,7 @@ import { levelBadge } from "@/lib/steam/level";
 import { themeCssVars } from "@/lib/steam/themes";
 import type { Video } from "@/lib/steam/types";
 import type { ProfileShowcases } from "@/lib/steam/showcases/types";
-import { Showcases, type ShowcaseEditing, type ShowcaseItem } from "@/components/Showcases/Showcases";
-import { HeaderFavoriteBadge, Sidebar } from "./Sidebar";
+import { Showcases } from "@/components/Showcases/Showcases";
 import styles from "./ProfilePreview.module.css";
 
 /** Everything the header draws. Built from a Profile plus whatever the user is trying on. */
@@ -59,21 +56,12 @@ function countryName(code: string): string {
 export function ProfilePreview({
   look,
   showcases,
-  showcaseItems,
-  showcaseEditing,
 }: {
   look: PreviewLook;
   /** The profile's showcases: null while loading, undefined with no profile loaded. */
   showcases?: ProfileShowcases | null;
-  /** The showcases to draw, when they've been edited. Defaults to `showcases` as Steam sent them. */
-  showcaseItems?: ShowcaseItem[];
-  /** Reorder and remove controls over each showcase. */
-  showcaseEditing?: ShowcaseEditing;
 }) {
-  const items =
-    showcaseItems ?? showcases?.showcases.map((showcase, i) => ({ id: String(i), showcase, source: "profile" as const }));
   const bg = look.background;
-  const sidebar = showcases?.sidebar;
   const hasVideo = Boolean(bg?.video?.webm || bg?.video?.mp4);
   const imageRatio = useImageRatio(bg?.image);
   const [videoRatio, setVideoRatio] = useState<{
@@ -162,7 +150,6 @@ export function ProfilePreview({
 
                 <div className={styles.badgeInfo}>
                   {look.level !== null && <Level level={look.level} />}
-                  {sidebar?.favoriteBadge && <HeaderFavoriteBadge badge={sidebar.favoriteBadge} />}
                 </div>
               </div>
             </div>
@@ -171,12 +158,11 @@ export function ProfilePreview({
 
         <div className={styles.content}>
           <div className={styles.contentInner}>
-            {/* div.profile_rightcol comes first in Steam's markup: it floats right. */}
-            {sidebar && <Sidebar sidebar={sidebar} />}
-            {/* div.profile_leftcol: showcases. */}
+            {/* div.profile_leftcol: showcases. The right column (badges,
+                groups, friends) isn't part of the preview yet. */}
             <div className={styles.leftcol}>
-              {items?.length ? <Showcases items={items} editing={showcaseEditing} /> : null}
-              <div className={styles.contentNote}>{showcasesNote(showcases, items, Boolean(showcaseItems))}</div>
+              {showcases?.showcases.length ? <Showcases showcases={showcases.showcases} /> : null}
+              <div className={styles.contentNote}>{showcasesNote(showcases)}</div>
             </div>
             <div className={styles.clearBoth} />
           </div>
@@ -186,25 +172,17 @@ export function ProfilePreview({
   );
 }
 
-function showcasesNote(
-  showcases: ProfileShowcases | null | undefined,
-  items: ShowcaseItem[] | undefined,
-  edited: boolean,
-): string {
-  if (edited && items) {
-    if (!items.length) return "No showcases. Add one from the Showcases panel below.";
-    if (showcases?.visibility === "public") return "Recent activity and comments aren't part of the preview yet.";
-  }
+function showcasesNote(showcases: ProfileShowcases | null | undefined): string {
   if (showcases === undefined) return "Paste a profile to see its showcases.";
   if (showcases === null) return "Loading showcases…";
   switch (showcases.visibility) {
     case "private":
       return "This profile is private, so Steam doesn't show its showcases.";
     case "unavailable":
-      return "Steam is busy, so the showcases will appear once it answers.";
+      return "Steam didn't send this profile's showcases just now. Try again in a minute.";
     default:
       return showcases.showcases.length
-        ? "Recent activity and comments aren't part of the preview yet."
+        ? "Badges, groups, friends and comments aren't part of the preview yet."
         : "This profile has no showcases.";
   }
 }

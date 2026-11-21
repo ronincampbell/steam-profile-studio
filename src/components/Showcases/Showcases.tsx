@@ -6,7 +6,6 @@
  * every size can be checked against Steam's profilev2.css. Showcases the
  * preview can't draw yet show just their title bar, so the order stays right.
  */
-"use client";
 /* eslint-disable @next/next/no-img-element -- Steam's own resized images, loaded as-is. */
 import type {
   AchievementShowcase,
@@ -19,90 +18,23 @@ import type {
   Showcase,
   ShowcaseStat,
 } from "@/lib/steam/showcases/types";
-import type { MouseEvent } from "react";
-import { useReorderDrag } from "@/components/Studio/useReorderDrag";
-import { NO_LINK } from "@/lib/studio/showcaseEditor";
 import styles from "./Showcases.module.css";
 import replay from "./Replay.module.css";
 
-/** One showcase on the preview. */
-export interface ShowcaseItem {
-  id: string;
-  showcase: Showcase;
-  /** "placeholder": Steam's markup for this type isn't captured, so a marked box is drawn instead. */
-  source?: "profile" | "sample" | "placeholder";
-}
-
-/** Editing controls. Without them the showcases are drawn exactly as Steam does. */
-export interface ShowcaseEditing {
-  onMove: (from: number, to: number) => void;
-  onRemove: (id: string) => void;
-}
-
-export function Showcases({ items, editing }: { items: ShowcaseItem[]; editing?: ShowcaseEditing }) {
-  const drag = useReorderDrag(editing?.onMove ?? (() => {}));
+export function Showcases({ showcases }: { showcases: Showcase[] }) {
   return (
-    // Sample content links nowhere: ignore clicks on those links.
-    <div className={styles.area} data-testid="showcases" onClickCapture={ignoreEmptyLinks}>
-      {items.map((item, i) => {
-        const drop = drag.dropAt?.index === i ? drag.dropAt.side : undefined;
-        return (
-          <ShowcaseBox
-            key={item.id}
-            item={item}
-            editing={
-              editing && {
-                index: i,
-                count: items.length,
-                drop,
-                dragging: drag.dragging === i,
-                handleProps: drag.handleProps(i, "[data-showcase]"),
-                targetProps: drag.targetProps(i),
-                onMove: editing.onMove,
-                onRemove: () => editing.onRemove(item.id),
-              }
-            }
-          />
-        );
-      })}
+    <div className={styles.area} data-testid="showcases">
+      {showcases.map((s, i) => (
+        <ShowcaseBox key={i} showcase={s} />
+      ))}
     </div>
   );
 }
 
-function ignoreEmptyLinks(e: MouseEvent<HTMLElement>) {
-  const link = (e.target as Element).closest("a");
-  if (link?.getAttribute("href") === NO_LINK) e.preventDefault();
-}
-
-interface BoxEditing {
-  index: number;
-  count: number;
-  drop?: "before" | "after";
-  dragging: boolean;
-  handleProps: ReturnType<ReturnType<typeof useReorderDrag>["handleProps"]>;
-  targetProps: ReturnType<ReturnType<typeof useReorderDrag>["targetProps"]>;
-  onMove: (from: number, to: number) => void;
-  onRemove: () => void;
-}
-
-function ShowcaseBox({ item, editing }: { item: ShowcaseItem; editing?: BoxEditing }) {
-  const { showcase } = item;
+function ShowcaseBox({ showcase }: { showcase: Showcase }) {
   const isArt = showcase.kind === "artwork";
-  const editClasses = editing
-    ? [
-        styles.editable,
-        editing.dragging ? styles.dragging : "",
-        editing.drop === "before" ? styles.dropBefore : "",
-        editing.drop === "after" ? styles.dropAfter : "",
-      ].join(" ")
-    : "";
   return (
-    <div
-      className={`${styles.customization} ${isArt ? styles.myart : ""} ${editClasses}`}
-      data-showcase={showcase.kind}
-      data-source={item.source}
-      {...editing?.targetProps}
-    >
+    <div className={`${styles.customization} ${isArt ? styles.myart : ""}`} data-showcase={showcase.kind}>
       {/* Steam hides the Artwork showcase's header with CSS; so do we. */}
       {!isArt && <div className={styles.header}>{showcase.title}</div>}
       <div className={`${styles.block} ${showcase.kind === "replay" ? styles.replayBlock : ""}`}>
@@ -113,59 +45,10 @@ function ShowcaseBox({ item, editing }: { item: ShowcaseItem; editing?: BoxEditi
         {showcase.kind === "completionist" && <Completionist showcase={showcase} />}
         {showcase.kind === "replay" && <Replay showcase={showcase} />}
         {showcase.kind === "achievement" && <Achievement showcase={showcase} />}
-        {showcase.kind === "unsupported" &&
-          (item.source === "placeholder" ? (
-            <div className={`${styles.contentBg} ${styles.placeholder}`}>
-              Placeholder. Steam&apos;s layout for this showcase hasn&apos;t been captured yet, so the preview
-              can&apos;t draw it.
-            </div>
-          ) : (
-            <div className={styles.unsupported}>This showcase isn&apos;t in the preview yet.</div>
-          ))}
+        {showcase.kind === "unsupported" && (
+          <div className={styles.unsupported}>This showcase isn&apos;t in the preview yet.</div>
+        )}
       </div>
-      {editing && (
-        // Floats over the showcase on hover, so it never moves Steam's layout.
-        <div className={styles.editBar} role="group" aria-label={`${showcase.title} controls`}>
-          <button
-            type="button"
-            className={`${styles.editButton} ${styles.dragHandle}`}
-            title="Drag to reorder"
-            aria-label="Drag to reorder"
-            {...editing.handleProps}
-          >
-            ⠿
-          </button>
-          <button
-            type="button"
-            className={styles.editButton}
-            title="Move up"
-            aria-label="Move up"
-            disabled={editing.index === 0}
-            onClick={() => editing.onMove(editing.index, editing.index - 1)}
-          >
-            ↑
-          </button>
-          <button
-            type="button"
-            className={styles.editButton}
-            title="Move down"
-            aria-label="Move down"
-            disabled={editing.index === editing.count - 1}
-            onClick={() => editing.onMove(editing.index, editing.index + 1)}
-          >
-            ↓
-          </button>
-          <button
-            type="button"
-            className={styles.editButton}
-            title="Remove"
-            aria-label={`Remove ${showcase.title}`}
-            onClick={editing.onRemove}
-          >
-            ✕
-          </button>
-        </div>
-      )}
     </div>
   );
 }
