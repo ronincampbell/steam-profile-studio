@@ -196,7 +196,7 @@ export function FavoriteGameView({ showcase }: { showcase: FavoriteGameShowcase 
   );
 }
 
-function GameInfo({ info }: { info: GameInfoStats }) {
+export function GameInfo({ info }: { info: GameInfoStats }) {
   const ach = info.achievements;
   const achievements = ach && (
     <div className={styles.gameInfoAchievements}>
@@ -228,17 +228,24 @@ function GameInfo({ info }: { info: GameInfoStats }) {
         </div>
       </div>
       <div className={styles.achievementIcons}>
+        {/* Steam's markup has whitespace between these inline blocks, which adds a space's width to each gap. */}
         {ach.icons.map((icon, i) => (
-          <div key={i} className={styles.gameInfoAchievement} title={icon.name}>
-            <a href={icon.href} {...ext}>
-              <img src={icon.image} alt={icon.name} />
-            </a>
-          </div>
+          <Fragment key={i}>
+            {i > 0 && " "}
+            <div className={styles.gameInfoAchievement} title={icon.name}>
+              <a href={icon.href} {...ext}>
+                <img src={icon.image} alt={icon.name} />
+              </a>
+            </div>
+          </Fragment>
         ))}
         {ach.more && (
-          <a className={cx(styles.gameInfoAchievement, styles.plusMore)} href={ach.more.href} {...ext}>
-            {ach.more.text}
-          </a>
+          <>
+            {ach.icons.length > 0 && " "}
+            <a className={cx(styles.gameInfoAchievement, styles.plusMore)} href={ach.more.href} {...ext}>
+              {ach.more.text}
+            </a>
+          </>
         )}
       </div>
     </div>

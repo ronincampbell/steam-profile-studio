@@ -190,7 +190,7 @@ function parseFavoriteGame(block: HTMLElement, title: string): FavoriteGameShowc
   };
 }
 
-function parseGameInfo(info: HTMLElement): GameInfoStats {
+export function parseGameInfo(info: HTMLElement): GameInfoStats {
   const out: GameInfoStats = { files: [] };
   const ach = info.querySelector(".game_info_achievements");
   if (ach) {

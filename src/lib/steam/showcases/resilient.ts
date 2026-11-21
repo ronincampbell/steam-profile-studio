@@ -213,7 +213,15 @@ export function createShowcaseLoader(options: ShowcaseLoaderOptions = {}) {
       ok: true,
       value: page.isPrivate
         ? { steamId, visibility: "private", showcases: [], fetchedAt }
-        : { steamId, visibility: "public", showcases: page.showcases, sidebar: page.sidebar, fetchedAt },
+        : {
+            steamId,
+            visibility: "public",
+            showcases: page.showcases,
+            sidebar: page.sidebar,
+            recentActivity: page.recentActivity,
+            comments: page.comments,
+            fetchedAt,
+          },
     };
   }
 

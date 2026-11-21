@@ -376,6 +376,65 @@ export interface ProfileShowcases {
   staleBecause?: "rate-limited" | "steam-error";
   /** The right-hand column and the favourite badge, read from the same page. */
   sidebar?: ProfileSidebar;
+  /** The Recent Activity box under the showcases. Missing when Steam shows none. */
+  recentActivity?: RecentActivity;
+  /** The first page of profile comments. Missing when comments are off. */
+  comments?: ProfileComments;
+}
+
+/* ---------- Recent Activity and Comments (bottom of div.profile_leftcol) ---------- */
+
+/** One game in Recent Activity (div.recent_game). */
+export interface RecentGame {
+  name: string;
+  href: string;
+  /** The 184×69 store capsule. */
+  capsule: string;
+  /** "396 hrs on record" */
+  hours: string;
+  /** "last played on Nov 14" or "Currently In-Game". */
+  lastPlayed: string;
+  /** Achievements, badge and review links, as under a Favorite Game. */
+  info?: GameInfoStats;
+}
+
+export interface RecentActivity {
+  /** "11.2 hours past 2 weeks" */
+  playtime?: string;
+  games: RecentGame[];
+  /** "All Recently Played", "Wishlist", "Reviews" under the games. */
+  links: { text: string; href: string }[];
+}
+
+export interface ProfileComment {
+  /** Steam's comment id. */
+  id: string;
+  author: {
+    name: string;
+    href: string;
+    avatar: string;
+    /** 2× avatar for sharp screens. */
+    avatar2x?: string;
+    state: PersonaState;
+    /** The commenter's avatar frame, still and animated. */
+    frame?: { image: string; animatedImage?: string };
+  };
+  /** As Steam prints it: "Jun 12 @ 2:29am". */
+  time: string;
+  /** Hover text: "June 12, 2026 @ 2:29:43 am PST". */
+  timeTitle: string;
+  /** The comment as cleaned HTML (see sanitizeNotes). */
+  html: string;
+}
+
+export interface ProfileComments {
+  total: number;
+  /** Comments per page (6 on profiles). */
+  pageSize: number;
+  /** "https://steamcommunity.com/id/Fuzzycast/allcomments" */
+  allHref: string;
+  /** The newest page, as Steam serves it. */
+  list: ProfileComment[];
 }
 
 /* ---------- Right-hand column (div.profile_rightcol) ---------- */

@@ -1,0 +1,393 @@
+/*
+ * Recent Activity and Comments, from Steam's profilev2.css (profile-specific
+ * overrides), globalv2.css (comment threads) and shared_global.css (page
+ * buttons, player avatars). Each rule names the Steam selector it copies.
+ */
+
+/* .whiteLink (globalv2.css) */
+.whiteLink {
+  color: #ebebeb;
+  text-decoration: none;
+}
+.whiteLink:hover {
+  color: #66c0f4;
+}
+
+/* ---------- Recent Activity ---------- */
+
+/* .profile_recentgame_header (on top of .profile_customization_header) */
+.recentHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+/* .recentgame_quicklinks */
+.quicklinks {
+  float: inline-end;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* .link_separator: Steam gives it no rule of its own, so it keeps the page grey */
+.linkSeparator {
+  color: inherit;
+}
+
+/* <div style="clear: inline-end;"> */
+.clearEnd {
+  clear: inline-end;
+}
+
+/* .recent_game */
+.recentGame {
+  backdrop-filter: blur(20px);
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  margin-bottom: 21px;
+}
+
+/* .recent_game_content */
+.recentGameContent {
+  padding: 8px 10px;
+}
+
+/* .recent_game .game_info */
+.gameInfo {
+  position: relative;
+  height: 69px;
+}
+
+/* .recent_game .game_info .game_info_cap */
+.gameInfoCap {
+  float: inline-start;
+  margin-inline-end: 8px;
+  width: 184px;
+  max-width: 33%;
+}
+
+/* .recent_game .game_info .game_info_cap img */
+.gameInfoCap img {
+  display: block;
+  width: 100%;
+}
+
+/* .recent_game .game_info .game_info_details */
+.gameInfoDetails {
+  position: absolute;
+  inset-inline-end: 0;
+  bottom: 0;
+  text-align: end;
+  line-height: 19px; /* measured: Motiva Sans at 13px, so the Arial fallback lines up too */
+}
+
+/* .recent_game .game_info .game_name */
+.gameName {
+  padding-top: 10px;
+  font-size: 14px;
+}
+
+/* ---------- Comments ---------- */
+
+/* .profile_comment_area */
+.commentArea {
+  margin-top: 84px;
+  backdrop-filter: blur(20px);
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+/* .commentthread_area */
+.threadArea {
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+/*
+ * .commentthread_header (globalv2.css) with .profile_comment_area
+ * .commentthread_header (profilev2.css) on top.
+ */
+.threadHeader {
+  margin-bottom: 1px;
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  flex-direction: column;
+  background: var(--color-showcase-header);
+  background: linear-gradient(90deg, var(--gradient-showcase-header-left) 0%, var(--color-showcase-header) 90%);
+  font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
+  font-weight: 200;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 30px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* .profile_comment_area .commentthread_header_and_count */
+.headerAndCount {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* .commentthread_count_label (+ .ellipsis) */
+.countLabel {
+  margin-inline-end: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* .profile_comment_area .commentthread_header .commentthread_paging */
+.paging {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* .profile_comment_area .commentthread_header .commentthread_allcommentslink */
+.allCommentsLink {
+  margin-inline-end: 12px;
+  font-size: 12px;
+  font-family: Arial, Helvetica, Verdana, sans-serif;
+  color: #ebebeb;
+  text-decoration: none;
+}
+.allCommentsLink:hover {
+  text-decoration: underline;
+}
+
+/* .commentthread_pagelinks_ctn */
+.pageLinksCtn {
+  height: fit-content;
+  line-height: normal;
+}
+
+/* .pagebtn (shared_global.css) + .profile_comment_area .pagebtn */
+.pageBtn {
+  padding: 0 16px;
+  display: inline-block;
+  border: 1px transparent;
+  border-radius: 3px;
+  background-color: #ffffff20;
+  cursor: pointer;
+  color: white;
+  text-decoration: none;
+  line-height: 16px;
+}
+.pageBtn:first-child {
+  margin-inline-end: 4px;
+}
+.pageBtn:last-child {
+  margin-inline-start: 4px;
+}
+.pageBtn:not(.disabled):hover {
+  background-color: #66c0f4;
+  color: #fff;
+}
+.pageBtn.disabled {
+  cursor: default;
+  opacity: 0.2;
+}
+
+/* .commentthread_pagelinks */
+.pageLinks {
+  margin: 0 8px;
+}
+
+/* .commentthread_pagelink */
+.pageLink {
+  cursor: pointer;
+  color: #ffffff;
+  text-decoration: none;
+}
+.pageLink:hover {
+  text-decoration: underline;
+}
+.pageLink.active {
+  cursor: default;
+  color: #939393;
+  text-decoration: none;
+}
+
+/* .profile_comment_area .commentthread_comment_container */
+.commentContainer {
+  margin-top: 9px;
+  border-radius: 5px;
+  padding-block: 10px;
+  padding-inline: 0 10px;
+}
+
+/* .commentthread_comment */
+.comment {
+  position: relative;
+  padding-bottom: 8px;
+  padding-top: 8px;
+  padding-inline-start: 11px;
+  margin-bottom: 8px;
+  min-height: 40px;
+  overflow: hidden;
+}
+
+/* .commentthread_comment_content */
+.commentContent {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* .commentthread_comment_author */
+.commentAuthor {
+  line-height: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+/* .profile_comment_area .author_name_group */
+.authorNameGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+/* .commentthread_comment_author .flex_row */
+.flexRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* .commentthread_comment_author a + a.hoverunderline */
+.authorLink {
+  font-size: 14px;
+  color: #ebebeb;
+  text-decoration: none;
+}
+.authorLink:hover {
+  text-decoration: underline;
+}
+
+/* .commentthread_comment_timestamp, colour from profilev2.css */
+.timestamp {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  flex-grow: 1;
+}
+
+/* .commentthread_comment_text, colour from profilev2.css */
+.comment .commentText {
+  font-size: 13px;
+  color: #ffffff;
+  word-wrap: break-word;
+  overflow-y: auto;
+  max-height: 400px;
+  line-height: 18px;
+  padding-inline-start: 52px;
+}
+
+/* .commentthread_comment_text a */
+.comment .commentText a {
+  color: #c6d4df;
+  text-decoration: underline;
+}
+.comment .commentText a:hover {
+  color: #ebebeb;
+}
+
+/* img.emoticon (globalv2.css) */
+.commentText :global(img.emoticon) {
+  vertical-align: text-bottom;
+  height: 18px;
+  width: 18px;
+}
+
+/*
+ * .commentthread_footer (globalv2.css) with .profile_comment_area
+ * .commentthread_footer (profilev2.css) on top.
+ */
+.threadFooter {
+  font-size: 14px;
+  line-height: 24px;
+  margin-bottom: 1px;
+  padding-bottom: 15px;
+  padding-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-inline: 10px;
+}
+
+/* .commentthread_paging (globalv2.css) */
+.footerPaging {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* ---------- Commenter avatar (.playerAvatar, shared_global.css) ---------- */
+
+.playerAvatar {
+  width: 34px;
+  height: 34px;
+  position: relative;
+  border-radius: 0;
+  padding: 1px;
+  flex-shrink: 0;
+}
+.playerAvatar img {
+  display: block;
+  width: 32px;
+  height: 32px;
+  padding: 1px;
+  border-radius: 0;
+  border: none;
+}
+.playerAvatar.offline {
+  background: linear-gradient(to bottom, rgba(106, 106, 106, 1) 5%, rgba(85, 85, 85, 1) 95%);
+}
+.playerAvatar.offline img {
+  background: linear-gradient(to bottom, #515151 5%, #474747 95%);
+}
+.playerAvatar.online {
+  background: linear-gradient(to bottom, rgba(83, 164, 196, 1) 5%, rgba(69, 128, 151, 1) 95%);
+}
+.playerAvatar.online img {
+  background: linear-gradient(to bottom, #41778f 5%, #3d697b 95%);
+}
+.playerAvatar.inGame {
+  background: linear-gradient(to bottom, rgba(143, 185, 59, 1) 5%, rgba(110, 140, 49, 1) 95%);
+}
+.playerAvatar.inGame img {
+  background: linear-gradient(to bottom, #66812e 5%, #59702b 95%);
+}
+
+/* .playerAvatar .profile_avatar_frame */
+.avatarFrame {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* .playerAvatar .profile_avatar_frame > picture > img */
+.playerAvatar .avatarFrame img {
+  transform: scale(1.23);
+  width: 32px;
+  height: 32px;
+  background: none;
+}
