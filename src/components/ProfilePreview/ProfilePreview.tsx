@@ -1,3 +1,4 @@
+"use client";
 /**
  * A Steam profile page header, rebuilt to match Steam's own markup and CSS.
  *
@@ -13,7 +14,7 @@
  */
 /* eslint-disable @next/next/no-img-element -- Steam's CDN images, APNGs and
    GIFs go straight to <img>; next/image would re-encode them and lose the animation. */
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { levelBadge } from "@/lib/steam/level";
 import { themeCssVars } from "@/lib/steam/themes";
 import type { Video } from "@/lib/steam/types";
@@ -35,11 +36,16 @@ export interface PreviewLook {
   themeId?: string;
 }
 
-const COUNTRY_FLAGS = "https://community.fastly.steamstatic.com/public/images/countryflags/";
+const COUNTRY_FLAGS =
+  "https://community.fastly.steamstatic.com/public/images/countryflags/";
 
 function countryName(code: string): string {
   try {
-    return new Intl.DisplayNames(["en"], { type: "region" }).of(code.toUpperCase()) ?? code;
+    return (
+      new Intl.DisplayNames(["en"], { type: "region" }).of(
+        code.toUpperCase(),
+      ) ?? code
+    );
   } catch {
     return code;
   }
@@ -48,83 +54,145 @@ function countryName(code: string): string {
 export function ProfilePreview({ look }: { look: PreviewLook }) {
   const bg = look.background;
   const hasVideo = Boolean(bg?.video?.webm || bg?.video?.mp4);
+  const imageRatio = useImageRatio(bg?.image);
+  const [videoRatio, setVideoRatio] = useState<{
+    src: string;
+    ratio: number;
+  } | null>(null);
+  const videoSrc = bg?.video?.webm ?? bg?.video?.mp4;
+  const ratio =
+    (hasVideo && videoRatio && videoRatio.src === videoSrc
+      ? videoRatio.ratio
+      : undefined) ?? imageRatio;
+
   const pageStyle = {
     ...themeCssVars(look.themeId),
     backgroundImage: bg?.image && !hasVideo ? `url("${bg.image}")` : undefined,
+    // Height ÷ width of the background, so the page can be as tall as it.
+    "--bg-ratio": bg ? String(ratio ?? 1080 / 1920) : undefined,
   } as CSSProperties;
 
   return (
-    <div
-      className={`${styles.profilePage} ${bg ? styles.hasProfileBackground : ""}`}
-      style={pageStyle}
-      data-testid="profile-preview"
-    >
-      {hasVideo && (
-        <div className={styles.animatedBackground}>
-          {/* key: a new video needs a fresh element, or the old one keeps playing */}
-          <video key={bg!.video!.webm ?? bg!.video!.mp4} playsInline autoPlay muted loop poster={bg!.image}>
-            {bg!.video!.webm && <source src={bg!.video!.webm} type="video/webm" />}
-            {bg!.video!.mp4 && <source src={bg!.video!.mp4} type="video/mp4" />}
-          </video>
-        </div>
-      )}
+    <div className={styles.container}>
+      <div
+        className={`${styles.profilePage} ${bg ? styles.hasProfileBackground : ""}`}
+        style={pageStyle}
+        data-testid="profile-preview"
+      >
+        {hasVideo && (
+          <div className={styles.animatedBackground}>
+            {/* key: a new video needs a fresh element, or the old one keeps playing */}
+            <video
+              key={videoSrc}
+              playsInline
+              autoPlay
+              muted
+              loop
+              poster={bg!.image}
+              onLoadedMetadata={(e) => {
+                const v = e.currentTarget;
+                if (v.videoWidth)
+                  setVideoRatio({
+                    src: videoSrc!,
+                    ratio: v.videoHeight / v.videoWidth,
+                  });
+              }}
+            >
+              {bg!.video!.webm && (
+                <source src={bg!.video!.webm} type="video/webm" />
+              )}
+              {bg!.video!.mp4 && (
+                <source src={bg!.video!.mp4} type="video/mp4" />
+              )}
+            </video>
+          </div>
+        )}
 
-      <div className={styles.headerBg}>
-        <div className={styles.headerBgTexture}>
-          <div className={styles.header}>
-            <div className={styles.headerContent}>
-              <Avatar look={look} />
+        <div className={styles.headerBg}>
+          <div className={styles.headerBgTexture}>
+            <div className={styles.header}>
+              <div className={styles.headerContent}>
+                <Avatar look={look} />
 
-              <div className={styles.centeredCol}>
-                <div className={styles.centeredPersona}>
-                  <div className={styles.personaName}>
-                    <span>{look.name}</span> <span className={styles.nameArrow} aria-hidden />
-                  </div>
-                  {(look.realName || look.countryCode) && (
-                    <div className={styles.realName}>
-                      {look.realName && <bdi>{look.realName}</bdi>}{" "}
-                      {look.countryCode && (
-                        <div className={styles.location}>
-                          {" "}
-                          <img
-                            className={styles.flag}
-                            src={`${COUNTRY_FLAGS}${look.countryCode.toLowerCase()}.gif`}
-                            alt=""
-                          />{" "}
-                          {countryName(look.countryCode)}
-                        </div>
-                      )}
+                <div className={styles.centeredCol}>
+                  <div className={styles.centeredPersona}>
+                    <div className={styles.personaName}>
+                      <span>{look.name}</span>{" "}
+                      <span className={styles.nameArrow} aria-hidden />
                     </div>
-                  )}
+                    {(look.realName || look.countryCode) && (
+                      <div className={styles.realName}>
+                        {look.realName && <bdi>{look.realName}</bdi>}{" "}
+                        {look.countryCode && (
+                          <div className={styles.location}>
+                            {" "}
+                            <img
+                              className={styles.flag}
+                              src={`${COUNTRY_FLAGS}${look.countryCode.toLowerCase()}.gif`}
+                              alt=""
+                            />{" "}
+                            {countryName(look.countryCode)}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div className={styles.badgeInfo}>
-                {look.level !== null && <Level level={look.level} />}
+                <div className={styles.badgeInfo}>
+                  {look.level !== null && <Level level={look.level} />}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className={styles.content}>
-        <div className={styles.contentNote}>
-          Showcases, badges and comments aren&apos;t part of the preview yet.
+        <div className={styles.content}>
+          <div className={styles.contentNote}>
+            Showcases, badges and comments aren&apos;t part of the preview yet.
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
+/** Height ÷ width of an image, once it has loaded. */
+function useImageRatio(src: string | undefined) {
+  const [loaded, setLoaded] = useState<{ src: string; ratio: number } | null>(
+    null,
+  );
+  useEffect(() => {
+    if (!src) return;
+    const img = new Image();
+    img.onload = () => {
+      if (img.naturalWidth)
+        setLoaded({ src, ratio: img.naturalHeight / img.naturalWidth });
+    };
+    img.src = src;
+    return () => {
+      img.onload = null;
+    };
+  }, [src]);
+  return loaded && loaded.src === src ? loaded.ratio : undefined;
+}
+
 function Avatar({ look }: { look: PreviewLook }) {
   const anim = look.animatedAvatar;
   return (
-    <div className={`${styles.playerAvatar} ${styles[look.status === "in-game" ? "inGame" : look.status]}`}>
+    <div
+      className={`${styles.playerAvatar} ${styles[look.status === "in-game" ? "inGame" : look.status]}`}
+    >
       <div className={styles.avatarInner}>
         {look.frame && (
           <div className={styles.avatarFrame}>
             <picture>
-              {look.frame.image && <source media="(prefers-reduced-motion: reduce)" srcSet={look.frame.image} />}
+              {look.frame.image && (
+                <source
+                  media="(prefers-reduced-motion: reduce)"
+                  srcSet={look.frame.image}
+                />
+              )}
               <img src={look.frame.animatedImage ?? look.frame.image} alt="" />
             </picture>
           </div>
@@ -134,7 +202,10 @@ function Avatar({ look }: { look: PreviewLook }) {
             media="(prefers-reduced-motion: reduce)"
             srcSet={anim?.image ?? look.avatar}
           />
-          <img src={anim?.animatedImage ?? anim?.image ?? look.avatar} alt={`${look.name}'s avatar`} />
+          <img
+            src={anim?.animatedImage ?? anim?.image ?? look.avatar}
+            alt={`${look.name}'s avatar`}
+          />
         </picture>
       </div>
     </div>
@@ -146,7 +217,10 @@ function Level({ level }: { level: number }) {
   const style: CSSProperties =
     badge.kind === "ring"
       ? { borderColor: badge.borderColor }
-      : { backgroundImage: `url("${badge.image}")`, backgroundPosition: badge.position };
+      : {
+          backgroundImage: `url("${badge.image}")`,
+          backgroundPosition: badge.position,
+        };
   return (
     <div className={`${styles.personaName} ${styles.personaLevel}`}>
       Level{" "}

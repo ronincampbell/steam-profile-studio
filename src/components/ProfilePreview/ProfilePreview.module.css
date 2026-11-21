@@ -14,13 +14,17 @@
   box-sizing: content-box;
 }
 
+/* Lets the page size itself from its own width (cqw units below). */
+.container {
+  container-type: inline-size;
+}
+
 /* div.profile_page (+ .has_profile_background, .full_width_background) */
 .profilePage {
   position: relative;
   display: flex;
   flex-direction: column;
   min-width: 976px;
-  padding-bottom: 48px;
   overflow: hidden;
   color: #8f98a0;
   font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
@@ -35,6 +39,10 @@
 .hasProfileBackground {
   /* Steam: natural size up to 1920px wide windows, then stretch to 100%. */
   background-size: max(100%, 1920px) auto;
+  /* Not Steam: its showcases make the page long enough to show the whole
+     background. Until we draw showcases, make the page at least as tall as
+     the background (drawn max(100%, 1920px) wide). */
+  min-height: calc(max(100cqw, 1920px) * var(--bg-ratio, 0.5625));
 }
 
 /* .profile_animated_background */
@@ -251,6 +259,7 @@
 /* .profile_content.has_profile_background */
 .content {
   position: relative;
+  flex: 1 0 auto;
   width: 952px;
   min-height: 360px;
   margin: 0 auto;
