@@ -97,6 +97,7 @@ describe("normalizeProfile", () => {
       avatar: "https://avatars.steamstatic.com/7a0d41286fbdaec5d200908e9f90a60d6ed1184c_full.jpg",
       countryCode: "AU",
       level: 75,
+      status: "online",
       isPublic: true,
       themeId: "Steel",
       equipped: {},

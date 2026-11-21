@@ -86,6 +86,8 @@ export interface Profile {
   countryCode?: string;
   /** null when Steam won't say (private profile). */
   level: number | null;
+  /** Drives the coloured edge around the avatar, as on Steam. */
+  status: "online" | "offline" | "in-game";
   /** Private and friends-only profiles show only name and avatar on Steam. */
   isPublic: boolean;
   /** Steam theme id from GetProfileCustomization, e.g. "Steel"; absent = default. */

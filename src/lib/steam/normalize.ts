@@ -57,6 +57,10 @@ export interface RawPlayerSummary {
   avatarfull: string;
   communityvisibilitystate: number;
   loccountrycode?: string;
+  /** 0 offline, 1 online, 2 busy, 3 away, 4 snooze, 5 looking to trade, 6 looking to play. */
+  personastate?: number;
+  /** Set while the player is in a game. */
+  gameid?: string;
 }
 
 /* ---------- Catalogue ---------- */
@@ -167,6 +171,7 @@ export function normalizeProfile(
     avatar: summary.avatarfull,
     countryCode: summary.loccountrycode || undefined,
     level,
+    status: summary.gameid ? "in-game" : summary.personastate ? "online" : "offline",
     // 3 = public; 1 = private or friends-only, as far as the Web API says.
     isPublic: summary.communityvisibilitystate === 3,
     themeId: themeId || undefined,

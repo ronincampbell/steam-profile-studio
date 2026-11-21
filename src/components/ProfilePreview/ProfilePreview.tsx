@@ -1,0 +1,162 @@
+/**
+ * A Steam profile page header, rebuilt to match Steam's own markup and CSS.
+ *
+ * Layers, bottom to top (CLAUDE.md "Architecture sketch"):
+ *   1. page black + theme colours (CSS variables from src/lib/steam/themes.ts)
+ *   2. profile background: image, or a looping muted video if animated
+ *   3. avatar: static, or the animated avatar's GIF
+ *   4. avatar frame (animated APNG; static PNG for reduced-motion users)
+ *   5. name, real name + country, level badge
+ *
+ * Class names in the CSS module follow Steam's (profile_header_bg_texture →
+ * headerBgTexture and so on) so values can be checked against Steam's CSS.
+ */
+/* eslint-disable @next/next/no-img-element -- Steam's CDN images, APNGs and
+   GIFs go straight to <img>; next/image would re-encode them and lose the animation. */
+import type { CSSProperties } from "react";
+import { levelBadge } from "@/lib/steam/level";
+import { themeCssVars } from "@/lib/steam/themes";
+import type { Video } from "@/lib/steam/types";
+import styles from "./ProfilePreview.module.css";
+
+/** Everything the header draws. Built from a Profile plus whatever the user is trying on. */
+export interface PreviewLook {
+  name: string;
+  realName?: string;
+  countryCode?: string;
+  level: number | null;
+  status: "online" | "offline" | "in-game";
+  /** The avatar image (Steam's 184×184, or an uploaded picture). */
+  avatar: string;
+  /** Animated avatar (GIF) shown in place of `avatar`, with its static fallback. */
+  animatedAvatar?: { image?: string; animatedImage?: string };
+  frame?: { image?: string; animatedImage?: string };
+  background?: { image?: string; video?: Video };
+  themeId?: string;
+}
+
+const COUNTRY_FLAGS = "https://community.fastly.steamstatic.com/public/images/countryflags/";
+
+function countryName(code: string): string {
+  try {
+    return new Intl.DisplayNames(["en"], { type: "region" }).of(code.toUpperCase()) ?? code;
+  } catch {
+    return code;
+  }
+}
+
+export function ProfilePreview({ look }: { look: PreviewLook }) {
+  const bg = look.background;
+  const hasVideo = Boolean(bg?.video?.webm || bg?.video?.mp4);
+  const pageStyle = {
+    ...themeCssVars(look.themeId),
+    backgroundImage: bg?.image && !hasVideo ? `url("${bg.image}")` : undefined,
+  } as CSSProperties;
+
+  return (
+    <div
+      className={`${styles.profilePage} ${bg ? styles.hasProfileBackground : ""}`}
+      style={pageStyle}
+      data-testid="profile-preview"
+    >
+      {hasVideo && (
+        <div className={styles.animatedBackground}>
+          {/* key: a new video needs a fresh element, or the old one keeps playing */}
+          <video key={bg!.video!.webm ?? bg!.video!.mp4} playsInline autoPlay muted loop poster={bg!.image}>
+            {bg!.video!.webm && <source src={bg!.video!.webm} type="video/webm" />}
+            {bg!.video!.mp4 && <source src={bg!.video!.mp4} type="video/mp4" />}
+          </video>
+        </div>
+      )}
+
+      <div className={styles.headerBg}>
+        <div className={styles.headerBgTexture}>
+          <div className={styles.header}>
+            <div className={styles.headerContent}>
+              <Avatar look={look} />
+
+              <div className={styles.centeredCol}>
+                <div className={styles.centeredPersona}>
+                  <div className={styles.personaName}>
+                    <span>{look.name}</span> <span className={styles.nameArrow} aria-hidden />
+                  </div>
+                  {(look.realName || look.countryCode) && (
+                    <div className={styles.realName}>
+                      {look.realName && <bdi>{look.realName}</bdi>}{" "}
+                      {look.countryCode && (
+                        <div className={styles.location}>
+                          {" "}
+                          <img
+                            className={styles.flag}
+                            src={`${COUNTRY_FLAGS}${look.countryCode.toLowerCase()}.gif`}
+                            alt=""
+                          />{" "}
+                          {countryName(look.countryCode)}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.badgeInfo}>
+                {look.level !== null && <Level level={look.level} />}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.content}>
+        <div className={styles.contentNote}>
+          Showcases, badges and comments aren&apos;t part of the preview yet.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Avatar({ look }: { look: PreviewLook }) {
+  const anim = look.animatedAvatar;
+  return (
+    <div className={`${styles.playerAvatar} ${styles[look.status === "in-game" ? "inGame" : look.status]}`}>
+      <div className={styles.avatarInner}>
+        {look.frame && (
+          <div className={styles.avatarFrame}>
+            <picture>
+              {look.frame.image && <source media="(prefers-reduced-motion: reduce)" srcSet={look.frame.image} />}
+              <img src={look.frame.animatedImage ?? look.frame.image} alt="" />
+            </picture>
+          </div>
+        )}
+        <picture>
+          <source
+            media="(prefers-reduced-motion: reduce)"
+            srcSet={anim?.image ?? look.avatar}
+          />
+          <img src={anim?.animatedImage ?? anim?.image ?? look.avatar} alt={`${look.name}'s avatar`} />
+        </picture>
+      </div>
+    </div>
+  );
+}
+
+function Level({ level }: { level: number }) {
+  const badge = levelBadge(level);
+  const style: CSSProperties =
+    badge.kind === "ring"
+      ? { borderColor: badge.borderColor }
+      : { backgroundImage: `url("${badge.image}")`, backgroundPosition: badge.position };
+  return (
+    <div className={`${styles.personaName} ${styles.personaLevel}`}>
+      Level{" "}
+      <div
+        className={`${styles.friendPlayerLevel} ${badge.kind === "sprite" ? styles.levelSprite : ""}`}
+        style={style}
+        data-level-class={badge.className}
+      >
+        <span className={styles.friendPlayerLevelNum}>{badge.level}</span>
+      </div>
+    </div>
+  );
+}
