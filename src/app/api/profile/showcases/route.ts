@@ -1,8 +1,9 @@
 /**
  * GET /api/profile/showcases?id=<SteamID64>
  *
- * The profile's showcases (see src/lib/steam/showcases/types.ts), read from
- * its public Steam profile page. Separate from /api/profile so the header
+ * The profile's showcases and right-hand column (see
+ * src/lib/steam/showcases/types.ts), read from its public Steam profile page.
+ * Separate from /api/profile so the header
  * never waits on the slower page load: the preview asks for this once the
  * profile has loaded, using the SteamID64 /api/profile resolved.
  *

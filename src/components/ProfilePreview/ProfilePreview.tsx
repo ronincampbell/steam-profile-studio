@@ -7,7 +7,9 @@
  *   2. profile background: image, or a looping muted video if animated
  *   3. avatar: static, or the animated avatar's GIF
  *   4. avatar frame (animated APNG; static PNG for reduced-motion users)
- *   5. name, real name + country, level badge
+ *   5. name, real name + country, level badge and favourite badge
+ * then the page content: showcases on the left, the right-hand column
+ * (status, badges, counts, groups, friends) on the right.
  *
  * Class names in the CSS module follow Steam's (profile_header_bg_texture →
  * headerBgTexture and so on) so values can be checked against Steam's CSS.
@@ -20,6 +22,7 @@ import { themeCssVars } from "@/lib/steam/themes";
 import type { Video } from "@/lib/steam/types";
 import type { ProfileShowcases } from "@/lib/steam/showcases/types";
 import { Showcases, type ShowcaseEditing, type ShowcaseItem } from "@/components/Showcases/Showcases";
+import { HeaderFavoriteBadge, Sidebar } from "./Sidebar";
 import styles from "./ProfilePreview.module.css";
 
 /** Everything the header draws. Built from a Profile plus whatever the user is trying on. */
@@ -70,6 +73,7 @@ export function ProfilePreview({
   const items =
     showcaseItems ?? showcases?.showcases.map((showcase, i) => ({ id: String(i), showcase, source: "profile" as const }));
   const bg = look.background;
+  const sidebar = showcases?.sidebar;
   const hasVideo = Boolean(bg?.video?.webm || bg?.video?.mp4);
   const imageRatio = useImageRatio(bg?.image);
   const [videoRatio, setVideoRatio] = useState<{
@@ -158,6 +162,7 @@ export function ProfilePreview({
 
                 <div className={styles.badgeInfo}>
                   {look.level !== null && <Level level={look.level} />}
+                  {sidebar?.favoriteBadge && <HeaderFavoriteBadge badge={sidebar.favoriteBadge} />}
                 </div>
               </div>
             </div>
@@ -166,8 +171,9 @@ export function ProfilePreview({
 
         <div className={styles.content}>
           <div className={styles.contentInner}>
-            {/* div.profile_leftcol: showcases. The right column (badges,
-                groups, friends) isn't part of the preview yet. */}
+            {/* div.profile_rightcol comes first in Steam's markup: it floats right. */}
+            {sidebar && <Sidebar sidebar={sidebar} />}
+            {/* div.profile_leftcol: showcases. */}
             <div className={styles.leftcol}>
               {items?.length ? <Showcases items={items} editing={showcaseEditing} /> : null}
               <div className={styles.contentNote}>{showcasesNote(showcases, items, Boolean(showcaseItems))}</div>
@@ -187,7 +193,7 @@ function showcasesNote(
 ): string {
   if (edited && items) {
     if (!items.length) return "No showcases. Add one from the Showcases panel below.";
-    if (showcases?.visibility === "public") return "Badges, groups, friends and comments aren't part of the preview yet.";
+    if (showcases?.visibility === "public") return "Recent activity and comments aren't part of the preview yet.";
   }
   if (showcases === undefined) return "Paste a profile to see its showcases.";
   if (showcases === null) return "Loading showcases…";
@@ -198,7 +204,7 @@ function showcasesNote(
       return "Steam is busy, so the showcases will appear once it answers.";
     default:
       return showcases.showcases.length
-        ? "Badges, groups, friends and comments aren't part of the preview yet."
+        ? "Recent activity and comments aren't part of the preview yet."
         : "This profile has no showcases.";
   }
 }

@@ -12,7 +12,7 @@ import type { ProfileShowcases } from "@/lib/steam/showcases/types";
 const MAX_AUTO_RETRIES = 3;
 
 export interface ShowcasesState {
-  /** The showcases for the current profile, or null while loading (or with no profile). */
+  /** The showcases (and right-hand column) for the current profile, or null while loading (or with no profile). */
   showcases: ProfileShowcases | null;
   /** Set while Steam is busy and there's no copy to show. */
   busy: { retryAt: number | null } | null;
