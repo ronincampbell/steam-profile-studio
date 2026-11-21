@@ -109,7 +109,7 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
         </h2>
         <span className={styles.note}>for &ldquo;{backgroundName}&rdquo;</span>
         <button className={styles.linkButton} onClick={() => update({ enabled: false })}>
-          Close
+          {inPanel ? "Take it off the preview" : "Close"}
         </button>
       </div>
 
