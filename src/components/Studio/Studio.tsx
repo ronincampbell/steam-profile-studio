@@ -34,14 +34,10 @@ export function Studio() {
   const [draft, setDraft] = useState(query ?? "");
   const [tryOn, setTryOn] = useState<TryOn>({});
   const [custom, setCustom] = useState<CustomArt>({});
-  // Friends are other people: their names and avatars stay hidden unless
-  // whoever is looking turns this off. Not kept in the URL, so every shared
-  // link opens with friends hidden.
-  const [hideFriends, setHideFriends] = useState(true);
 
   const profile = state.status === "ready" ? state.profile : PLACEHOLDER_PROFILE;
   const look = useMemo(() => buildLook(profile, tryOn, custom), [profile, tryOn, custom]);
-  const showcases = useShowcases(state.status === "ready" ? state.profile.steamId : null, !hideFriends);
+  const showcases = useShowcases(state.status === "ready" ? state.profile.steamId : null);
 
   const current = useMemo(() => {
     const out: Partial<Record<Slot, Cosmetic | undefined>> = {};
@@ -124,10 +120,6 @@ export function Studio() {
           }}
         />
         <CustomArtPicker custom={custom} onChange={setCustom} />
-        <label className={styles.toggle}>
-          <input type="checkbox" checked={hideFriends} onChange={(e) => setHideFriends(e.target.checked)} />
-          Hide friends&apos; names and avatars
-        </label>
       </div>
 
       <ItemBrowser current={current} onApply={apply} />

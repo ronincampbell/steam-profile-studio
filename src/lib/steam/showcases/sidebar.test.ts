@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseProfilePage } from "./parse";
-import { hideFriendDetails } from "./sidebar";
 
 // Fuzzycast's public profile, captured 21 Nov 2026 (friends and comments redacted).
 const html = readFileSync(join(__dirname, "../../../../reference/html/fuzzycast-profile.html"), "utf8");
@@ -65,7 +64,7 @@ describe("parseSidebar on Fuzzycast", () => {
   });
 
   it("reads top friends' levels and online state", () => {
-    expect(sidebar.friends).toMatchObject({ label: "Friends", total: "161", detailsHidden: false });
+    expect(sidebar.friends).toMatchObject({ label: "Friends", total: "161" });
     expect(sidebar.friends!.list.map((f) => [f.level, f.state])).toEqual([
       [164, "online"],
       [154, "offline"],
@@ -80,18 +79,6 @@ describe("parseSidebar on Fuzzycast", () => {
       detail: "[redacted]",
       href: "https://steamcommunity.com/profiles/REDACTED",
     });
-  });
-});
-
-describe("hideFriendDetails", () => {
-  it("keeps only each friend's level and state", () => {
-    const hidden = hideFriendDetails(sidebar);
-    expect(hidden.friends!.detailsHidden).toBe(true);
-    expect(hidden.friends!.list[0]).toEqual({ level: 164, state: "online" });
-    expect(JSON.stringify(hidden.friends)).not.toMatch(/redacted|avatars\./i);
-    // Everything else is untouched.
-    expect(hidden.groups).toBe(sidebar.groups);
-    expect(hidden.friends!.total).toBe("161");
   });
 });
 

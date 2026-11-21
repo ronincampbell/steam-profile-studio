@@ -101,7 +101,7 @@ export function Sidebar({ sidebar }: { sidebar: ProfileSidebar }) {
           <Count link={friends} />
           <div data-testid="top-friends">
             {friends.list.map((f, i) => (
-              <Friend key={i} friend={f} hidden={friends.detailsHidden} />
+              <Friend key={i} friend={f} />
             ))}
           </div>
         </div>
@@ -143,35 +143,22 @@ function Count({ link }: { link: CountLink }) {
   );
 }
 
-/**
- * div.friendBlock. With `hidden`, the avatar and name are left blank (the
- * API didn't send them) and drawn as neutral bars, keeping the exact layout.
- */
-function Friend({ friend, hidden }: { friend: SidebarFriend; hidden: boolean }) {
+/** div.friendBlock */
+function Friend({ friend }: { friend: SidebarFriend }) {
   const state = STATE_CLASS[friend.state];
   return (
-    <div className={`${styles.friendBlock} ${state}`} data-hidden={hidden || undefined}>
-      {friend.href && !hidden && (
+    <div className={`${styles.friendBlock} ${state}`}>
+      {friend.href && (
         <a className={styles.friendBlockLinkOverlay} href={friend.href} target="_blank" rel="noreferrer" aria-label={friend.name} />
       )}
       {friend.level !== null && <FriendLevel level={friend.level} />}
       <div className={`${styles.playerAvatar} ${state}`}>
-        {friend.avatar && !hidden ? <img src={friend.avatar} alt="" /> : <span className={styles.avatarBlank} />}
+        {friend.avatar ? <img src={friend.avatar} alt="" /> : <span className={styles.avatarBlank} />}
       </div>
       <div className={styles.friendBlockContent}>
-        {hidden ? (
-          <>
-            <span className={styles.hiddenBar} style={{ width: 96 }} />
-            <br />
-            <span className={styles.hiddenBar} style={{ width: 56 }} />
-          </>
-        ) : (
-          <>
-            {friend.name}
-            <br />
-            <span>{friend.detail}</span>
-          </>
-        )}
+        {friend.name}
+        <br />
+        <span>{friend.detail}</span>
       </div>
     </div>
   );

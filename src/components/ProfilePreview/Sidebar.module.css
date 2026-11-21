@@ -192,9 +192,6 @@
   cursor: pointer;
   background-color: #3a3a3a;
 }
-.friendBlock[data-hidden] {
-  cursor: default;
-}
 
 /* .friendBlockLinkOverlay */
 .friendBlockLinkOverlay {
@@ -248,17 +245,6 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-
-/* Not Steam: stands in for a hidden friend's name and status line. */
-.hiddenBar {
-  display: inline-block;
-  height: 7px;
-  margin-top: 3px;
-  border-radius: 2px;
-  background: currentColor;
-  opacity: 0.35;
-  vertical-align: top;
 }
 
 /* .friendPlayerLevel (shared_global.css) + .friendBlock .friendPlayerLevel */

@@ -3,10 +3,6 @@
  * favourite badge under the level in the header, read from the same HTML the
  * showcases come from. The markup is in reference/html/fuzzycast-profile.html
  * (search for "profile_rightcol").
- *
- * Friends are other people, so `hideFriendDetails()` strips their names,
- * avatars and links before the API sends the sidebar out, unless the caller
- * asked for them.
  */
 import type { HTMLElement } from "node-html-parser";
 import { classes, hasClass, text, tooltipLines } from "./dom";
@@ -104,27 +100,10 @@ export function parseSidebar(root: HTMLElement): ProfileSidebar | undefined {
     sidebar.friends = {
       ...friendsLink,
       list: friends.querySelectorAll(".profile_topfriends .friendBlock").map(parseFriend),
-      detailsHidden: false,
     };
   }
 
   return sidebar;
-}
-
-/**
- * The sidebar without other people's names, avatars and profile links. Levels
- * and online state stay, so the list keeps its exact layout.
- */
-export function hideFriendDetails(sidebar: ProfileSidebar): ProfileSidebar {
-  if (!sidebar.friends) return sidebar;
-  return {
-    ...sidebar,
-    friends: {
-      ...sidebar.friends,
-      list: sidebar.friends.list.map(({ level, state }) => ({ level, state })),
-      detailsHidden: true,
-    },
-  };
 }
 
 function parseFavoriteBadge(root: HTMLElement): FavoriteBadge | undefined {

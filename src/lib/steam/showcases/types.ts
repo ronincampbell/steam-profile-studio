@@ -195,11 +195,7 @@ export interface SidebarGroup {
   primary: boolean;
 }
 
-/**
- * One friend in the top-friends list. Friends are other people, so the API
- * leaves out `name`, `avatar`, `href` and `detail` unless asked for them
- * (`?friends=1`); see `hideFriendDetails()`.
- */
+/** One friend in the top-friends list. */
 export interface SidebarFriend {
   level: number | null;
   state: PersonaState;
@@ -219,9 +215,5 @@ export interface ProfileSidebar {
   /** Games, Inventory, Screenshots, Reviews, Artwork… in Steam's order. */
   itemLinks: CountLink[];
   groups?: CountLink & { list: SidebarGroup[] };
-  friends?: CountLink & {
-    list: SidebarFriend[];
-    /** True when names and avatars were left out. */
-    detailsHidden: boolean;
-  };
+  friends?: CountLink & { list: SidebarFriend[] };
 }
