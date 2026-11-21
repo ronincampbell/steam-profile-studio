@@ -19,6 +19,7 @@ import {
   type RawPlayerSummary,
   type RawRewardItem,
 } from "./normalize";
+import { pointsShopAppUrl } from "./pointsShop";
 import { ITEM_TYPES, type CataloguePage, type ItemType, type Profile, type ShopItem } from "./types";
 
 const API = "https://api.steampowered.com";
@@ -147,4 +148,48 @@ export async function getCataloguePage({ type, cursor, search }: CatalogueQuery)
     // this page was full.
     nextCursor: defs.length >= 100 ? r.response.next_cursor : undefined,
   };
+}
+
+/**
+ * The items inside a profile bundle (a Points Shop "profile theme").
+ *
+ * Bundle parts aren't sold on their own, so the normal catalogue query
+ * leaves them out. Asking for the bundle's app with
+ * `include_direct_purchase_disabled=true` includes them (verified 21 Nov
+ * 2026 on Bayside Beasts, app 4197880).
+ */
+export async function getBundle(appid: number, defid: number): Promise<ShopItem[] | null> {
+  "use cache";
+  cacheLife("catalogue");
+
+  const defs: RawRewardItem[] = [];
+  let cursor: string | undefined;
+  // An app rarely has more than a few hundred items; stop after 5 pages regardless.
+  for (let page = 0; page < 5; page++) {
+    const params: Record<string, string | number> = {
+      count: 1000,
+      language: "english",
+      "appids[0]": appid,
+      include_direct_purchase_disabled: "true",
+    };
+    if (cursor) params.cursor = cursor;
+    const r = await steamGet<{ response: { definitions?: RawRewardItem[]; next_cursor?: string } }>(
+      "ILoyaltyRewardsService/QueryRewardItems/v1",
+      params,
+    );
+    const batch = r.response.definitions ?? [];
+    defs.push(...batch);
+    if (batch.length < 1000 || !r.response.next_cursor) break;
+    cursor = r.response.next_cursor;
+  }
+
+  const bundle = defs.find((d) => d.defid === defid);
+  if (!bundle?.bundle_defids?.length) return null;
+  return bundle.bundle_defids
+    .map((id) => defs.find((d) => d.defid === id))
+    .filter((d): d is RawRewardItem => Boolean(d))
+    .map((d) => normalizeRewardItem(d))
+    .filter((i): i is ShopItem => i !== null)
+    // Bundle parts can't be bought on their own; the bundle's page sells them.
+    .map((i) => ({ ...i, buyUrl: pointsShopAppUrl(appid) }));
 }

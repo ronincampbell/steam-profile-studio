@@ -110,3 +110,13 @@ Steam's `profilev2.css`. Points Shop theme items carry the same id in
 its own. The same response also lists showcase slots (`customizations`),
 useful for the showcases stretch goal. Raw JSON:
 `GetProfileCustomization.nokey.json`.
+
+## Profile themes are bundles (verified 21 Nov 2026)
+
+Every class-8 Points Shop item lists `bundle_defids`: its background, mini
+profile background, avatar frame and animated avatar. 92 of the 129 have
+`profile_theme_id: "GameProfile"`, which has no colours of its own, so they
+look like Steam's default theme unless their parts are applied too. The
+parts aren't sold on their own, so a normal catalogue query leaves them out;
+`QueryRewardItems?appids[0]=<appid>&include_direct_purchase_disabled=true`
+includes them. `/api/bundle?appid=&defid=` returns them (`getBundle()`).

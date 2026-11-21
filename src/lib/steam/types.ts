@@ -58,6 +58,12 @@ export interface ShopItem extends Cosmetic {
   thumbnail?: string;
   /** Points Shop game page that lists this item (there's no per-item URL). */
   buyUrl: string;
+  /**
+   * Themes only. Every Points Shop "profile theme" is really a bundle: a
+   * colour scheme plus a background, mini background, avatar frame and
+   * animated avatar, listed here by defid. Fetch them from /api/bundle.
+   */
+  bundleDefids?: number[];
 }
 
 export interface CataloguePage {

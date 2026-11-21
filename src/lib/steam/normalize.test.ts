@@ -54,6 +54,15 @@ describe("normalizeRewardItem", () => {
     expect(animated[0].video.mp4).toMatch(/\.mp4$/);
   });
 
+  it("keeps a profile theme's bundle contents", () => {
+    const def = api("QueryRewardItems.class-8-profile_modifier_theme.json").definitions[0];
+    expect(normalizeRewardItem(def)).toMatchObject({
+      name: "Bayside Beasts",
+      themeId: "GameProfile",
+      bundleDefids: [4107600, 4107601, 4107602, 4107603],
+    });
+  });
+
   it("skips item classes the app doesn't preview", () => {
     expect(normalizeRewardItem({ appid: 1, defid: 1, community_item_class: 4, community_item_data: {} })).toBeNull();
   });

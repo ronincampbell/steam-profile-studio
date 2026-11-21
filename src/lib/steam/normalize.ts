@@ -18,6 +18,8 @@ export interface RawRewardItem {
   defid: number;
   community_item_class: number;
   point_cost?: string;
+  /** Profile bundles (class 8): the background, mini background, frame and avatar inside. */
+  bundle_defids?: number[];
   community_item_data?: {
     item_name?: string;
     item_title?: string;
@@ -110,6 +112,7 @@ export function normalizeRewardItem(raw: RawRewardItem): ShopItem | null {
       item.image = url(d.item_image_large);
       item.thumbnail = url(d.item_image_small) ?? item.image;
       item.themeId = d.profile_theme_id;
+      item.bundleDefids = raw.bundle_defids?.length ? raw.bundle_defids : undefined;
       break;
   }
   return stripUndefined(item);

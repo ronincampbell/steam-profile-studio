@@ -11,12 +11,18 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ItemBrowser } from "@/components/ItemBrowser/ItemBrowser";
 import { ProfilePreview } from "@/components/ProfilePreview/ProfilePreview";
 import { buildLook, PLACEHOLDER_PROFILE, type CustomArt, type Slot, type TryOn } from "@/lib/studio/look";
-import type { Cosmetic } from "@/lib/steam/types";
+import type { Cosmetic, ItemType, ShopItem } from "@/lib/steam/types";
 import { CustomArtPicker } from "./CustomArtPicker";
 import { FitToWidth } from "./FitToWidth";
 import { SlotBar } from "./SlotBar";
 import { useProfile, type ProfileState } from "./useProfile";
 import styles from "./Studio.module.css";
+
+const SLOT_BY_TYPE: Partial<Record<ItemType, Slot>> = {
+  background: "background",
+  "avatar-frame": "avatarFrame",
+  "animated-avatar": "animatedAvatar",
+};
 
 export function Studio() {
   const router = useRouter();
@@ -38,6 +44,30 @@ export function Studio() {
     }
     return out;
   }, [profile, tryOn]);
+
+  async function apply(slot: Slot, item: ShopItem) {
+    setTryOn((prev) => ({ ...prev, [slot]: item }));
+    if (slot !== "theme" || !item.bundleDefids) return;
+    // A Points Shop "theme" is a bundle: put its background, frame and
+    // animated avatar on too, the way equipping it on Steam does.
+    try {
+      const res = await fetch(`/api/bundle?appid=${item.appid}&defid=${item.defid}`);
+      if (!res.ok) return;
+      const { items } = (await res.json()) as { items: ShopItem[] };
+      setTryOn((prev) => {
+        // Ignore a slow answer if another theme was picked meanwhile.
+        if (prev.theme !== item) return prev;
+        const next = { ...prev };
+        for (const part of items) {
+          const partSlot = SLOT_BY_TYPE[part.type];
+          if (partSlot) next[partSlot] = part;
+        }
+        return next;
+      });
+    } catch {
+      // Colours still apply; the bundle's other parts just don't.
+    }
+  }
 
   function submit(e: FormEvent) {
     e.preventDefault();
@@ -90,7 +120,7 @@ export function Studio() {
         <CustomArtPicker custom={custom} onChange={setCustom} />
       </div>
 
-      <ItemBrowser current={current} onApply={(slot, item) => setTryOn({ ...tryOn, [slot]: item })} />
+      <ItemBrowser current={current} onApply={apply} />
     </div>
   );
 }
