@@ -23,6 +23,11 @@ import type {
 } from "./types";
 
 export interface ParsedProfilePage {
+  /**
+   * False when the HTML isn't a profile page at all (Steam's error page, a
+   * "profile not found" page, a captcha). Never cache those as a result.
+   */
+  isProfilePage: boolean;
   /** Steam marks private (and, to visitors, friends-only) profiles with this body class. */
   isPrivate: boolean;
   showcases: Showcase[];
@@ -30,15 +35,16 @@ export interface ParsedProfilePage {
 
 export function parseProfilePage(html: string): ParsedProfilePage {
   const root = parse(html);
+  const isProfilePage = Boolean(root.querySelector(".profile_page"));
   const isPrivate = Boolean(root.querySelector("body.private_profile, div.profile_page.private_profile"));
   const area = root.querySelector(".profile_customization_area");
-  if (!area) return { isPrivate, showcases: [] };
+  if (!area) return { isProfilePage, isPrivate, showcases: [] };
 
   const showcases = area.children
     .filter((el) => hasClass(el, "profile_customization"))
     .map(parseShowcase)
     .filter((s): s is Showcase => s !== null);
-  return { isPrivate, showcases };
+  return { isProfilePage, isPrivate, showcases };
 }
 
 /**

@@ -179,7 +179,7 @@ function showcasesNote(showcases: ProfileShowcases | null | undefined): string {
     case "private":
       return "This profile is private, so Steam doesn't show its showcases.";
     case "unavailable":
-      return "Steam didn't send this profile's showcases just now. Try again in a minute.";
+      return "Steam is busy, so the showcases will appear once it answers.";
     default:
       return showcases.showcases.length
         ? "Badges, groups, friends and comments aren't part of the preview yet."

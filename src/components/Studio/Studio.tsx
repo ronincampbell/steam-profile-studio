@@ -14,6 +14,7 @@ import { buildLook, PLACEHOLDER_PROFILE, type CustomArt, type Slot, type TryOn }
 import type { Cosmetic, ItemType, ShopItem } from "@/lib/steam/types";
 import { CustomArtPicker } from "./CustomArtPicker";
 import { FitToWidth } from "./FitToWidth";
+import { ShowcasesNotice } from "./ShowcasesNotice";
 import { SlotBar } from "./SlotBar";
 import { useProfile, type ProfileState } from "./useProfile";
 import { useShowcases } from "./useShowcases";
@@ -37,7 +38,7 @@ export function Studio() {
 
   const profile = state.status === "ready" ? state.profile : PLACEHOLDER_PROFILE;
   const look = useMemo(() => buildLook(profile, tryOn, custom), [profile, tryOn, custom]);
-  const showcases = useShowcases(state.status === "ready" ? state.profile.steamId : null);
+  const showcasesState = useShowcases(state.status === "ready" ? state.profile.steamId : null);
 
   const current = useMemo(() => {
     const out: Partial<Record<Slot, Cosmetic | undefined>> = {};
@@ -101,10 +102,11 @@ export function Studio() {
           </button>
         </form>
         <StatusLine state={state} />
+        {state.status === "ready" && <ShowcasesNotice state={showcasesState} />}
       </header>
 
       <FitToWidth>
-        <ProfilePreview look={look} showcases={state.status === "ready" ? showcases : undefined} />
+        <ProfilePreview look={look} showcases={state.status === "ready" ? showcasesState.showcases : undefined} />
       </FitToWidth>
 
       <div className={styles.controls}>

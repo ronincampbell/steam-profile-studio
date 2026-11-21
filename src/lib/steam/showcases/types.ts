@@ -159,4 +159,12 @@ export interface ProfileShowcases {
    */
   visibility: "public" | "private" | "unavailable";
   showcases: Showcase[];
+  /** When Steam sent the page these were read from (ISO 8601). Absent for `unavailable`. */
+  fetchedAt?: string;
+  /**
+   * Set when Steam failed just now and this is the last good copy instead:
+   * `rate-limited` for a 429, `steam-error` for anything else (5xx, timeout,
+   * a page that wasn't a profile).
+   */
+  staleBecause?: "rate-limited" | "steam-error";
 }
