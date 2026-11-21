@@ -1,0 +1,209 @@
+/* App chrome around the Steam preview. Steam-adjacent colours, not a copy. */
+.studio {
+  min-height: 100vh;
+  background: #0e141b;
+  color: #c6d4df;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.topBar {
+  padding: 16px max(16px, calc((100% - 976px) / 2));
+  background: #171d25;
+  border-bottom: 1px solid #000;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: normal;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+
+.form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.input {
+  flex: 1 1 320px;
+  min-width: 0;
+  height: 36px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 14px;
+  color: #ffffff;
+  background: #316282;
+  background: rgba(103, 193, 245, 0.12);
+  border: 1px solid rgba(103, 193, 245, 0.25);
+  border-radius: 3px;
+  outline: none;
+}
+.input:focus {
+  border-color: #66c0f4;
+}
+.input::placeholder {
+  color: #7a8b9d;
+}
+
+.button {
+  height: 38px;
+  padding: 0 18px;
+  font: inherit;
+  font-size: 14px;
+  color: #ffffff;
+  background: linear-gradient(to right, #47bfff 5%, #1a44c2 60%);
+  background-size: 330% 100%;
+  background-position: 25% 0;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.button:hover {
+  background-position: 0 0;
+}
+.button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.error,
+.note {
+  margin-top: 8px;
+  font-size: 13px;
+}
+.error {
+  color: #ff7b7b;
+}
+.note {
+  color: #8f98a0;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.fit {
+  width: 100%;
+  overflow: hidden;
+}
+
+.controls {
+  max-width: 976px;
+  margin: 0 auto;
+  padding: 16px 16px 0;
+  display: grid;
+  gap: 12px;
+}
+
+.slots {
+  list-style: none;
+  display: grid;
+  gap: 1px;
+  background: #263041;
+  border: 1px solid #263041;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.slot {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 13px;
+  background: #1b2431;
+}
+
+.slotLabel {
+  color: #8f98a0;
+}
+
+.slotName {
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slotSource {
+  font-size: 12px;
+  color: #6b7785;
+}
+
+.slotActions {
+  display: flex;
+  gap: 10px;
+}
+.slotActions a,
+.slotActions button,
+.linkButton {
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  color: #66c0f4;
+  background: none;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+}
+.slotActions a:hover,
+.slotActions button:hover,
+.linkButton:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .slot {
+    grid-template-columns: 1fr auto;
+  }
+  .slotSource {
+    display: none;
+  }
+}
+
+.custom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.customTitle {
+  color: #ffffff;
+}
+
+.fileButton {
+  position: relative;
+  padding: 7px 12px;
+  color: #ffffff;
+  background: rgba(103, 193, 245, 0.15);
+  border: 1px solid rgba(103, 193, 245, 0.35);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.fileButton:hover {
+  background: rgba(103, 193, 245, 0.25);
+}
+.fileButton:focus-within {
+  outline: 2px solid #66c0f4;
+}
+.fileButton input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.customNote {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: #6b7785;
+}

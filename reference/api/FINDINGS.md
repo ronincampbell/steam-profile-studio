@@ -97,3 +97,26 @@ The steam-profile-studio cloud environment had to allow
 `store.fastly.steamstatic.com` for these checks. The browser will load assets
 from `shared.fastly.steamstatic.com` directly, so `next.config.ts` image
 settings (if `next/image` is used) will need that host too.
+
+## Profile theme (verified 21 Nov 2026)
+
+`IPlayerService/GetProfileCustomization/v1?steamid=<id>` works without a key
+and returns `profile_theme: { theme_id: "Steel" }` for Fuzzycast, matching the
+`SteelTheme` class on the real profile page's `<body>`. Steam's theme classes
+only set CSS variables (header and content gradients, showcase header and
+button colours); their values are in `src/lib/steam/themes.ts`, copied from
+Steam's `profilev2.css`. Points Shop theme items carry the same id in
+`community_item_data.profile_theme_id`; `GameProfile` has no colour scheme of
+its own. The same response also lists showcase slots (`customizations`),
+useful for the showcases stretch goal. Raw JSON:
+`GetProfileCustomization.nokey.json`.
+
+## Profile themes are bundles (verified 21 Nov 2026)
+
+Every class-8 Points Shop item lists `bundle_defids`: its background, mini
+profile background, avatar frame and animated avatar. 92 of the 129 have
+`profile_theme_id: "GameProfile"`, which has no colours of its own, so they
+look like Steam's default theme unless their parts are applied too. The
+parts aren't sold on their own, so a normal catalogue query leaves them out;
+`QueryRewardItems?appids[0]=<appid>&include_direct_purchase_disabled=true`
+includes them. `/api/bundle?appid=&defid=` returns them (`getBundle()`).
