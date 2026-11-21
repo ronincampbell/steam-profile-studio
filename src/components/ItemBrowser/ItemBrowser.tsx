@@ -27,14 +27,25 @@ interface Props {
   /** What's currently showing in each slot (tried-on or equipped). */
   current: Partial<Record<Slot, Cosmetic | undefined>>;
   onApply: (slot: Slot, item: ShopItem) => void;
+  /** Which item type to show. The app's menu picks it. */
+  type: ItemType;
+  onTypeChange: (type: ItemType) => void;
+  /** Inside one of the app's panels: the panel names the type, so no tabs or outer padding. */
+  inPanel?: boolean;
 }
 
-export function ItemBrowser({ current, onApply }: Props) {
-  const [tab, setTab] = useState(TABS[0]);
+export function ItemBrowser({ current, onApply, type, onTypeChange, inPanel }: Props) {
+  const tab = TABS.find((t) => t.type === type) ?? TABS[0];
   const [draft, setDraft] = useState("");
   const search = useDebounced(draft.trim(), 350);
   const catalogue = useCatalogue(tab.type, search);
   const [shown, setShown] = useState(BATCH);
+  // Start from the first batch again whenever the type changes.
+  const [shownFor, setShownFor] = useState(tab.type);
+  if (shownFor !== tab.type) {
+    setShownFor(tab.type);
+    setShown(BATCH);
+  }
 
   const visible = catalogue.items.slice(0, shown);
   const canShowMore = shown < catalogue.items.length || catalogue.hasMore;
@@ -44,27 +55,24 @@ export function ItemBrowser({ current, onApply }: Props) {
     setShown(shown + BATCH);
   }
 
-  function switchTab(next: (typeof TABS)[number]) {
-    setTab(next);
-    setShown(BATCH);
-  }
-
   return (
-    <section className={styles.browser} aria-label="Points Shop items">
+    <section className={`${styles.browser} ${inPanel ? styles.inPanel : ""}`} aria-label="Points Shop items">
       <div className={styles.toolbar}>
-        <div className={styles.tabs} role="tablist">
-          {TABS.map((t) => (
-            <button
-              key={t.type}
-              role="tab"
-              aria-selected={t.type === tab.type}
-              className={styles.tab}
-              onClick={() => switchTab(t)}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
+        {!inPanel && (
+          <div className={styles.tabs} role="tablist">
+            {TABS.map((t) => (
+              <button
+                key={t.type}
+                role="tab"
+                aria-selected={t.type === tab.type}
+                className={styles.tab}
+                onClick={() => onTypeChange(t.type)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        )}
         <input
           className={styles.search}
           type="search"

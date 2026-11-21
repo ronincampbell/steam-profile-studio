@@ -1,0 +1,755 @@
+/*
+ * The app's own chrome: header, menus and panels. None of this is Steam's
+ * design; it only borrows Steam's blue so the two sit well together.
+ *
+ * Rule for every layout: nothing here takes space in the page except the
+ * 104px header (Steam's own header height), so the preview below lands where
+ * Steam draws the profile. Menus and panels float over it.
+ */
+
+.chrome {
+  --c-bg: #0b0e13;
+  --c-surface: rgba(16, 21, 29, 0.92);
+  --c-surface-solid: #121821;
+  --c-raised: #1a222e;
+  --c-line: rgba(255, 255, 255, 0.08);
+  --c-line-strong: rgba(255, 255, 255, 0.14);
+  --c-text: #e8eef4;
+  --c-muted: #8a97a6;
+  --c-accent: #66c0f4;
+  --c-accent-2: #9b7bff;
+  --c-shadow: 0 18px 48px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --c-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --c-glass: blur(18px) saturate(140%);
+
+  min-height: 100vh;
+  background: var(--c-bg);
+}
+
+.chrome :is(button, a, input, select):focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* ---------- Header (104px, every layout) ---------- */
+
+.header {
+  position: relative;
+  z-index: 40;
+  height: 104px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 32px;
+  font-family: var(--c-font);
+  color: var(--c-text);
+  background:
+    radial-gradient(600px 160px at 12% -40%, rgba(102, 192, 244, 0.16), transparent 70%),
+    radial-gradient(500px 140px at 88% -60%, rgba(155, 123, 255, 0.12), transparent 70%),
+    linear-gradient(180deg, #121821 0%, #0b0e13 100%);
+  /* A shadow, not a border, so the header stays exactly 104px. */
+  box-shadow: inset 0 -1px 0 var(--c-line);
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+}
+
+.headerRow {
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 28px;
+}
+
+.headerTwoRow {
+  justify-content: flex-start;
+}
+.headerTwoRow .headerRow {
+  height: 60px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.wordmark {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.wordmarkTop {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+.wordmarkMain {
+  margin-top: 4px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  background: linear-gradient(90deg, #ffffff 30%, #a9dcff 70%, #c8b8ff);
+  background-clip: text;
+  color: transparent;
+}
+
+.headerTwoRow .wordmarkMain {
+  font-size: 19px;
+}
+
+.search {
+  justify-self: center;
+  width: 100%;
+  max-width: 680px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px 0 16px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--c-line-strong);
+  border-radius: 999px;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    box-shadow 0.15s;
+}
+.search:focus-within {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(102, 192, 244, 0.7);
+  box-shadow: 0 0 0 4px rgba(102, 192, 244, 0.14);
+}
+.headerTwoRow .search {
+  height: 40px;
+}
+
+.searchIcon {
+  flex: none;
+  color: var(--c-muted);
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--c-text);
+  background: none;
+  border: none;
+  outline: none;
+}
+.searchInput::placeholder {
+  color: #6f7c8b;
+}
+
+.searchButton {
+  flex: none;
+  height: 34px;
+  padding: 0 18px;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #06121b;
+  background: linear-gradient(135deg, #8fd3ff, var(--c-accent) 45%, #4a9fe0);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.headerTwoRow .searchButton {
+  height: 30px;
+}
+.searchButton:hover {
+  filter: brightness(1.1);
+}
+.searchButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.ghostButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--c-text);
+  background: transparent;
+  border: 1px solid var(--c-line-strong);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.ghostButton:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.iconButton {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: var(--c-muted);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.iconButton:hover {
+  color: var(--c-text);
+  background: rgba(255, 255, 255, 0.07);
+}
+.iconButton[aria-pressed="true"] {
+  color: var(--c-accent);
+  background: rgba(102, 192, 244, 0.12);
+}
+
+/* ---------- Panels (every layout) ---------- */
+
+.panelHead {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 16px 14px 18px;
+  border-bottom: 1px solid var(--c-line);
+  font-family: var(--c-font);
+}
+
+.panelIcon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: var(--c-accent);
+  background: linear-gradient(135deg, rgba(102, 192, 244, 0.18), rgba(155, 123, 255, 0.14));
+  border-radius: 10px;
+}
+
+.panelTitles {
+  flex: 1;
+  min-width: 0;
+}
+
+.panelTitle {
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--c-text);
+}
+
+.panelHint {
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--c-muted);
+}
+
+.panelBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 18px 24px;
+  container: panel / inline-size;
+  scrollbar-width: thin;
+  scrollbar-color: #334152 transparent;
+}
+.panelBody[hidden] {
+  display: none;
+}
+
+/* What each panel says when it has nothing to show yet. */
+.empty {
+  padding: 28px 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--c-muted);
+}
+
+/* ---------- A. Side drawer ---------- */
+
+.drawer {
+  position: fixed;
+  z-index: 50;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  display: flex;
+  /* On the right, so the panel never covers the avatar and frame you're trying on. */
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--c-font);
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: var(--c-surface);
+  backdrop-filter: var(--c-glass);
+  border: 1px solid var(--c-line-strong);
+  border-radius: 18px;
+  box-shadow: var(--c-shadow);
+}
+
+.railItem {
+  display: contents;
+}
+
+.railRule {
+  height: 1px;
+  margin: 4px 8px;
+  background: var(--c-line-strong);
+}
+
+.railButton {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: var(--c-muted);
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+.railButton:hover {
+  color: var(--c-text);
+  background: rgba(255, 255, 255, 0.07);
+}
+.railButton[aria-pressed="true"] {
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(102, 192, 244, 0.35), rgba(155, 123, 255, 0.3));
+  box-shadow: inset 0 0 0 1px rgba(102, 192, 244, 0.45);
+}
+
+/* Name of the tool, shown on hover while the drawer is closed. */
+.railTip {
+  position: absolute;
+  right: calc(100% + 14px);
+  top: 50%;
+  translate: 0 -50%;
+  padding: 5px 10px;
+  font-size: 12.5px;
+  white-space: nowrap;
+  color: var(--c-text);
+  background: var(--c-surface-solid);
+  border: 1px solid var(--c-line-strong);
+  border-radius: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s;
+}
+.railButton:hover .railTip {
+  opacity: 1;
+}
+.drawerOpen .railTip {
+  display: none;
+}
+
+.drawerPanel {
+  display: flex;
+  flex-direction: column;
+  width: min(500px, calc(100vw - 110px));
+  height: min(760px, calc(100vh - 32px));
+  background: var(--c-surface);
+  backdrop-filter: var(--c-glass);
+  border: 1px solid var(--c-line-strong);
+  border-radius: 18px;
+  box-shadow: var(--c-shadow);
+  opacity: 0;
+  translate: 24px 0;
+  scale: 0.98;
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease,
+    translate 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+    scale 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.drawerOpen .drawerPanel {
+  opacity: 1;
+  translate: 0 0;
+  scale: 1;
+  pointer-events: auto;
+}
+
+/* ---------- B. Toolbar ---------- */
+
+.toolbarZone {
+  display: contents;
+}
+
+.toolRow {
+  width: 100%;
+  max-width: 1360px;
+  height: 44px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--c-line);
+}
+
+.subject {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.subject img {
+  border-radius: 4px;
+}
+.subject strong {
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.levelChip {
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--c-accent);
+  border: 1px solid rgba(102, 192, 244, 0.4);
+  border-radius: 999px;
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 100%;
+}
+
+.toolItem {
+  display: contents;
+}
+
+.toolRule {
+  width: 1px;
+  height: 18px;
+  margin: 0 8px;
+  background: var(--c-line-strong);
+}
+
+.toolButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 100%;
+  padding: 0 11px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--c-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.toolButton:hover {
+  color: var(--c-text);
+}
+
+/* How many slots you're trying something on in (on "Wearing now"). */
+.count {
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 17px;
+  text-align: center;
+  color: #06121b;
+  background: var(--c-accent);
+  border-radius: 999px;
+}
+.railButton .count,
+.dockButton .count {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+}
+.dockButton .count {
+  right: 8px;
+}
+.toolButton[aria-expanded="true"] {
+  color: #ffffff;
+}
+.toolButton[aria-expanded="true"]::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--c-accent), var(--c-accent-2));
+  border-radius: 2px;
+}
+
+.dropPanel {
+  position: fixed;
+  z-index: 39;
+  top: 104px;
+  right: max(16px, calc((100vw - 1360px) / 2 + 16px));
+  width: min(640px, calc(100vw - 32px));
+  max-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--c-font);
+  background: var(--c-surface);
+  backdrop-filter: var(--c-glass);
+  border: 1px solid var(--c-line-strong);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  box-shadow: var(--c-shadow);
+  opacity: 0;
+  translate: 0 -10px;
+  pointer-events: none;
+  transition:
+    opacity 0.16s ease,
+    translate 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dropOpen {
+  opacity: 1;
+  translate: 0 0;
+  pointer-events: auto;
+}
+
+/* ---------- C. Dock ---------- */
+
+.dock {
+  position: fixed;
+  z-index: 50;
+  bottom: 20px;
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 8px 10px;
+  font-family: var(--c-font);
+  background: var(--c-surface);
+  backdrop-filter: var(--c-glass);
+  border: 1px solid var(--c-line-strong);
+  border-radius: 22px;
+  box-shadow: var(--c-shadow);
+}
+
+.dockItem {
+  display: flex;
+  align-items: center;
+}
+
+.dockRule {
+  align-self: center;
+  width: 1px;
+  height: 34px;
+  margin: 0 6px;
+  background: var(--c-line-strong);
+}
+
+.dockButton {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 74px;
+  padding: 4px 0 2px;
+  font: inherit;
+  color: var(--c-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dockIcon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  color: var(--c-text);
+  background: linear-gradient(160deg, #233043, #161d28);
+  border: 1px solid var(--c-line-strong);
+  border-radius: 14px;
+  transition:
+    transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 0.18s;
+}
+.dockButton:hover .dockIcon {
+  transform: translateY(-6px) scale(1.12);
+}
+.dockButton[aria-pressed="true"] .dockIcon {
+  color: #ffffff;
+  background: linear-gradient(135deg, #3a8fd0, #7a5ee8);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+/* Dot under the open tool, like an app launcher. */
+.dockButton[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  width: 4px;
+  height: 4px;
+  background: var(--c-accent);
+  border-radius: 50%;
+}
+
+.dockLabel {
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.dockButton:hover .dockLabel,
+.dockButton[aria-pressed="true"] .dockLabel {
+  color: var(--c-text);
+}
+
+.sheet {
+  position: fixed;
+  z-index: 49;
+  left: 50%;
+  bottom: 118px;
+  width: min(1040px, calc(100vw - 32px));
+  height: min(560px, calc(100vh - 240px));
+  display: flex;
+  flex-direction: column;
+  font-family: var(--c-font);
+  background: var(--c-surface);
+  backdrop-filter: var(--c-glass);
+  border: 1px solid var(--c-line-strong);
+  border-radius: 20px;
+  box-shadow: var(--c-shadow);
+  opacity: 0;
+  translate: -50% 24px;
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease,
+    translate 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.sheetOpen {
+  opacity: 1;
+  translate: -50% 0;
+  pointer-events: auto;
+}
+
+/* ---------- Notices ---------- */
+
+.toasts {
+  position: fixed;
+  z-index: 60;
+  right: 20px;
+  bottom: 20px;
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+  max-width: min(420px, calc(100vw - 40px));
+  font-family: var(--c-font);
+  pointer-events: none;
+}
+.toastsHigh {
+  bottom: 118px;
+}
+.toasts > * {
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  background: var(--c-surface);
+  backdrop-filter: var(--c-glass);
+  border: 1px solid var(--c-line-strong);
+  border-radius: 12px;
+  box-shadow: var(--c-shadow);
+  pointer-events: auto;
+}
+
+/* ---------- Smaller screens ---------- */
+
+@media (max-width: 1100px) {
+  .header {
+    padding: 0 20px;
+  }
+  .headerRow {
+    gap: 16px;
+  }
+  .wordmark,
+  .subject span:not(.levelChip) {
+    display: none;
+  }
+  .toolButton {
+    padding: 0 8px;
+    font-size: 0;
+    gap: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  /* The preview is scaled down here, so pixel matching doesn't apply: let
+     the header grow to fit. */
+  .header {
+    height: auto;
+    padding: 12px 16px;
+  }
+  .headerRow {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .headerRow > .ghostButton {
+    display: none;
+  }
+  .dockLabel {
+    display: none;
+  }
+  .dockButton {
+    width: 48px;
+  }
+  .dockRule {
+    margin: 0 2px;
+  }
+  /* The header is taller here, so the toolbar's panel comes up from the bottom instead. */
+  .dropPanel {
+    top: auto;
+    bottom: 0;
+    right: 0;
+    width: 100vw;
+    max-height: 75vh;
+    border-top: 1px solid var(--c-line-strong);
+    border-radius: 16px 16px 0 0;
+  }
+  .toolRule {
+    margin: 0 2px;
+  }
+}
