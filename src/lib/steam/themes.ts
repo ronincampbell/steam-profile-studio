@@ -423,5 +423,26 @@ export function themeCssVars(themeId: string | undefined | null): Record<string,
     "--btn-background": c.btnBackground,
     "--btn-background-hover": c.btnBackgroundHover,
     "--btn-outline": c.btnOutline,
+    ...achievementVars(themeId),
+  };
+}
+
+/**
+ * Steam draws the Favorite Game showcase's achievement bar and trophy
+ * differently on the default theme: `body:not(.DefaultTheme)` rules in
+ * profilev2.css dim the bar colours, add a shine and fade the trophy to 75%.
+ * These variables carry the default theme's values; MoreShowcases.module.css
+ * falls back to the other themes' values. (That a profile with no theme gets
+ * Steam's `DefaultTheme` body class is inferred, not seen on a real page.)
+ */
+function achievementVars(themeId: string | undefined | null): Record<string, string> {
+  // Only a profile with no theme: GameProfile reuses the default colours but
+  // its body class is GameProfileTheme, so it gets the other themes' look.
+  if (themeId && themeId !== DEFAULT_THEME_ID) return {};
+  return {
+    "--achievement-segment-base": "#1a9fffd4",
+    "--achievement-segment-dlc": "#ab59b9ba",
+    "--achievement-segment-shine": "none",
+    "--achievement-ribbon-opacity": "1",
   };
 }

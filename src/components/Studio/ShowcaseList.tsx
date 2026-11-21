@@ -122,6 +122,7 @@ export function ShowcaseList({ list, profileShowcases, edited, onMove, onRemove,
             {SHOWCASE_TYPES.filter((t) => t.kind).map((t) => (
               <option key={t.type} value={t.type}>
                 {t.label} {kinds.has(t.kind!) ? "(your data)" : "(sample content)"}
+                {t.retired ? " (retired by Steam)" : ""}
               </option>
             ))}
           </optgroup>

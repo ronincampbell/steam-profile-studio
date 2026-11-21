@@ -7,6 +7,7 @@
  * profile's real showcases.
  */
 import type { Showcase, ShowcaseKind, ShowcaseStat } from "@/lib/steam/showcases/types";
+import { sampleShowcase as moreSample } from "@/lib/steam/showcases/samples";
 import { showcaseType, typeForKind } from "./showcaseCatalog";
 
 /**
@@ -15,7 +16,7 @@ import { showcaseType, typeForKind } from "./showcaseCatalog";
  * - sample: Steam's real layout (captured from a profile) with tidy
  *   placeholder content, because this profile doesn't have that showcase.
  * - placeholder: a plainly marked box, because Steam's markup for this type
- *   hasn't been captured yet (SHOWCASES.md lists the 17 types).
+ *   hasn't been captured (only the retired Greenlight types now).
  */
 export type ShowcaseSource = "profile" | "sample" | "placeholder";
 
@@ -207,5 +208,8 @@ export function sampleShowcase(
         achievements: times(7, () => ({ href: NO_LINK, image: placeholderImage(64, 64), rare: false })),
         stats: [stat("Achievements"), stat("Rare Achievements")],
       };
+    default:
+      // The other 15 types: samples.ts, built from their captured markup.
+      return moreSample(kind, { name: ctx.name, image: placeholderImage, link: NO_LINK });
   }
 }

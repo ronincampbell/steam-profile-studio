@@ -33,6 +33,7 @@ describe("parseProfilePage on Fuzzycast", () => {
         UGC +
         "1751305252904455749/6C54780DCB70D1EDBA3229B11CC47F292F4930F4/?imw=480&imh=480&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true",
       publishedFileId: "2365002180",
+      maxWidth: 480,
       name: "_",
     });
     expect(art.small.map((s) => s.publishedFileId)).toEqual(["2364631422", "2364631742", "2364631961"]);

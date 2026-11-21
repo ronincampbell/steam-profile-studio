@@ -12,7 +12,7 @@ const kinds = (list: { showcase: { kind: string } }[]) => list.map((s) => s.show
 describe("showcase catalogue", () => {
   it("lists all 24 Steam showcase types once, 7 of them drawn", () => {
     expect(SHOWCASE_TYPES.map((t) => t.type)).toEqual(Array.from({ length: 24 }, (_, i) => i + 1));
-    expect(SHOWCASE_TYPES.filter((t) => t.kind).map((t) => t.type)).toEqual([2, 5, 13, 15, 17, 23, 24]);
+    expect(SHOWCASE_TYPES.filter((t) => t.kind).map((t) => t.type)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 21, 22, 23, 24]);
   });
 });
 
@@ -74,9 +74,9 @@ describe("showcase editor", () => {
   });
 
   it("uses a marked placeholder for types whose markup isn't captured", () => {
-    const s = makeShowcase(8, fuzzycast, ctx);
+    const s = makeShowcase(18, fuzzycast, ctx);
     expect(s.source).toBe("placeholder");
-    expect(s.showcase).toMatchObject({ kind: "unsupported", title: "Custom Info Box" });
+    expect(s.showcase).toMatchObject({ kind: "unsupported", title: "Greenlight Showcase" });
   });
 });
 
