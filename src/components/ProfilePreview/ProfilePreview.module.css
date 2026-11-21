@@ -124,6 +124,8 @@
   height: 100%;
   padding: 0;
   border: none;
+  /* Not in Steam's CSS (its avatars are always square); keeps uploads square. */
+  object-fit: cover;
 }
 
 /* .playerAvatar .profile_avatar_frame */

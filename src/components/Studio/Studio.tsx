@@ -8,10 +8,14 @@
  */
 import { useMemo, useState, type FormEvent } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ItemBrowser } from "@/components/ItemBrowser/ItemBrowser";
 import { ProfilePreview } from "@/components/ProfilePreview/ProfilePreview";
-import { buildLook, PLACEHOLDER_PROFILE, type CustomArt, type TryOn } from "@/lib/studio/look";
+import { buildLook, PLACEHOLDER_PROFILE, type CustomArt, type Slot, type TryOn } from "@/lib/studio/look";
+import type { Cosmetic } from "@/lib/steam/types";
+import { CustomArtPicker } from "./CustomArtPicker";
 import { FitToWidth } from "./FitToWidth";
-import { useProfile } from "./useProfile";
+import { SlotBar } from "./SlotBar";
+import { useProfile, type ProfileState } from "./useProfile";
 import styles from "./Studio.module.css";
 
 export function Studio() {
@@ -22,10 +26,18 @@ export function Studio() {
   const state = useProfile(query);
   const [draft, setDraft] = useState(query ?? "");
   const [tryOn, setTryOn] = useState<TryOn>({});
-  const [custom] = useState<CustomArt>({});
+  const [custom, setCustom] = useState<CustomArt>({});
 
   const profile = state.status === "ready" ? state.profile : PLACEHOLDER_PROFILE;
   const look = useMemo(() => buildLook(profile, tryOn, custom), [profile, tryOn, custom]);
+
+  const current = useMemo(() => {
+    const out: Partial<Record<Slot, Cosmetic | undefined>> = {};
+    for (const slot of ["background", "avatarFrame", "animatedAvatar", "theme"] as Slot[]) {
+      out[slot] = slot in tryOn ? (tryOn[slot] ?? undefined) : profile.equipped[slot];
+    }
+    return out;
+  }, [profile, tryOn]);
 
   function submit(e: FormEvent) {
     e.preventDefault();
@@ -62,11 +74,28 @@ export function Studio() {
       <FitToWidth>
         <ProfilePreview look={look} />
       </FitToWidth>
+
+      <div className={styles.controls}>
+        <SlotBar
+          profile={profile}
+          tryOn={tryOn}
+          custom={custom}
+          onRemove={(slot) => setTryOn({ ...tryOn, [slot]: null })}
+          onReset={(slot) => {
+            const next = { ...tryOn };
+            delete next[slot];
+            setTryOn(next);
+          }}
+        />
+        <CustomArtPicker custom={custom} onChange={setCustom} />
+      </div>
+
+      <ItemBrowser current={current} onApply={(slot, item) => setTryOn({ ...tryOn, [slot]: item })} />
     </div>
   );
 }
 
-function StatusLine({ state }: { state: ReturnType<typeof useProfile> }) {
+function StatusLine({ state }: { state: ProfileState }) {
   if (state.status === "error") return <p className={styles.error}>{state.message}</p>;
   if (state.status === "ready" && !state.profile.isPublic) {
     return <p className={styles.note}>This profile is private, so Steam only shares its name and avatar.</p>;
