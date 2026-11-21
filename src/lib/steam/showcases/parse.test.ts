@@ -175,6 +175,18 @@ describe("parseProfilePage edge cases", () => {
     });
   });
 
+  it("spots long artwork (asked for 506px wide, no letterbox)", () => {
+    const p = parseProfilePage(`<div class="profile_customization_area">
+      <div class="profile_customization myart"><div class="profile_customization_header">Artwork Showcase</div>
+        <div class="profile_customization_block"><div class="screenshot_showcase">
+          <div class="screenshot_showcase_primary showcase_slot"><a class="screenshot_showcase_screenshot" href="https://x/1">
+            <img src="https://images.steamusercontent.com/ugc/1/A/?imw=506&&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false"></a>
+            <div class="screenshot_showcase_itemname">_</div></div>
+        </div></div></div>
+    </div>`);
+    expect(p.showcases[0]).toMatchObject({ kind: "artwork", mode: "long" });
+  });
+
   it("knows when the page isn't a profile at all (Steam's error page)", () => {
     expect(parseProfilePage("<html><body><h2>An error was encountered</h2></body></html>").isProfilePage).toBe(false);
   });

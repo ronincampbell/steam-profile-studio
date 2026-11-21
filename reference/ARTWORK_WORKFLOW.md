@@ -5,7 +5,12 @@ the pieces ("chunks") of the background that sit behind each artwork slot. You p
 them in Photoshop, upload them to Steam as artwork, and they line up with the background,
 the way Ronin's "NO SIGNAL / FUZZYCAST" GIF uses the middle of *Glitch Sansui-zu*.
 
-Researched 21 Nov 2026. No app code was changed.
+Researched 21 Nov 2026. **Built 21 Nov 2026** (Ronin approved the plan with the recommended
+answers to questions 1–4; PSD left for later): `src/lib/artwork/` and
+`src/components/ArtworkWorkflow/`. In the preview, the slots land on exactly the positions in
+§3.2 (normal and long, checked with Playwright), and the exported pieces match the background
+video's first frame within decoder noise (about 1/255). The upload-test unknowns in §11 are
+still open, and the app labels those steps "not yet tested".
 
 **How to read the tags:**
 - **C** means confirmed, and the source is given: a file and line, a Steam CSS rule, a
