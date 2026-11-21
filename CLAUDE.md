@@ -28,12 +28,13 @@ Paste a public profile → it renders like Steam's profile header (name, avatar,
 | Vanity name → SteamID | `ISteamUser/ResolveVanityURL/v1` | needs key |
 | Name, avatar, profile URL | `ISteamUser/GetPlayerSummaries/v2` | needs key |
 | Steam level | `IPlayerService/GetSteamLevel/v1` | needs key |
-| Currently equipped items | `IPlayerService/GetProfileItemsEquipped/v1` | undocumented, **test first** |
-| Points Shop catalogue | `ILoyaltyRewardsService/QueryRewardItems/v1` | undocumented; used by community Points Shop tools. `count` must be 100–1000. Check whether it needs a key, how to filter by item class, and which fields hold image/video URLs |
-| Buy links | Points Shop item pages | work out the deep-link format from the catalogue data |
+| Currently equipped items | `IPlayerService/GetProfileItemsEquipped/v1` | undocumented; works without a key (verified 21 Nov). Asset paths are `items/<appid>/<file>` |
+| Points Shop catalogue | `ILoyaltyRewardsService/QueryRewardItems/v1` | undocumented; works without a key. `count` 100–1000, filter with `community_item_classes[0]=<n>` (3 background, 8 theme, 13 mini background, 14 frame, 15 animated avatar), page with `next_cursor`. Images/videos are bare filenames in `community_item_data` |
+| Buy links | `https://store.steampowered.com/points/shop/app/<appid>` | verified 21 Nov: **no per-item link exists**; this game page lists the item and the user clicks it. `pointsShopAppUrl()` |
+| Image/video URLs | `https://shared.fastly.steamstatic.com/community_assets/images/` | verified 21 Nov: catalogue → `items/<appid>/<file>`, equipped → `<path>`. `assetUrl()`, `catalogueAssetUrl()`. Old `cdn.*/steamcommunity/public/images` paths 404 |
 | Showcases (stretch) | public profile HTML | scrape; only for public profiles |
 
-First step on the data side: write a small script that calls each endpoint for Ronin's own profile and saves the raw JSON to `/reference/api/` so the real data shape is known before any types are written.
+First step on the data side: write a small script that calls each endpoint for Ronin's own profile and saves the raw JSON to `/reference/api/` so the real data shape is known before any types are written. Done: see `reference/api/FINDINGS.md`.
 
 ## Architecture sketch
 
