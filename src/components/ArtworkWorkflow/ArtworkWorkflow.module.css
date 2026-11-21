@@ -1,0 +1,332 @@
+/* The artwork planner panel. App chrome in Steam-adjacent colours, matching Studio.module.css. */
+.panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  gap: 10px;
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #c6d4df;
+  background: #1b2431;
+  border: 1px solid #263041;
+  border-radius: 4px;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  align-items: baseline;
+}
+
+.title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: normal;
+  color: #ffffff;
+}
+
+.head .linkButton {
+  margin-inline-start: auto;
+}
+
+.note {
+  font-size: 12px;
+  color: #8f98a0;
+}
+
+.error,
+.warning {
+  margin: 0;
+  font-size: 12px;
+}
+.error {
+  color: #ff7b7b;
+}
+.warning {
+  color: #e8c36a;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #263041;
+}
+
+.stepNumber {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  color: #ffffff;
+  background: #2a475e;
+  border-radius: 50%;
+}
+
+.stepBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  min-width: 0;
+}
+
+.stepTitle {
+  color: #ffffff;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.choice {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  background: #16202d;
+  border: 1px solid #263041;
+  border-radius: 3px;
+}
+.choice input {
+  grid-row: span 2;
+  margin: 2px 0 0;
+}
+.choiceOn {
+  border-color: #66c0f4;
+  background: rgba(103, 193, 245, 0.08);
+}
+.choiceTitle {
+  color: #ffffff;
+}
+.choiceDetail {
+  font-size: 12px;
+  color: #8f98a0;
+}
+
+.slider {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: center;
+}
+.slider input[type="range"] {
+  flex: 1 1 200px;
+  accent-color: #66c0f4;
+}
+.value {
+  min-width: 52px;
+  font-variant-numeric: tabular-nums;
+  color: #ffffff;
+}
+
+.check {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.check input {
+  accent-color: #66c0f4;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+}
+
+.select {
+  justify-self: start;
+  max-width: 100%;
+  padding: 6px 8px;
+  font: inherit;
+  color: #ffffff;
+  background: #16202d;
+  border: 1px solid #263041;
+  border-radius: 3px;
+}
+
+.primaryButton {
+  padding: 7px 16px;
+  font: inherit;
+  color: #ffffff;
+  background: linear-gradient(to right, #47bfff 5%, #1a44c2 60%);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.primaryButton:hover {
+  filter: brightness(1.1);
+}
+.primaryButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+  filter: none;
+}
+
+.linkButton {
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  color: #66c0f4;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.linkButton:hover {
+  text-decoration: underline;
+}
+
+.sizes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  font-size: 12px;
+}
+.sizes code,
+.code code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: #ffffff;
+}
+
+.dropZone {
+  position: relative;
+  display: block;
+  padding: 16px;
+  text-align: center;
+  color: #8f98a0;
+  border: 1px dashed #3d4f66;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.dropZone:hover,
+.dropZoneActive {
+  color: #ffffff;
+  border-color: #66c0f4;
+  background: rgba(103, 193, 245, 0.06);
+}
+.dropZone:focus-within {
+  outline: 2px solid #66c0f4;
+}
+.dropZone input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.checks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+}
+.checks li {
+  padding-inline-start: 10px;
+  border-inline-start: 2px solid transparent;
+}
+.good {
+  border-color: #5ba32b !important;
+}
+.bad {
+  border-color: #e8c36a !important;
+}
+.ok {
+  color: #a4d007;
+}
+.problem {
+  display: block;
+  color: #e8c36a;
+}
+
+.guide {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: guide;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+.guide > li {
+  counter-increment: guide;
+}
+.guideHead {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: baseline;
+  color: #ffffff;
+  cursor: pointer;
+}
+.guideHead input {
+  accent-color: #66c0f4;
+}
+.guideHead span:first-of-type::before {
+  content: counter(guide) ". ";
+}
+.guideDone .guideHead span:first-of-type {
+  color: #8f98a0;
+  text-decoration: line-through;
+}
+.guideText {
+  margin: 2px 0 0 22px;
+  font-size: 12px;
+  color: #acb2b8;
+}
+.guideText a {
+  color: #66c0f4;
+  word-break: break-all;
+}
+.tag {
+  padding: 0 6px;
+  font-size: 11px;
+  color: #e8c36a;
+  border: 1px solid rgba(232, 195, 106, 0.5);
+  border-radius: 9px;
+}
+.code {
+  min-width: 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 6px 0 0 22px;
+  padding: 8px 10px;
+  background: #0e141b;
+  border: 1px solid #263041;
+  border-radius: 3px;
+}
+.code code {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* Inside a menu panel, which has its own title and box. */
+.bare {
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

@@ -46,13 +46,19 @@ export interface ArtworkShowcase {
   small: ArtworkImage[];
   /** The "+ 41" tile under the small images, linking to all of them. */
   more?: { text: string; href: string };
+  /**
+   * "long": images uploaded as wide images, which Steam shows at full height,
+   * 506px and 100px wide, without letterboxing (reference/ARTWORK_WORKFLOW.md §1).
+   * Missing means normal: fitted into 480×480 and 100×80 boxes.
+   */
+  mode?: "normal" | "long";
 }
 
 /**
  * Screenshot Showcase (type 7), Video Showcase (14) and Featured Artwork (22)
  * use the Artwork showcase's markup. Featured Artwork has one wide image
  * (`.screenshot_showcase_primary.single`) and no small ones; videos have a
- * play icon over each image.
+ * play icon over the large image.
  */
 export interface ScreenshotShowcase extends Omit<ArtworkShowcase, "kind"> {
   kind: "screenshot" | "video" | "featuredArtwork";

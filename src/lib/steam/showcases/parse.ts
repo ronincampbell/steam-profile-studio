@@ -122,9 +122,13 @@ function parseArtwork(block: HTMLElement, title: string): ArtworkShowcase {
   // "+ 41": Steam links to the rest of the player's artwork (seen on
   // visitors' view of a profile with more than 4 artworks).
   const moreEl = block.querySelector(".screenshot_count");
+  // Long artwork (uploaded as a wide image) is asked for 506px wide with no
+  // letterbox; normal artwork is letterboxed into 480×480.
+  const long = primary ? /[?&]imw=506\b/.test(primary.image) && !/letterbox=true/.test(primary.image) : false;
   return {
     kind: "artwork",
     title,
+    ...(long ? { mode: "long" as const } : {}),
     primary: primary
       ? {
           ...primary,
