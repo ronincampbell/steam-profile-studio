@@ -159,4 +159,61 @@ export interface ProfileShowcases {
    */
   visibility: "public" | "private" | "unavailable";
   showcases: Showcase[];
+  /** The right-hand column and the favourite badge, read from the same page. */
+  sidebar?: ProfileSidebar;
+}
+
+/* ---------- Right-hand column (div.profile_rightcol) ---------- */
+
+/** One "Games 394" line. `total` is missing when Steam shows no number (Inventory). */
+export interface CountLink {
+  label: string;
+  total?: string;
+  href: string;
+}
+
+export type PersonaState = "online" | "offline" | "in-game";
+
+/** The badge under "Level 75" in the header (div.profile_header_badge). */
+export interface FavoriteBadge {
+  href: string;
+  image: string;
+  name: string;
+  /** "100 XP" */
+  xp: string;
+  /** Tooltip lines, e.g. ["Lost Soul", "Level 1 Hyper Light Drifter Badge"]. */
+  tooltip: string[];
+}
+
+export interface SidebarGroup {
+  name: string;
+  href: string;
+  avatar: string;
+  /** "22 Members" */
+  members: string;
+  /** The primary group is drawn bigger (64px avatar). */
+  primary: boolean;
+}
+
+/** One friend in the top-friends list. */
+export interface SidebarFriend {
+  level: number | null;
+  state: PersonaState;
+  name?: string;
+  avatar?: string;
+  href?: string;
+  /** The grey line under the name, e.g. "Online" or a game name. */
+  detail?: string;
+}
+
+export interface ProfileSidebar {
+  favoriteBadge?: FavoriteBadge;
+  /** div.profile_in_game: "Currently Online", or "Currently In-Game" plus the game. */
+  status?: { state: PersonaState; header: string; detail?: string };
+  awards?: CountLink & { icons: { image: string; animatedImage?: string; tooltip: string }[] };
+  badges?: CountLink & { icons: { href: string; image: string; tooltip: string[] }[] };
+  /** Games, Inventory, Screenshots, Reviews, Artwork… in Steam's order. */
+  itemLinks: CountLink[];
+  groups?: CountLink & { list: SidebarGroup[] };
+  friends?: CountLink & { list: SidebarFriend[] };
 }

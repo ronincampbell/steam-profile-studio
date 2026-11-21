@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { ProfileShowcases } from "@/lib/steam/showcases/types";
 
-/** The showcases for `steamId`, or null while loading (or with no profile). */
+/** The showcases (and right-hand column) for `steamId`, or null while loading (or with no profile). */
 export function useShowcases(steamId: string | null): ProfileShowcases | null {
   const [result, setResult] = useState<ProfileShowcases | null>(null);
 
