@@ -20,6 +20,8 @@ import {
   type RawRewardItem,
 } from "./normalize";
 import { pointsShopAppUrl } from "./pointsShop";
+import { parseProfilePage } from "./showcases/parse";
+import type { ProfileShowcases } from "./showcases/types";
 import { ITEM_TYPES, type CataloguePage, type ItemType, type Profile, type ShopItem } from "./types";
 
 const API = "https://api.steampowered.com";
@@ -111,6 +113,46 @@ export async function getProfile(steamId: string): Promise<Profile | null> {
     normalizeEquipped(equipped.response),
     customization.response.profile_theme?.theme_id,
   );
+}
+
+/* ---------- Showcases ---------- */
+
+/**
+ * A profile's showcases, read from its public profile page.
+ *
+ * Showcases aren't in the Web API, so this loads
+ * steamcommunity.com/profiles/<id>/ (English labels) and parses the HTML; see
+ * reference/html/SHOWCASES.md. Cached like a profile (about 10 minutes):
+ * Steam's community site starts answering 429 after a handful of quick
+ * requests, so each profile costs it at most one page load per 10 minutes.
+ *
+ * Never throws: when Steam is down or rate limiting, this answers
+ * `unavailable` and caches that for seconds only. (An error thrown inside a
+ * "use cache" function reaches the caller as a generic error, so the route
+ * couldn't tell it apart from a bug.)
+ */
+export async function getShowcases(steamId: string): Promise<ProfileShowcases> {
+  "use cache";
+
+  let html: string | null = null;
+  try {
+    const res = await fetch(`https://steamcommunity.com/profiles/${steamId}/?l=english`, {
+      headers: { Accept: "text/html", "Accept-Language": "en-US,en;q=0.9" },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (res.ok) html = await res.text();
+  } catch {
+    // Treated as unavailable below.
+  }
+  if (html === null) {
+    cacheLife("seconds");
+    return { steamId, visibility: "unavailable", showcases: [] };
+  }
+
+  cacheLife("profile");
+  const page = parseProfilePage(html);
+  if (page.isPrivate) return { steamId, visibility: "private", showcases: [] };
+  return { steamId, visibility: "public", showcases: page.showcases };
 }
 
 /* ---------- Catalogue ---------- */

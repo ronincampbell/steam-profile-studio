@@ -16,6 +16,7 @@ import { CustomArtPicker } from "./CustomArtPicker";
 import { FitToWidth } from "./FitToWidth";
 import { SlotBar } from "./SlotBar";
 import { useProfile, type ProfileState } from "./useProfile";
+import { useShowcases } from "./useShowcases";
 import styles from "./Studio.module.css";
 
 const SLOT_BY_TYPE: Partial<Record<ItemType, Slot>> = {
@@ -36,6 +37,7 @@ export function Studio() {
 
   const profile = state.status === "ready" ? state.profile : PLACEHOLDER_PROFILE;
   const look = useMemo(() => buildLook(profile, tryOn, custom), [profile, tryOn, custom]);
+  const showcases = useShowcases(state.status === "ready" ? state.profile.steamId : null);
 
   const current = useMemo(() => {
     const out: Partial<Record<Slot, Cosmetic | undefined>> = {};
@@ -102,7 +104,7 @@ export function Studio() {
       </header>
 
       <FitToWidth>
-        <ProfilePreview look={look} />
+        <ProfilePreview look={look} showcases={state.status === "ready" ? showcases : undefined} />
       </FitToWidth>
 
       <div className={styles.controls}>

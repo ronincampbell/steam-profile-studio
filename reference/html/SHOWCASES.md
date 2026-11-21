@@ -24,9 +24,13 @@ Things to know before building on it:
   localised. Without it the server's region or the `Accept-Language` header
   decides the language.
 - **Rate limit (verified, roughly).** After about five quick requests the
-  site answered **HTTP 429**; a minute later it answered normally again. The
-  exact limit is unknown. Caching per profile (below) and treating 429 as
-  "showcases unavailable right now" handles this.
+  site answered **HTTP 429**. On a second day of testing (21 Nov, during the
+  build) the same cloud IP got 429 again after only 2 to 4 requests spread
+  over a few minutes, and stayed limited for several minutes. The exact limit
+  is unknown and seems to depend on recent traffic from the IP. Caching per
+  profile and treating 429 as "showcases unavailable right now" handles it,
+  but **check it from Vercel**: its servers share IP addresses, so the
+  limit may be hit more often there.
 - **Anonymous view differs from the reference screenshot**, which was taken
   signed in as the owner:
   - The owner sees a **"+ 2" tile** under the Artwork showcase's small images
@@ -277,6 +281,18 @@ Steam the same way it loads item images. They don't need copying into the repo.
 
 ### First 3 showcases
 
+**Built 21 Nov 2026** (Ronin approved this plan): Game Collector, Artwork and
+Badge Collector first, then (same day, same PR) Favourite Guide,
+Completionist, Steam Replay and Achievement. All 7 showcase types on
+Fuzzycast's profile are drawn, in `src/components/Showcases/` (Replay's CSS
+in `Replay.module.css`, copied from the inline `<style>` in the page), parsed by
+`src/lib/steam/showcases/parse.ts` and served by `/api/profile/showcases`.
+Any other showcase type shows its title bar only, so the page order stays right.
+
+Parser gotcha: node-html-parser's `classList` can pick up `class="…"` from
+inside other attributes (Steam's achievement `data-tooltip-html` holds HTML),
+so the parser reads the `class` attribute itself (`classes()` / `hasClass()`).
+
 1. **Game Collector**: the most common showcase, very visual (a wall of
    capsules), simple markup, all images on an allowed host.
 2. **Artwork**: the most visual and the first thing on Fuzzycast's profile,
@@ -344,8 +360,28 @@ match the API's types, and log a warning when Steam's markup drifts.
   diff it against the same crop of the reference. Use the anonymous view
   (no "+ 2" tile, no "Add a Showcase") and expect those owner-only bits to
   differ.
-- **Fonts**: Motiva Sans is loaded from Steam's own CSS, never self-hosted,
-  the same as the header.
+- **Fonts**: as in the header, Motiva Sans is used only if the viewer has it
+  installed (it's licensed, so it's never self-hosted); otherwise Arial.
+  Where Steam leaves text at line-height "normal", the showcase CSS sets a
+  line height measured from the reference, so boxes are the same height in
+  either font. Only the letter shapes and widths differ.
+- **Result for the other 4 (21 Nov 2026)**: Completionist 561px, Steam
+  Replay 268px and Achievement 249px tall, the same as the screenshot; capsules
+  and achievement icons match pixel for pixel, and Replay differs only in its
+  bold text. Two known differences: the **Favorite Guide** is 30px shorter here
+  because its title is written in fancy Unicode letters that neither Motiva nor
+  Arial has, so the browser picks a system font for them, and the one in the
+  cloud test browser is narrower than the one on the Windows PC that took the
+  screenshot, so the title fits on one line instead of two (on the same
+  computer as Steam, it should wrap the same way). And the **adult-content
+  capsule** in Completionist is blurred, because that's what Steam shows
+  visitors (the screenshot was taken signed in as the owner).
+- **Result for the first 3 (21 Nov 2026)**, at 1725px wide against the
+  reference: Artwork box 531px tall, Game Collector 385px, Badge Collector
+  249px, all exactly as in the screenshot. The Favorite Guide header lands
+  on the same row (1284px). Capsules and badge icons match pixel for pixel;
+  the remaining differences are the Arial text and the animated artwork GIF
+  being on a different frame.
 
 ### Not confirmed (needs a real example before building)
 

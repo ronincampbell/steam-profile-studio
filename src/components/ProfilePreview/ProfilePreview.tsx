@@ -18,6 +18,8 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { levelBadge } from "@/lib/steam/level";
 import { themeCssVars } from "@/lib/steam/themes";
 import type { Video } from "@/lib/steam/types";
+import type { ProfileShowcases } from "@/lib/steam/showcases/types";
+import { Showcases } from "@/components/Showcases/Showcases";
 import styles from "./ProfilePreview.module.css";
 
 /** Everything the header draws. Built from a Profile plus whatever the user is trying on. */
@@ -51,7 +53,14 @@ function countryName(code: string): string {
   }
 }
 
-export function ProfilePreview({ look }: { look: PreviewLook }) {
+export function ProfilePreview({
+  look,
+  showcases,
+}: {
+  look: PreviewLook;
+  /** The profile's showcases: null while loading, undefined with no profile loaded. */
+  showcases?: ProfileShowcases | null;
+}) {
   const bg = look.background;
   const hasVideo = Boolean(bg?.video?.webm || bg?.video?.mp4);
   const imageRatio = useImageRatio(bg?.image);
@@ -148,13 +157,34 @@ export function ProfilePreview({ look }: { look: PreviewLook }) {
         </div>
 
         <div className={styles.content}>
-          <div className={styles.contentNote}>
-            Showcases, badges and comments aren&apos;t part of the preview yet.
+          <div className={styles.contentInner}>
+            {/* div.profile_leftcol: showcases. The right column (badges,
+                groups, friends) isn't part of the preview yet. */}
+            <div className={styles.leftcol}>
+              {showcases?.showcases.length ? <Showcases showcases={showcases.showcases} /> : null}
+              <div className={styles.contentNote}>{showcasesNote(showcases)}</div>
+            </div>
+            <div className={styles.clearBoth} />
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+function showcasesNote(showcases: ProfileShowcases | null | undefined): string {
+  if (showcases === undefined) return "Paste a profile to see its showcases.";
+  if (showcases === null) return "Loading showcases…";
+  switch (showcases.visibility) {
+    case "private":
+      return "This profile is private, so Steam doesn't show its showcases.";
+    case "unavailable":
+      return "Steam didn't send this profile's showcases just now. Try again in a minute.";
+    default:
+      return showcases.showcases.length
+        ? "Badges, groups, friends and comments aren't part of the preview yet."
+        : "This profile has no showcases.";
+  }
 }
 
 /** Height ÷ width of an image, once it has loaded. */

@@ -1,0 +1,337 @@
+/**
+ * Profile showcases, rebuilt from Steam's markup and CSS.
+ *
+ * The element structure and class names follow Steam's profile page (see
+ * reference/html/SHOWCASES.md and reference/html/fuzzycast-profile.html) so
+ * every size can be checked against Steam's profilev2.css. Showcases the
+ * preview can't draw yet show just their title bar, so the order stays right.
+ */
+/* eslint-disable @next/next/no-img-element -- Steam's own resized images, loaded as-is. */
+import type {
+  AchievementShowcase,
+  ArtworkShowcase,
+  BadgeCollectorShowcase,
+  CompletionistShowcase,
+  FavoriteGuideShowcase,
+  GameCollectorShowcase,
+  ReplayShowcase,
+  Showcase,
+  ShowcaseStat,
+} from "@/lib/steam/showcases/types";
+import styles from "./Showcases.module.css";
+import replay from "./Replay.module.css";
+
+export function Showcases({ showcases }: { showcases: Showcase[] }) {
+  return (
+    <div className={styles.area} data-testid="showcases">
+      {showcases.map((s, i) => (
+        <ShowcaseBox key={i} showcase={s} />
+      ))}
+    </div>
+  );
+}
+
+function ShowcaseBox({ showcase }: { showcase: Showcase }) {
+  const isArt = showcase.kind === "artwork";
+  return (
+    <div className={`${styles.customization} ${isArt ? styles.myart : ""}`} data-showcase={showcase.kind}>
+      {/* Steam hides the Artwork showcase's header with CSS; so do we. */}
+      {!isArt && <div className={styles.header}>{showcase.title}</div>}
+      <div className={`${styles.block} ${showcase.kind === "replay" ? styles.replayBlock : ""}`}>
+        {showcase.kind === "artwork" && <Artwork showcase={showcase} />}
+        {showcase.kind === "gameCollector" && <GameCollector showcase={showcase} />}
+        {showcase.kind === "badgeCollector" && <BadgeCollector showcase={showcase} />}
+        {showcase.kind === "favoriteGuide" && <FavoriteGuide showcase={showcase} />}
+        {showcase.kind === "completionist" && <Completionist showcase={showcase} />}
+        {showcase.kind === "replay" && <Replay showcase={showcase} />}
+        {showcase.kind === "achievement" && <Achievement showcase={showcase} />}
+        {showcase.kind === "unsupported" && (
+          <div className={styles.unsupported}>This showcase isn&apos;t in the preview yet.</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Stats({ stats, wrap = false }: { stats: ShowcaseStat[]; wrap?: boolean }) {
+  if (!stats.length) return null;
+  return (
+    <div className={`${styles.contentBg} ${styles.statsRow} ${wrap ? styles.statsRowWrap : ""}`}>
+      {stats.map((s, i) => {
+        const inner = (
+          <>
+            <div className={styles.statValue}>{s.value}</div>
+            <div className={styles.statLabel}>{s.label}</div>
+          </>
+        );
+        return s.href ? (
+          <a
+            key={i}
+            className={`${styles.stat} ${styles.statLink}`}
+            href={s.href}
+            title={s.tooltip}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {inner}
+          </a>
+        ) : (
+          <div key={i} className={styles.stat} title={s.tooltip}>
+            {inner}
+          </div>
+        );
+      })}
+      <div className={styles.clearStart} />
+    </div>
+  );
+}
+
+function Artwork({ showcase }: { showcase: ArtworkShowcase }) {
+  const { primary, small } = showcase;
+  return (
+    <div className={styles.screenshotShowcase}>
+      {primary && (
+        <div className={`${styles.screenshotPrimary} ${styles.slot}`}>
+          <a className={styles.screenshot} href={primary.href} target="_blank" rel="noreferrer">
+            <img width="100%" style={{ maxWidth: 480 }} src={primary.image} alt={primary.name} />
+          </a>
+          <div className={styles.screenshotItemName}>{primary.name}</div>
+          <div className={styles.screenshotStats} />
+        </div>
+      )}
+      <div className={styles.screenshotRightCol}>
+        {small.map((s, i) => (
+          <div key={i} className={`${styles.smallScreenshot} ${styles.slot}`}>
+            <a className={styles.screenshot} href={s.href} target="_blank" rel="noreferrer">
+              <img width="100%" style={{ maxWidth: 100 }} src={s.image} alt="" />
+            </a>
+          </div>
+        ))}
+      </div>
+      <div className={styles.clearBoth} />
+    </div>
+  );
+}
+
+function GameCollector({ showcase }: { showcase: GameCollectorShowcase }) {
+  return (
+    <>
+      <div>
+        <Stats stats={showcase.stats} />
+        {showcase.bodyLabel && <div className={styles.bodyLabel}>{showcase.bodyLabel}</div>}
+        {showcase.games.length > 0 && (
+          <div className={styles.gameCollectorGames}>
+            {showcase.games.map((g, i) => (
+              <div key={i} className={`${styles.slot} ${styles.gameCollectorGame}`}>
+                <a href={g.href} target="_blank" rel="noreferrer">
+                  <img className={styles.gameCapsule} src={g.image} alt="" />
+                </a>
+              </div>
+            ))}
+            <div className={styles.clearStart} />
+          </div>
+        )}
+      </div>
+      <div className={styles.clearBoth} />
+    </>
+  );
+}
+
+function BadgeCollector({ showcase }: { showcase: BadgeCollectorShowcase }) {
+  return (
+    <>
+      <div>
+        <div className={styles.badgesIcons}>
+          {showcase.badges.map((b, i) => (
+            <div key={i} className={`${styles.slot} ${styles.badge}`} title={b.tooltip.join("\n")}>
+              <a href={b.href} target="_blank" rel="noreferrer">
+                <img className={styles.badgeIcon} src={b.image} alt={b.tooltip[0] ?? ""} />
+              </a>
+            </div>
+          ))}
+          <div className={styles.clearStart} />
+        </div>
+        <Stats stats={showcase.stats} />
+      </div>
+      <div className={styles.clearBoth} />
+    </>
+  );
+}
+
+function FavoriteGuide({ showcase }: { showcase: FavoriteGuideShowcase }) {
+  const g = showcase.guide;
+  if (!g) return null;
+  return (
+    <div className={styles.favoriteGuide}>
+      <div className={styles.contentBg}>
+        <div className={`${styles.workshopItem} ${styles.slot}`}>
+          <a href={g.href} target="_blank" rel="noreferrer">
+            <img className={styles.workshopItemImage} src={g.image} alt="" />
+          </a>
+          <div>
+            <div className={styles.detailTitle}>
+              <a href={g.href} target="_blank" rel="noreferrer">
+                {g.name}
+              </a>
+            </div>
+            {g.authors.length > 0 && (
+              <div className={styles.guideContributors}>
+                {g.creditPrefix}
+                {g.authors.map((a, i) => (
+                  <span key={i}>
+                    {i > 0 && ", "}
+                    <a href={a.href} target="_blank" rel="noreferrer">
+                      {a.name}
+                    </a>
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className={styles.guideAppInfo}>
+              {g.stars && (
+                <div className={styles.workshopStars}>
+                  <img src={g.stars.image} alt="" /> {g.stars.text}
+                </div>
+              )}
+              {g.app && (
+                <div className={styles.workshopApp}>
+                  <a href={g.app.href} target="_blank" rel="noreferrer">
+                    <img src={g.app.icon} alt="" />
+                  </a>{" "}
+                  <a href={g.app.href} target="_blank" rel="noreferrer">
+                    {g.app.name}
+                  </a>
+                </div>
+              )}
+            </div>
+            <div className={styles.guideDescription}>{g.description}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Completionist({ showcase }: { showcase: CompletionistShowcase }) {
+  return (
+    <>
+      <div className={styles.completionist}>
+        {showcase.games.length > 0 && (
+          <div className={`${styles.contentBg} ${styles.completionistSlots}`}>
+            {showcase.games.map((g, i) => (
+              <div
+                key={i}
+                className={`${styles.slot} ${styles.completionistGame} ${g.adultContent ? styles.adultContent : ""}`}
+              >
+                <a href={g.href} target="_blank" rel="noreferrer">
+                  <img className={styles.completionistCapsule} src={g.image} alt="" />
+                  <div className={styles.completionistBar}>
+                    <div className={styles.completionistRibbons}>
+                      <span className={styles.ribbons}>
+                        {g.ribbons.map((r, j) => (
+                          <span key={j} className={`${styles.ribbonGroup} ${styles[`ribbon_${r.variant}`] ?? ""}`}>
+                            {r.count && <span className={styles.ribbonCount}>{r.count}</span>}
+                            {Array.from({ length: Math.max(1, r.trophies) }, (_, k) => (
+                              <span key={k} className={`${styles.ribbon} ${k > 0 ? styles.stacked : ""}`} />
+                            ))}
+                          </span>
+                        ))}
+                      </span>
+                    </div>
+                    <div className={styles.completionistCounts}>
+                      <div className={styles.numAchievements}>{g.achievements}</div>
+                      {g.subtitle && <div className={styles.countsSubtitle}>{g.subtitle}</div>}
+                    </div>
+                  </div>
+                </a>
+              </div>
+            ))}
+          </div>
+        )}
+        <Stats stats={showcase.stats} wrap />
+      </div>
+      <div className={styles.clearBoth} />
+    </>
+  );
+}
+
+function Achievement({ showcase }: { showcase: AchievementShowcase }) {
+  return (
+    <>
+      <div className={styles.achievementShowcase}>
+        {showcase.achievements.length > 0 && (
+          <div className={`${styles.contentBg} ${styles.achievementIcons}`}>
+            {showcase.achievements.map((a, i) => (
+              <div
+                key={i}
+                className={`${styles.slot} ${styles.achievement} ${a.rare ? styles.rare : ""}`}
+                title={[a.name, a.description, a.game, a.percent].filter(Boolean).join("\n")}
+              >
+                {a.rare && (
+                  <div className={styles.glowRoot}>
+                    <div className={styles.glowContainer}>
+                      <div className={styles.glow} />
+                    </div>
+                  </div>
+                )}
+                <a href={a.href} target="_blank" rel="noreferrer">
+                  <img src={a.image} alt={a.name ?? ""} />
+                </a>
+              </div>
+            ))}
+            <div className={styles.clearStart} />
+          </div>
+        )}
+        <Stats stats={showcase.stats} wrap />
+      </div>
+      <div className={styles.clearBoth} />
+    </>
+  );
+}
+
+/** Steam Replay. Its CSS is inline in Steam's page; see Replay.module.css. */
+function Replay({ showcase }: { showcase: ReplayShowcase }) {
+  const sizeClass = replay[showcase.background.size] ?? replay.xsmall_capsule_background;
+  const body = (
+    <div className={`${replay.replay} ${replay[`gradient_${showcase.year}`] ?? ""}`}>
+      <div className={replay.background_ctn}>
+        <div className={replay.background_img_ctn}>
+          {showcase.background.images.map((src, i) => (
+            <img key={i} className={sizeClass} src={src} alt="" />
+          ))}
+        </div>
+      </div>
+      <div className={replay.games_played_ctn}>
+        <div className={`${replay.big_stat} ${showcase.gamesPlayed.highNum ? replay.high_num : ""}`}>
+          {showcase.gamesPlayed.value}
+        </div>
+        <div className={replay.games_played_text}>
+          <div className={replay.games_played_title}>{showcase.gamesPlayed.label}</div>
+        </div>
+      </div>
+      {showcase.stats.map((s) => (
+        <div key={s.key} className={`${replay.stat_ctn} ${replay[s.key] ?? ""}`}>
+          <div className={`${replay.mid_stat} ${replay[s.size] ?? ""}`}>{s.value}</div>
+          {s.label}
+        </div>
+      ))}
+      <div className={replay.most_played_ctn}>
+        <div className={replay.most_played_images_ctn}>
+          {showcase.mostPlayed.map((m, i) => (
+            <div key={i} className={replay.most_played_app}>
+              <img className={replay.most_played_capsule} src={m.image} alt="" />
+              <div className={replay.most_played_percent}>{m.percent}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+  return showcase.href ? (
+    <a href={showcase.href} target="_blank" rel="noreferrer">
+      {body}
+    </a>
+  ) : (
+    body
+  );
+}

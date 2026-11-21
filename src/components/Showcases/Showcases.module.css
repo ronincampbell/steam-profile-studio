@@ -1,0 +1,653 @@
+/*
+ * Profile showcases. Values are Steam's, from profilev2.css (21 Nov 2026);
+ * each rule names the Steam selector it copies. Steam's page uses
+ * content-box sizing and float layout, so this does too.
+ *
+ * Line heights: Steam leaves most text at "normal", which depends on the
+ * font. Motiva Sans (Steam's font, licensed, so only used when the viewer has
+ * it) is taller than the Arial fallback, so text that Steam sets in Motiva
+ * gets an explicit line height here, measured from the reference screenshot,
+ * so the boxes come out the same height either way.
+ */
+
+/* a, .whiteLink (globalv2.css) */
+.area a {
+  color: #ebebeb;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.area img {
+  border: none;
+}
+
+/* .profile_customization */
+.customization {
+  position: relative;
+  background-position: top left;
+  background-repeat: no-repeat;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(20px);
+  border-radius: 3px;
+  padding: 0;
+  margin-bottom: 12px;
+  font-size: 13px;
+  overflow: hidden;
+}
+
+/* .profile_customization_header */
+.header {
+  font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
+  font-weight: 200;
+  background: var(--color-showcase-header);
+  background: linear-gradient(90deg, var(--gradient-showcase-header-left) 0%, var(--color-showcase-header) 90%);
+  padding: 5px 10px 5px 10px;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 30px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* .profile_customization_block */
+.block {
+  position: relative;
+  border-radius: 5px;
+  padding: 20px 10px 11px 10px;
+  margin-bottom: 0;
+  font-size: 13px;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+/* .myart .profile_customization_block */
+.myart .block {
+  padding: 15px 10px 11px 10px;
+}
+
+/* .showcase_content_bg */
+.contentBg {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 8px;
+  border-radius: 5px;
+  margin-bottom: 9px;
+  overflow: hidden;
+}
+
+.contentBg:last-child {
+  margin-bottom: 0;
+}
+
+/* .showcase_stats_row */
+.statsRow {
+  white-space: nowrap;
+}
+
+/* .achievement_showcase .showcase_stats_row,
+   .showcase_achievementscompletionist_games .showcase_stats_row:
+   long labels wrap instead of clipping */
+.statsRowWrap {
+  display: flex;
+  white-space: normal;
+}
+
+.statsRowWrap .stat {
+  min-width: 0;
+}
+
+/* .showcase_stat, .showcase_stats_row .showcase_stat */
+.stat {
+  font-size: 34px;
+  margin-inline-start: 42px;
+  display: inline-block;
+}
+
+.stat:first-child {
+  margin-inline-start: 0;
+}
+
+/* .showcase_stat .value */
+.statValue {
+  font-size: 1em;
+  font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
+  font-weight: 200;
+  color: #ffffff;
+  line-height: 52px; /* matches Motiva Sans at 34px in the reference */
+}
+
+/* .showcase_stat .label */
+.statLabel {
+  font-size: 0.5em;
+  line-height: 21px; /* matches Motiva Sans at 17px in the reference */
+  color: #9b9b9b;
+}
+
+.statLink:hover .statLabel {
+  color: #ffffff;
+}
+
+/* .showcase_bodylabel */
+.bodyLabel {
+  font-size: 13px;
+  line-height: 19px; /* matches Motiva Sans at 13px in the reference */
+  margin-bottom: 8px;
+  color: #898989;
+}
+
+/* .showcase_slot */
+.slot {
+  display: block;
+  float: inline-start;
+  position: relative;
+}
+
+/* <div style="clear: inline-start;"> / <div style="clear: both;"> */
+.clearStart {
+  clear: inline-start;
+}
+
+.clearBoth {
+  clear: both;
+}
+
+/* ---------- Game Collector ---------- */
+
+/* .showcase_gamecollector_game */
+.gameCollectorGame {
+  width: 148px;
+  height: 56px;
+  margin-inline-start: 7px;
+  margin-bottom: 7px;
+  line-height: 56px;
+}
+
+/* .showcase_gamecollector_games .showcase_gamecollector_game:nth-child(4n-3) */
+.gameCollectorGames .gameCollectorGame:nth-child(4n-3) {
+  margin-inline-start: 0;
+}
+
+/* .showcase_gamecollector_game img.game_capsule */
+.gameCapsule {
+  width: 148px;
+  height: 56px;
+}
+
+/* ---------- Badge Collector ---------- */
+
+/* .showcase_badges_icons */
+.badgesIcons {
+  margin-bottom: 0;
+}
+
+/* .showcase_badges_icons .showcase_badge */
+.badge {
+  float: inline-start;
+  position: relative;
+  margin-inline-start: 26px;
+  margin-bottom: 9px;
+}
+
+.badge,
+.badgeIcon {
+  width: 80px;
+  height: 80px;
+}
+
+/* .showcase_badges_icons .showcase_badge:nth-child(6n-5) */
+.badgesIcons .badge:nth-child(6n-5) {
+  margin-inline-start: 0;
+}
+
+/* ---------- Artwork ---------- */
+
+/* .screenshot_showcase_primary */
+.screenshotPrimary {
+  width: 508px;
+  max-width: calc(83% - 7px);
+  float: inline-start;
+  margin-inline-end: 7px;
+}
+
+/* .screenshot_showcase_screenshot */
+.screenshot {
+  cursor: pointer;
+  border: 1px solid #000000;
+  display: block;
+  overflow: hidden;
+}
+
+.screenshot:hover {
+  border: 1px solid #97c0e3;
+}
+
+.screenshotPrimary .screenshot {
+  margin-bottom: 4px;
+}
+
+.screenshot img {
+  display: block;
+}
+
+.screenshotPrimary .screenshot img {
+  margin-inline-start: auto;
+  margin-inline-end: auto;
+}
+
+/* .screenshot_showcase_itemname */
+.screenshotItemName {
+  word-wrap: break-word;
+  line-height: 19px; /* matches Motiva Sans at 13px in the reference */
+}
+
+/* .screenshot_showcase_stats */
+.screenshotStats {
+  line-height: 24px;
+}
+
+/* .screenshot_showcase_rightcol */
+.screenshotRightCol {
+  overflow: hidden;
+  max-width: 17%;
+  width: 102px;
+  text-align: center;
+}
+
+/* .screenshot_showcase_smallscreenshot */
+.smallScreenshot {
+  float: none;
+  margin-bottom: 11px;
+  overflow: hidden;
+}
+
+/* ---------- Favorite Guide ---------- */
+
+/* .workshop_showcase_item, .favoriteguide_showcase .workshop_showcase_item */
+.workshopItem {
+  height: auto;
+  min-height: 160px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* .workshop_showcase_item.showcase_slot */
+.workshopItem.slot {
+  float: none;
+}
+
+/* .workshop_showcase_item img.workshop_showcase_item_image */
+.workshopItemImage {
+  float: inline-start;
+  width: 160px;
+  max-width: 40%;
+  margin-inline-end: 8px;
+  display: block;
+}
+
+/* .showcase_item_detail_title */
+.detailTitle {
+  font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
+  font-weight: 200;
+  font-size: 24px;
+  padding-top: 10px;
+  color: #ffffff;
+  line-height: 29px;
+  max-height: 58px;
+  overflow: hidden;
+}
+
+/* .guide_showcase_contributors */
+.guideContributors {
+  margin-bottom: 8px;
+  line-height: 19px; /* matches Motiva Sans at 13px in the reference */
+}
+
+/* .guide_showcase_appinfo */
+.guideAppInfo {
+  line-height: 32px;
+  margin-bottom: 8px;
+}
+
+/* .workshop_showcase_stars */
+.workshopStars {
+  float: inline-end;
+}
+
+/* .workshop_showcase_app; .guide_showcase_appinfo .workshop_showcase_app img */
+.workshopApp {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.workshopApp img {
+  vertical-align: middle;
+}
+
+/* .guide_showcase_item_description */
+.guideDescription {
+  line-height: 18px;
+  max-height: 72px;
+}
+
+/* ---------- Completionist ---------- */
+
+/* .showcase_achievementscompletionist_slots */
+.completionistSlots {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 7px;
+}
+
+/* .showcase_achievementscompletionist_game */
+.completionistGame {
+  position: relative;
+  float: none;
+  box-sizing: border-box;
+  line-height: normal;
+}
+
+.completionistGame > a {
+  display: block;
+  padding-bottom: 40px;
+}
+
+/* .showcase_achievementscompletionist_game img.game_capsule */
+.completionistCapsule {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 304 / 142;
+}
+
+/* .app_has_adult_content (shared_global.css): Steam blurs these for visitors */
+.adultContent {
+  overflow: hidden;
+}
+
+.adultContent .completionistCapsule {
+  filter: blur(30px);
+}
+
+/* .showcase_achievementscompletionist_game_bar */
+.completionistBar {
+  font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
+  font-weight: 200;
+  position: absolute;
+  bottom: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
+  height: 40px;
+  padding: 0 8px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  line-height: normal;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* .showcase_achievementscompletionist_game_ribbons */
+.completionistRibbons {
+  display: flex;
+  align-items: center;
+}
+
+/* .showcase_completion_ribbons */
+.ribbons {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  line-height: normal;
+}
+
+/* .showcase_completion_ribbon_group (32px trophies inside the bar) */
+.ribbonGroup {
+  --trophy-base: 32px;
+  display: inline-flex;
+  align-items: center;
+  color: #1a9fff;
+}
+
+.ribbon_dlc {
+  color: #b658c4;
+}
+
+.ribbon_empty {
+  color: #8f98a0;
+}
+
+/* .showcase_completion_ribbon_count */
+.ribbonCount {
+  font-size: 14px;
+  font-weight: 500;
+  margin-inline-end: 4px;
+}
+
+/* .showcase_completion_ribbon */
+.ribbon {
+  --trophy-h: var(--trophy-base);
+  --trophy-w: calc(var(--trophy-h) * 16 / 24);
+  display: inline-block;
+  position: relative;
+  width: var(--trophy-w);
+  height: var(--trophy-h);
+  background: url("https://community.fastly.steamstatic.com/public/images/profile/achievement_trophy.svg") no-repeat center / contain;
+  z-index: 3;
+}
+
+.ribbon_dlc .ribbon {
+  background-image: url("https://community.fastly.steamstatic.com/public/images/profile/achievement_trophy_dlc.svg");
+}
+
+.ribbon_empty .ribbon {
+  filter: grayscale(1) brightness(0.7);
+  opacity: 0.7;
+}
+
+/* .showcase_completion_ribbon.stacked: extra trophies sit behind, smaller and
+   darker, with the front trophy's dilated outline cut out of them */
+.ribbon.stacked {
+  --trophy-h: calc(var(--trophy-base) * 0.875);
+  --prev-h: var(--trophy-base);
+  --prev-w: calc(var(--prev-h) * 16 / 24);
+  margin-inline-start: calc(var(--prev-w) * -0.3);
+  z-index: 2;
+  filter: brightness(0.8);
+  -webkit-mask-image: linear-gradient(#000, #000),
+    url("https://community.fastly.steamstatic.com/public/images/profile/achievement_trophy_dilated.svg");
+  mask-image: linear-gradient(#000, #000),
+    url("https://community.fastly.steamstatic.com/public/images/profile/achievement_trophy_dilated.svg");
+  -webkit-mask-size: 100% 100%, calc(var(--prev-w) * 19 / 16) calc(var(--prev-h) * 27 / 24);
+  mask-size: 100% 100%, calc(var(--prev-w) * 19 / 16) calc(var(--prev-h) * 27 / 24);
+  -webkit-mask-position: 0 0,
+    calc(var(--prev-w) * (-0.7 - 1.5 / 16)) calc((var(--trophy-h) - var(--prev-h)) / 2 - var(--prev-h) * 1.5 / 24);
+  mask-position: 0 0,
+    calc(var(--prev-w) * (-0.7 - 1.5 / 16)) calc((var(--trophy-h) - var(--prev-h)) / 2 - var(--prev-h) * 1.5 / 24);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.ribbon.stacked + .ribbon.stacked {
+  --trophy-h: calc(var(--trophy-base) * 0.75);
+  --prev-h: calc(var(--trophy-base) * 0.875);
+  z-index: 1;
+  filter: brightness(0.65);
+}
+
+/* the sweeping shine across each trophy */
+@keyframes completionTrophyShine {
+  0% {
+    background-position: 100% 0;
+  }
+  25%,
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.ribbon::after {
+  --shine-period: 4s;
+  --shine-stagger: 0.12s;
+  --shine-opacity: 0.6;
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--shine-opacity);
+  background: linear-gradient(110deg, transparent 40%, #ffffff 50%, transparent 60%) no-repeat 100% 0 / 300% 100%;
+  -webkit-mask: url("https://community.fastly.steamstatic.com/public/images/profile/achievement_trophy.svg") no-repeat center / contain;
+  mask: url("https://community.fastly.steamstatic.com/public/images/profile/achievement_trophy.svg") no-repeat center / contain;
+  animation: completionTrophyShine var(--shine-period) ease-in-out infinite
+    calc(var(--shine-index, 0) * var(--shine-stagger));
+}
+
+.ribbon.stacked {
+  --shine-index: 1;
+}
+
+.ribbon.stacked + .ribbon.stacked {
+  --shine-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ribbon::after {
+    display: none;
+  }
+}
+
+/* .showcase_achievementscompletionist_game_counts */
+.completionistCounts {
+  min-width: 0;
+  margin-inline-start: 8px;
+  text-align: end;
+}
+
+/* .showcase_achievementscompletionist_game_counts .num_achievements */
+.numAchievements {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* .showcase_achievementscompletionist_game_counts .subtitle */
+.countsSubtitle {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ---------- Achievement ---------- */
+
+/* .achievement_showcase .showcase_content_bg:not(.showcase_stats_row) */
+.achievementIcons {
+  padding-bottom: 3px;
+}
+
+/* .showcase_achievement */
+.achievement {
+  width: 64px;
+  height: 64px;
+  line-height: 64px;
+  float: inline-start;
+  margin-inline-start: 4.5%;
+  margin-bottom: 5px;
+}
+
+.achievement img {
+  width: 64px;
+  height: 64px;
+}
+
+/* .showcase_achievement:nth-child(7n-6) */
+.achievementIcons .achievement:nth-child(7n-6) {
+  margin-inline-start: 0;
+}
+
+/* .showcase_achievement.rare */
+.rare,
+.rare img {
+  position: relative;
+}
+
+.rare img {
+  box-shadow:
+    0px 0px 2px 1px rgba(255, 184, 78, 0.6),
+    0px 0px 16px 1px rgba(255, 184, 78, 0.4);
+}
+
+/* .achievement_glow_container_root, .achievement_glow_container */
+.glowRoot,
+.glowContainer {
+  position: absolute;
+  inset: -20%;
+  -webkit-mask-image: url("https://community.fastly.steamstatic.com/public/images/profile/achievement_square_mask.png");
+  mask-image: url("https://community.fastly.steamstatic.com/public/images/profile/achievement_square_mask.png");
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  -webkit-mask-size: 100%;
+  mask-size: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.glowContainer {
+  animation: achievementGlowRotate 18s linear infinite reverse;
+  -webkit-mask-image: url("https://community.fastly.steamstatic.com/public/images/profile/achievement_star_mask.png");
+  mask-image: url("https://community.fastly.steamstatic.com/public/images/profile/achievement_star_mask.png");
+}
+
+/* .achievement_glow */
+.glow {
+  position: absolute;
+  inset: -10px;
+  animation: achievementGlowRotate 6s linear infinite;
+  mix-blend-mode: overlay;
+  background: repeating-conic-gradient(
+    rgba(255, 217, 0, 0.178) 0%,
+    rgba(255, 184, 78, 0) 6%,
+    rgba(255, 217, 0, 0.178) 10%,
+    rgb(255, 184, 78) 26%,
+    rgba(255, 217, 0, 0.178) 35%,
+    rgb(255, 184, 78) 40%,
+    rgba(255, 217, 0, 0.178) 60%,
+    rgb(255, 184, 78) 82%,
+    rgba(255, 217, 0, 0.178) 100%
+  );
+  overflow: hidden;
+}
+
+@keyframes achievementGlowRotate {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glowContainer,
+  .glow {
+    animation: none;
+  }
+}
+
+/* ---------- Steam Replay ---------- */
+
+/* .profile_customization_block.replay_showcase_block */
+.replayBlock {
+  padding: 0;
+  border-radius: 0;
+}
+
+.replayBlock img {
+  display: block;
+}
+
+/* ---------- Not drawn yet ---------- */
+
+.unsupported {
+  color: #8f98a0;
+  opacity: 0.6;
+}
