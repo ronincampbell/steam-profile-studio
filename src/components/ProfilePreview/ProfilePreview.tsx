@@ -195,8 +195,11 @@ function showcasesNote(
   items: ShowcaseItem[] | undefined,
   edited: boolean,
 ): string | null {
-  if (edited && items) {
-    if (!items.length) return "No showcases. Add one from the Showcases panel below.";
+  // While Steam hasn't sent the showcases (busy or private), the editor's list
+  // is empty only because nothing arrived, so say why instead.
+  const waiting = showcases?.visibility === "unavailable" || showcases?.visibility === "private";
+  if (edited && items && !(waiting && !items.length)) {
+    if (!items.length) return "No showcases. Add one from Showcases in the toolbar above.";
     if (showcases?.visibility === "public") return null;
   }
   if (showcases === undefined) return "Paste a profile to see its showcases.";
