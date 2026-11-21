@@ -23,9 +23,14 @@
  * - Remembers where Steam redirects each profile (/profiles/<id> → /id/<name>)
  *   and asks for that address next time, skipping the redirect.
  *
- * Memory is per instance: a cold start begins empty. That's what the CDN
- * layer is for. Everything that touches the outside world (fetch, the clock,
- * waiting) is passed in, so the tests can fake a 429 without a network.
+ * Memory is per instance: a cold start begins empty. So when there's no
+ * fresh copy in memory, it first asks the `shared` cache (Vercel's Runtime
+ * Cache, shared by every instance), and saves each good answer there for a
+ * week. That cache is optional and its failures are ignored, so the app works
+ * the same without it, just with more trips to Steam.
+ *
+ * Everything that touches the outside world (fetch, the clock, waiting, the
+ * shared cache) is passed in, so the tests can fake a 429 without a network.
  */
 import { parseProfilePage } from "./parse";
 import type { ProfileShowcases } from "./types";
@@ -64,6 +69,20 @@ export interface ShowcaseLoaderOptions {
   maxCooldownMs?: number;
   /** Give up on one page load after this long. Default 10 seconds. */
   timeoutMs?: number;
+  /**
+   * A cache shared by every server instance (Vercel's Runtime Cache in
+   * production), holding each profile's last good copy. Optional: without it,
+   * each instance only has its own memory. Its failures are ignored.
+   */
+  shared?: SharedStore;
+  /** How long the shared cache keeps a last good copy. Default 7 days. */
+  sharedTtlMs?: number;
+}
+
+/** The part of Vercel's RuntimeCache (from @vercel/functions) this file uses. */
+export interface SharedStore {
+  get(key: string): Promise<unknown>;
+  set(key: string, value: unknown, options?: { ttl?: number }): Promise<void>;
 }
 
 interface Entry {
@@ -90,6 +109,8 @@ export function createShowcaseLoader(options: ShowcaseLoaderOptions = {}) {
     cooldownMs = 60_000,
     maxCooldownMs = 600_000,
     timeoutMs = 10_000,
+    shared,
+    sharedTtlMs = 7 * 24 * HOUR,
   } = options;
 
   /** Last good answer per SteamID. A Map keeps insertion order, so the first key is the oldest. */
@@ -103,10 +124,40 @@ export function createShowcaseLoader(options: ShowcaseLoaderOptions = {}) {
   /** Where Steam redirected each profile, e.g. https://steamcommunity.com/id/Fuzzycast/. */
   const profileUrls = new Map<string, string>();
 
-  function remember(steamId: string, value: ProfileShowcases) {
+  function remember(steamId: string, value: ProfileShowcases, fetchedAt = now()) {
     store.delete(steamId); // re-insert so it counts as newest
-    store.set(steamId, { value, fetchedAt: now() });
+    store.set(steamId, { value, fetchedAt });
     while (store.size > maxEntries) store.delete(store.keys().next().value!);
+  }
+
+  /** The shared cache's copy, if it has a sound one. Never throws. */
+  async function readShared(steamId: string): Promise<Entry | null> {
+    if (!shared) return null;
+    try {
+      const raw = (await shared.get(steamId)) as Partial<Entry> | null;
+      const v = raw?.value;
+      if (
+        typeof raw?.fetchedAt !== "number" ||
+        v?.steamId !== steamId ||
+        (v.visibility !== "public" && v.visibility !== "private") ||
+        !Array.isArray(v.showcases)
+      ) {
+        return null;
+      }
+      return { value: v, fetchedAt: raw.fetchedAt };
+    } catch {
+      return null;
+    }
+  }
+
+  /** Save a good copy for every instance. Never throws. */
+  async function writeShared(steamId: string, entry: Entry): Promise<void> {
+    if (!shared) return;
+    try {
+      await shared.set(steamId, entry, { ttl: Math.round(sharedTtlMs / 1000) });
+    } catch {
+      // The shared cache is a bonus; memory and the CDN still work.
+    }
   }
 
   function currentCooldown() {
@@ -214,13 +265,27 @@ export function createShowcaseLoader(options: ShowcaseLoaderOptions = {}) {
 
     let pending = inFlight.get(steamId);
     if (!pending) {
-      pending = load(steamId).finally(() => inFlight.delete(steamId));
+      pending = refresh(steamId).finally(() => inFlight.delete(steamId));
       inFlight.set(steamId, pending);
     }
+    return pending;
+  }
+
+  /** Shared cache first, then Steam, then the newest copy we have. */
+  async function refresh(steamId: string): Promise<ProfileShowcases> {
+    const fromShared = await readShared(steamId);
+    const mine = store.get(steamId);
+    if (fromShared && (!mine || fromShared.fetchedAt > mine.fetchedAt)) {
+      remember(steamId, fromShared.value, fromShared.fetchedAt);
+    }
+    const best = store.get(steamId);
+    if (best && now() - best.fetchedAt < freshMs) return best.value;
+
     try {
-      return await pending;
+      const value = await load(steamId);
+      await writeShared(steamId, store.get(steamId) ?? { value, fetchedAt: now() });
+      return value;
     } catch (e) {
-      // Read the store again: another request may have filled it meanwhile.
       const fallback = store.get(steamId);
       if (e instanceof SteamBusyError && fallback) return { ...fallback.value, staleBecause: e.reason };
       throw e;

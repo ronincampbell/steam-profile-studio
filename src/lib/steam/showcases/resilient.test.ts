@@ -207,6 +207,68 @@ describe("showcase loader", () => {
   });
 });
 
+/** A fake Runtime Cache: a Map that records what's written, with a TTL. */
+function fakeShared() {
+  const data = new Map<string, unknown>();
+  const ttls: number[] = [];
+  return {
+    data,
+    ttls,
+    get: vi.fn(async (key: string) => data.get(key) ?? null),
+    set: vi.fn(async (key: string, value: unknown, options?: { ttl?: number }) => {
+      data.set(key, JSON.parse(JSON.stringify(value)));
+      ttls.push(options?.ttl ?? 0);
+    }),
+  };
+}
+
+describe("showcase loader with the shared cache", () => {
+  it("saves good answers there for a week, so another instance needn't ask Steam", async () => {
+    const shared = fakeShared();
+    const a = setup([ok], { shared });
+    const first = await a.loader.get(ID);
+    expect(shared.ttls).toEqual([7 * 24 * 3600]);
+
+    // A second instance (cold start, empty memory) with the same shared cache.
+    const b = setup([() => tooMany()], { shared });
+    const second = await b.loader.get(ID);
+    expect(second).toEqual(first);
+    expect(b.fetch).not.toHaveBeenCalled();
+  });
+
+  it("gives a cold instance the shared copy, flagged, when Steam answers 429", async () => {
+    const shared = fakeShared();
+    const a = setup([ok], { shared });
+    await a.loader.get(ID);
+
+    const b = setup([() => tooMany()], { shared });
+    b.advance(8 * HOUR); // the shared copy is no longer fresh, so Steam is asked
+    const result = await b.loader.get(ID);
+    expect(b.fetch).toHaveBeenCalledTimes(1);
+    expect(result.staleBecause).toBe("rate-limited");
+    expect(result.visibility).toBe("public");
+  });
+
+  it("keeps working when the shared cache fails or holds junk", async () => {
+    const broken = { get: vi.fn(async () => { throw new Error("cache down"); }), set: vi.fn(async () => { throw new Error("cache down"); }) };
+    const a = setup([ok], { shared: broken });
+    expect((await a.loader.get(ID)).visibility).toBe("public");
+
+    const junk = { get: vi.fn(async () => ({ value: { steamId: "someone else" }, fetchedAt: 1 })), set: vi.fn(async () => {}) };
+    const b = setup([ok], { shared: junk });
+    expect((await b.loader.get(ID)).steamId).toBe(ID);
+    expect(b.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("asks the shared cache once for duplicate requests", async () => {
+    const shared = fakeShared();
+    const { loader } = setup([ok], { shared });
+    await Promise.all([loader.get(ID), loader.get(ID), loader.get(ID)]);
+    expect(shared.get).toHaveBeenCalledTimes(1);
+    expect(shared.set).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("parseRetryAfter", () => {
   it("reads seconds and HTTP dates", () => {
     const now = Date.UTC(2026, 10, 21, 12, 0, 0);

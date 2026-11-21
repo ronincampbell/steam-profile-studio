@@ -20,12 +20,16 @@ async function loadRoute() {
 }
 
 beforeEach(() => {
+  // Outside Vercel the shared cache is one in-memory copy for the whole test
+  // run, which would leak between tests; resilient.test.ts covers it instead.
+  vi.stubEnv("SHOWCASE_SHARED_CACHE", "off");
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(Date.UTC(2026, 10, 21, 12, 0, 0));
 });
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
 });
 
 describe("GET /api/profile/showcases", () => {
