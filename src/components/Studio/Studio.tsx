@@ -19,9 +19,7 @@ import {
 } from "@/lib/studio/showcaseEditor";
 import { buildLook, PLACEHOLDER_PROFILE, type CustomArt, type Slot, type TryOn } from "@/lib/studio/look";
 import type { Cosmetic, ItemType, ShopItem } from "@/lib/steam/types";
-import { DockLayout } from "./chrome/DockLayout";
-import { DrawerLayout } from "./chrome/DrawerLayout";
-import { LAYOUTS, type LayoutName, type PanelId } from "./chrome/menu";
+import type { PanelId } from "./chrome/menu";
 import { ToolbarLayout } from "./chrome/ToolbarLayout";
 import chrome from "./chrome/Chrome.module.css";
 import { CustomArtPicker } from "./CustomArtPicker";
@@ -38,11 +36,6 @@ const SLOT_BY_TYPE: Partial<Record<ItemType, Slot>> = {
   "avatar-frame": "avatarFrame",
   "animated-avatar": "animatedAvatar",
 };
-
-/** The menu layout everyone sees. `?ui=drawer|toolbar|dock` picks another, to compare. */
-const DEFAULT_LAYOUT: LayoutName = "toolbar";
-
-const LAYOUT_COMPONENTS = { drawer: DrawerLayout, toolbar: ToolbarLayout, dock: DockLayout };
 
 export function Studio() {
   const router = useRouter();
@@ -114,8 +107,6 @@ export function Studio() {
     router.replace(`${pathname}?${params}`, { scroll: false });
   }
 
-  const ui = searchParams.get("ui");
-  const Layout = LAYOUT_COMPONENTS[(LAYOUTS as readonly string[]).includes(ui ?? "") ? (ui as LayoutName) : DEFAULT_LAYOUT];
 
   function renderPanel(id: PanelId): ReactNode {
     switch (id) {
@@ -162,7 +153,7 @@ export function Studio() {
 
   return (
     <div className={chrome.chrome}>
-      <Layout
+      <ToolbarLayout
         form={{ draft, onDraftChange: setDraft, onSubmit: submit, loading: state.status === "loading" }}
         subject={state.status === "ready" ? { name: profile.name, avatar: profile.avatar, level: profile.level } : null}
         renderPanel={renderPanel}

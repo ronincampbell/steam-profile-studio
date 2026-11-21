@@ -291,120 +291,7 @@
   color: var(--c-muted);
 }
 
-/* ---------- A. Side drawer ---------- */
-
-.drawer {
-  position: fixed;
-  z-index: 50;
-  top: 50%;
-  right: 16px;
-  transform: translateY(-50%);
-  display: flex;
-  /* On the right, so the panel never covers the avatar and frame you're trying on. */
-  flex-direction: row-reverse;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--c-font);
-}
-
-.rail {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px;
-  background: var(--c-surface);
-  backdrop-filter: var(--c-glass);
-  border: 1px solid var(--c-line-strong);
-  border-radius: 18px;
-  box-shadow: var(--c-shadow);
-}
-
-.railItem {
-  display: contents;
-}
-
-.railRule {
-  height: 1px;
-  margin: 4px 8px;
-  background: var(--c-line-strong);
-}
-
-.railButton {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  color: var(--c-muted);
-  background: transparent;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition:
-    color 0.15s,
-    background 0.15s;
-}
-.railButton:hover {
-  color: var(--c-text);
-  background: rgba(255, 255, 255, 0.07);
-}
-.railButton[aria-pressed="true"] {
-  color: #ffffff;
-  background: linear-gradient(135deg, rgba(102, 192, 244, 0.35), rgba(155, 123, 255, 0.3));
-  box-shadow: inset 0 0 0 1px rgba(102, 192, 244, 0.45);
-}
-
-/* Name of the tool, shown on hover while the drawer is closed. */
-.railTip {
-  position: absolute;
-  right: calc(100% + 14px);
-  top: 50%;
-  translate: 0 -50%;
-  padding: 5px 10px;
-  font-size: 12.5px;
-  white-space: nowrap;
-  color: var(--c-text);
-  background: var(--c-surface-solid);
-  border: 1px solid var(--c-line-strong);
-  border-radius: 8px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.12s;
-}
-.railButton:hover .railTip {
-  opacity: 1;
-}
-.drawerOpen .railTip {
-  display: none;
-}
-
-.drawerPanel {
-  display: flex;
-  flex-direction: column;
-  width: min(500px, calc(100vw - 110px));
-  height: min(760px, calc(100vh - 32px));
-  background: var(--c-surface);
-  backdrop-filter: var(--c-glass);
-  border: 1px solid var(--c-line-strong);
-  border-radius: 18px;
-  box-shadow: var(--c-shadow);
-  opacity: 0;
-  translate: 24px 0;
-  scale: 0.98;
-  pointer-events: none;
-  transition:
-    opacity 0.18s ease,
-    translate 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
-    scale 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.drawerOpen .drawerPanel {
-  opacity: 1;
-  translate: 0 0;
-  scale: 1;
-  pointer-events: auto;
-}
-
-/* ---------- B. Toolbar ---------- */
+/* ---------- Toolbar ---------- */
 
 .toolbarZone {
   display: contents;
@@ -498,15 +385,6 @@
   background: var(--c-accent);
   border-radius: 999px;
 }
-.railButton .count,
-.dockButton .count {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-}
-.dockButton .count {
-  right: 8px;
-}
 .toolButton[aria-expanded="true"] {
   color: #ffffff;
 }
@@ -521,24 +399,25 @@
   border-radius: 2px;
 }
 
+/* Opens under its button: ToolbarLayout sets --drop-left (the panel's left
+   edge) and --caret-x (where the pointer sits, from that edge). */
 .dropPanel {
   position: fixed;
   z-index: 39;
-  top: 104px;
-  right: max(16px, calc((100vw - 1360px) / 2 + 16px));
+  top: 114px;
+  left: var(--drop-left, 16px);
   width: min(640px, calc(100vw - 32px));
-  max-height: calc(100vh - 120px);
+  max-height: calc(100vh - 130px);
   display: flex;
   flex-direction: column;
   font-family: var(--c-font);
   background: var(--c-surface);
   backdrop-filter: var(--c-glass);
   border: 1px solid var(--c-line-strong);
-  border-top: none;
-  border-radius: 0 0 16px 16px;
+  border-radius: 14px;
   box-shadow: var(--c-shadow);
   opacity: 0;
-  translate: 0 -10px;
+  translate: 0 -8px;
   pointer-events: none;
   transition:
     opacity 0.16s ease,
@@ -549,122 +428,28 @@
   translate: 0 0;
   pointer-events: auto;
 }
-
-/* ---------- C. Dock ---------- */
-
-.dock {
-  position: fixed;
-  z-index: 50;
-  bottom: 20px;
-  left: 50%;
-  translate: -50% 0;
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  padding: 8px 10px;
-  font-family: var(--c-font);
-  background: var(--c-surface);
-  backdrop-filter: var(--c-glass);
-  border: 1px solid var(--c-line-strong);
-  border-radius: 22px;
-  box-shadow: var(--c-shadow);
-}
-
-.dockItem {
-  display: flex;
-  align-items: center;
-}
-
-.dockRule {
-  align-self: center;
-  width: 1px;
-  height: 34px;
-  margin: 0 6px;
-  background: var(--c-line-strong);
-}
-
-.dockButton {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  width: 74px;
-  padding: 4px 0 2px;
-  font: inherit;
-  color: var(--c-muted);
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.dockIcon {
-  display: grid;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  color: var(--c-text);
-  background: linear-gradient(160deg, #233043, #161d28);
-  border: 1px solid var(--c-line-strong);
-  border-radius: 14px;
+/* Moving from one open panel to another: glide across to the new button. */
+.dropSliding,
+.dropSliding .caret {
   transition:
-    transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
-    background 0.18s;
+    opacity 0.16s ease,
+    translate 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+    left 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.dockButton:hover .dockIcon {
-  transform: translateY(-6px) scale(1.12);
-}
-.dockButton[aria-pressed="true"] .dockIcon {
-  color: #ffffff;
-  background: linear-gradient(135deg, #3a8fd0, #7a5ee8);
-  border-color: rgba(255, 255, 255, 0.25);
-}
-/* Dot under the open tool, like an app launcher. */
-.dockButton[aria-pressed="true"]::after {
-  content: "";
+
+/* The pointer up to the open button. A square turned 45°, with the panel's
+   top and left borders, half hidden behind the panel. */
+.caret {
   position: absolute;
-  bottom: -5px;
-  width: 4px;
-  height: 4px;
-  background: var(--c-accent);
-  border-radius: 50%;
-}
-
-.dockLabel {
-  font-size: 11.5px;
-  white-space: nowrap;
-}
-.dockButton:hover .dockLabel,
-.dockButton[aria-pressed="true"] .dockLabel {
-  color: var(--c-text);
-}
-
-.sheet {
-  position: fixed;
-  z-index: 49;
-  left: 50%;
-  bottom: 118px;
-  width: min(1040px, calc(100vw - 32px));
-  height: min(560px, calc(100vh - 240px));
-  display: flex;
-  flex-direction: column;
-  font-family: var(--c-font);
-  background: var(--c-surface);
-  backdrop-filter: var(--c-glass);
-  border: 1px solid var(--c-line-strong);
-  border-radius: 20px;
-  box-shadow: var(--c-shadow);
-  opacity: 0;
-  translate: -50% 24px;
-  pointer-events: none;
-  transition:
-    opacity 0.18s ease,
-    translate 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.sheetOpen {
-  opacity: 1;
-  translate: -50% 0;
-  pointer-events: auto;
+  top: -7px;
+  left: calc(var(--caret-x, 32px) - 6px);
+  width: 12px;
+  height: 12px;
+  background: #151b24;
+  border-top: 1px solid var(--c-line-strong);
+  border-left: 1px solid var(--c-line-strong);
+  border-radius: 3px 0 0 0;
+  rotate: 45deg;
 }
 
 /* ---------- Notices ---------- */
@@ -680,9 +465,6 @@
   max-width: min(420px, calc(100vw - 40px));
   font-family: var(--c-font);
   pointer-events: none;
-}
-.toastsHigh {
-  bottom: 118px;
 }
 .toasts > * {
   margin: 0;
@@ -730,24 +512,17 @@
   .headerRow > .ghostButton {
     display: none;
   }
-  .dockLabel {
-    display: none;
-  }
-  .dockButton {
-    width: 48px;
-  }
-  .dockRule {
-    margin: 0 2px;
-  }
   /* The header is taller here, so the toolbar's panel comes up from the bottom instead. */
   .dropPanel {
     top: auto;
     bottom: 0;
-    right: 0;
+    left: 0;
     width: 100vw;
     max-height: 75vh;
-    border-top: 1px solid var(--c-line-strong);
     border-radius: 16px 16px 0 0;
+  }
+  .caret {
+    display: none;
   }
   .toolRule {
     margin: 0 2px;
