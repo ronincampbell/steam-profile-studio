@@ -152,7 +152,7 @@ export async function getShowcases(steamId: string): Promise<ProfileShowcases> {
   cacheLife("profile");
   const page = parseProfilePage(html);
   if (page.isPrivate) return { steamId, visibility: "private", showcases: [] };
-  return { steamId, visibility: "public", showcases: page.showcases };
+  return { steamId, visibility: "public", showcases: page.showcases, sidebar: page.sidebar };
 }
 
 /* ---------- Catalogue ---------- */
