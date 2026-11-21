@@ -9,6 +9,8 @@
  * run against the captured page in reference/html/.
  */
 import { parse, type HTMLElement } from "node-html-parser";
+import { classes, hasClass, text } from "./dom";
+import { parseSidebar } from "./sidebar";
 import type {
   AchievementShowcase,
   ArtworkShowcase,
@@ -17,46 +19,38 @@ import type {
   CompletionRibbonGroup,
   FavoriteGuideShowcase,
   GameCollectorShowcase,
+  ProfileSidebar,
   ReplayShowcase,
   Showcase,
   ShowcaseStat,
 } from "./types";
 
 export interface ParsedProfilePage {
+  /**
+   * False when the HTML isn't a profile page at all (Steam's error page, a
+   * "profile not found" page, a captcha). Never cache those as a result.
+   */
+  isProfilePage: boolean;
   /** Steam marks private (and, to visitors, friends-only) profiles with this body class. */
   isPrivate: boolean;
   showcases: Showcase[];
+  /** The right-hand column and favourite badge; missing when the page has none (private). */
+  sidebar?: ProfileSidebar;
 }
 
 export function parseProfilePage(html: string): ParsedProfilePage {
   const root = parse(html);
+  const isProfilePage = Boolean(root.querySelector(".profile_page"));
   const isPrivate = Boolean(root.querySelector("body.private_profile, div.profile_page.private_profile"));
+  const sidebar = isPrivate ? undefined : parseSidebar(root);
   const area = root.querySelector(".profile_customization_area");
-  if (!area) return { isPrivate, showcases: [] };
+  if (!area) return { isProfilePage, isPrivate, showcases: [], sidebar };
 
   const showcases = area.children
     .filter((el) => hasClass(el, "profile_customization"))
     .map(parseShowcase)
     .filter((s): s is Showcase => s !== null);
-  return { isPrivate, showcases };
-}
-
-/**
- * An element's classes. Read from the class attribute rather than
- * node-html-parser's classList, which can pick up `class="…"` text from
- * inside other attributes (Steam's data-tooltip-html holds whole HTML snippets).
- */
-function classes(el: HTMLElement | null | undefined): string[] {
-  return (el?.getAttribute("class") ?? "").split(/\s+/).filter(Boolean);
-}
-
-function hasClass(el: HTMLElement | null | undefined, name: string): boolean {
-  return classes(el).includes(name);
-}
-
-/** Whitespace-collapsed text of an element ("\n\t\tGame Collector\t" → "Game Collector"). */
-function text(el: HTMLElement | null | undefined): string {
-  return (el?.text ?? "").replace(/\s+/g, " ").trim();
+  return { isProfilePage, isPrivate, showcases, sidebar };
 }
 
 function parseShowcase(el: HTMLElement): Showcase | null {
