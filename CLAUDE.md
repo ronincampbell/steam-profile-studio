@@ -33,7 +33,7 @@ Paste a public profile → it renders like Steam's profile header (name, avatar,
 | Points Shop catalogue | `ILoyaltyRewardsService/QueryRewardItems/v1` | undocumented; works without a key. `count` 100–1000, filter with `community_item_classes[0]=<n>` (3 background, 8 theme, 13 mini background, 14 frame, 15 animated avatar), page with `next_cursor`. Images/videos are bare filenames in `community_item_data` |
 | Buy links | `https://store.steampowered.com/points/shop/app/<appid>` | verified 21 Nov: **no per-item link exists**; this game page lists the item and the user clicks it. `pointsShopAppUrl()` |
 | Image/video URLs | `https://shared.fastly.steamstatic.com/community_assets/images/` | verified 21 Nov: catalogue → `items/<appid>/<file>`, equipped → `<path>`. `assetUrl()`, `catalogueAssetUrl()`. Old `cdn.*/steamcommunity/public/images` paths 404 |
-| Showcases (stretch) | `GetProfileCustomization` for slot contents, plus public profile HTML for anything it lacks | only for public profiles |
+| Showcases (stretch) | public profile HTML (`steamcommunity.com/profiles/<id>/?l=english`); `GetProfileCustomization` only gives type numbers and order | verified 21 Nov, see `reference/html/SHOWCASES.md`. Only for public profiles. The site rate-limits fast (429), so always go through the cached `getShowcases()` |
 | Profile page CSS values | Steam's `profilev2.css`, `shared_global.css` | Ronin okayed reading them (21 Nov) for exact numbers; don't commit the files. Motiva Sans is licensed: never self-host it |
 
 First step on the data side: write a small script that calls each endpoint for Ronin's own profile and saves the raw JSON to `/reference/api/` so the real data shape is known before any types are written. Done: see `reference/api/FINDINGS.md`.
@@ -41,6 +41,7 @@ First step on the data side: write a small script that calls each endpoint for R
 ## Architecture sketch
 
 - `src/app/api/profile/route.ts`: parse the input, resolve the SteamID, fetch summary, level and equipped items, return one normalised object. Cached.
+- `src/app/api/profile/showcases/route.ts`: `?id=<steamid64>`, the parsed showcases from the public profile page (`src/lib/steam/showcases/`). Separate so the header never waits on it. Cached.
 - `src/app/api/items/route.ts`: fetch and normalise the Points Shop catalogue by item type. Cached.
 - `src/lib/steam/`: typed fetch helpers, one per endpoint, plus input parsing (`/id/<vanity>`, `/profiles/<steamid64>`, a bare 17-digit ID, a bare vanity name).
 - `src/components/ProfilePreview/`: layered render, from the bottom up:

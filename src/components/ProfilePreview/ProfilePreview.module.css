@@ -273,6 +273,21 @@
   background-color: var(--gradient-background);
 }
 
+/* .profile_content_inner */
+.contentInner {
+  position: relative;
+}
+
+/* .profile_leftcol */
+.leftcol {
+  width: 652px;
+  float: inline-start;
+}
+
+.clearBoth {
+  clear: both;
+}
+
 .contentNote {
   color: #8f98a0;
   opacity: 0.6;

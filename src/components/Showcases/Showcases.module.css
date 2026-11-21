@@ -1,0 +1,256 @@
+/*
+ * Profile showcases. Values are Steam's, from profilev2.css (21 Nov 2026);
+ * each rule names the Steam selector it copies. Steam's page uses
+ * content-box sizing and float layout, so this does too.
+ *
+ * Line heights: Steam leaves most text at "normal", which depends on the
+ * font. Motiva Sans (Steam's font, licensed, so only used when the viewer has
+ * it) is taller than the Arial fallback, so text that Steam sets in Motiva
+ * gets an explicit line height here, measured from the reference screenshot,
+ * so the boxes come out the same height either way.
+ */
+
+/* a, .whiteLink (globalv2.css) */
+.area a {
+  color: #ebebeb;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.area img {
+  border: none;
+}
+
+/* .profile_customization */
+.customization {
+  position: relative;
+  background-position: top left;
+  background-repeat: no-repeat;
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(20px);
+  border-radius: 3px;
+  padding: 0;
+  margin-bottom: 12px;
+  font-size: 13px;
+  overflow: hidden;
+}
+
+/* .profile_customization_header */
+.header {
+  font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
+  font-weight: 200;
+  background: var(--color-showcase-header);
+  background: linear-gradient(90deg, var(--gradient-showcase-header-left) 0%, var(--color-showcase-header) 90%);
+  padding: 5px 10px 5px 10px;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 30px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* .profile_customization_block */
+.block {
+  position: relative;
+  border-radius: 5px;
+  padding: 20px 10px 11px 10px;
+  margin-bottom: 0;
+  font-size: 13px;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+/* .myart .profile_customization_block */
+.myart .block {
+  padding: 15px 10px 11px 10px;
+}
+
+/* .showcase_content_bg */
+.contentBg {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 8px;
+  border-radius: 5px;
+  margin-bottom: 9px;
+  overflow: hidden;
+}
+
+.contentBg:last-child {
+  margin-bottom: 0;
+}
+
+/* .showcase_stats_row */
+.statsRow {
+  white-space: nowrap;
+}
+
+/* .showcase_stat, .showcase_stats_row .showcase_stat */
+.stat {
+  font-size: 34px;
+  margin-inline-start: 42px;
+  display: inline-block;
+}
+
+.stat:first-child {
+  margin-inline-start: 0;
+}
+
+/* .showcase_stat .value */
+.statValue {
+  font-size: 1em;
+  font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
+  font-weight: 200;
+  color: #ffffff;
+  line-height: 52px; /* matches Motiva Sans at 34px in the reference */
+}
+
+/* .showcase_stat .label */
+.statLabel {
+  font-size: 0.5em;
+  line-height: 21px; /* matches Motiva Sans at 17px in the reference */
+  color: #9b9b9b;
+}
+
+.statLink:hover .statLabel {
+  color: #ffffff;
+}
+
+/* .showcase_bodylabel */
+.bodyLabel {
+  font-size: 13px;
+  line-height: 19px; /* matches Motiva Sans at 13px in the reference */
+  margin-bottom: 8px;
+  color: #898989;
+}
+
+/* .showcase_slot */
+.slot {
+  display: block;
+  float: inline-start;
+  position: relative;
+}
+
+/* <div style="clear: inline-start;"> / <div style="clear: both;"> */
+.clearStart {
+  clear: inline-start;
+}
+
+.clearBoth {
+  clear: both;
+}
+
+/* ---------- Game Collector ---------- */
+
+/* .showcase_gamecollector_game */
+.gameCollectorGame {
+  width: 148px;
+  height: 56px;
+  margin-inline-start: 7px;
+  margin-bottom: 7px;
+  line-height: 56px;
+}
+
+/* .showcase_gamecollector_games .showcase_gamecollector_game:nth-child(4n-3) */
+.gameCollectorGames .gameCollectorGame:nth-child(4n-3) {
+  margin-inline-start: 0;
+}
+
+/* .showcase_gamecollector_game img.game_capsule */
+.gameCapsule {
+  width: 148px;
+  height: 56px;
+}
+
+/* ---------- Badge Collector ---------- */
+
+/* .showcase_badges_icons */
+.badgesIcons {
+  margin-bottom: 0;
+}
+
+/* .showcase_badges_icons .showcase_badge */
+.badge {
+  float: inline-start;
+  position: relative;
+  margin-inline-start: 26px;
+  margin-bottom: 9px;
+}
+
+.badge,
+.badgeIcon {
+  width: 80px;
+  height: 80px;
+}
+
+/* .showcase_badges_icons .showcase_badge:nth-child(6n-5) */
+.badgesIcons .badge:nth-child(6n-5) {
+  margin-inline-start: 0;
+}
+
+/* ---------- Artwork ---------- */
+
+/* .screenshot_showcase_primary */
+.screenshotPrimary {
+  width: 508px;
+  max-width: calc(83% - 7px);
+  float: inline-start;
+  margin-inline-end: 7px;
+}
+
+/* .screenshot_showcase_screenshot */
+.screenshot {
+  cursor: pointer;
+  border: 1px solid #000000;
+  display: block;
+  overflow: hidden;
+}
+
+.screenshot:hover {
+  border: 1px solid #97c0e3;
+}
+
+.screenshotPrimary .screenshot {
+  margin-bottom: 4px;
+}
+
+.screenshot img {
+  display: block;
+}
+
+.screenshotPrimary .screenshot img {
+  margin-inline-start: auto;
+  margin-inline-end: auto;
+}
+
+/* .screenshot_showcase_itemname */
+.screenshotItemName {
+  word-wrap: break-word;
+  line-height: 19px; /* matches Motiva Sans at 13px in the reference */
+}
+
+/* .screenshot_showcase_stats */
+.screenshotStats {
+  line-height: 24px;
+}
+
+/* .screenshot_showcase_rightcol */
+.screenshotRightCol {
+  overflow: hidden;
+  max-width: 17%;
+  width: 102px;
+  text-align: center;
+}
+
+/* .screenshot_showcase_smallscreenshot */
+.smallScreenshot {
+  float: none;
+  margin-bottom: 11px;
+  overflow: hidden;
+}
+
+/* ---------- Not drawn yet ---------- */
+
+.unsupported {
+  color: #8f98a0;
+  opacity: 0.6;
+}
