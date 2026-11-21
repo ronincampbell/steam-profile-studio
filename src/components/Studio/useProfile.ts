@@ -9,28 +9,30 @@ export type ProfileState =
   | { status: "ready"; query: string; profile: Profile }
   | { status: "error"; query: string; message: string };
 
+type Result = { query: string; profile: Profile } | { query: string; message: string };
+
 export function useProfile(query: string | null): ProfileState {
-  const [state, setState] = useState<ProfileState>({ status: "idle" });
+  const [result, setResult] = useState<Result | null>(null);
 
   useEffect(() => {
-    if (!query) {
-      setState({ status: "idle" });
-      return;
-    }
+    if (!query) return;
     const controller = new AbortController();
-    setState({ status: "loading", query });
     fetch(`/api/profile?q=${encodeURIComponent(query)}`, { signal: controller.signal })
       .then(async (res) => {
         const body = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(body.error ?? `Something went wrong (${res.status})`);
-        setState({ status: "ready", query, profile: body as Profile });
+        setResult({ query, profile: body as Profile });
       })
       .catch((e: Error) => {
-        if (controller.signal.aborted) return;
-        setState({ status: "error", query, message: e.message });
+        if (!controller.signal.aborted) setResult({ query, message: e.message });
       });
     return () => controller.abort();
   }, [query]);
 
-  return state;
+  if (!query) return { status: "idle" };
+  // A result for an older query means the new one is still loading.
+  if (!result || result.query !== query) return { status: "loading", query };
+  return "profile" in result
+    ? { status: "ready", query, profile: result.profile }
+    : { status: "error", query, message: result.message };
 }
