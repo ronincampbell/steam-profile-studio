@@ -5,7 +5,7 @@
 import type { ItemType } from "@/lib/steam/types";
 import type { IconName } from "./Icons";
 
-export type PanelId = ItemType | "art" | "showcases" | "wearing";
+export type PanelId = ItemType | "art" | "artwork" | "showcases" | "wearing";
 
 export interface MenuEntry {
   id: PanelId;
@@ -22,6 +22,7 @@ export const MENU: MenuEntry[] = [
   { id: "animated-avatar", label: "Animated avatars", icon: "avatar", group: "shop", hint: "Animated avatars replace your picture. Click one to try it on." },
   { id: "theme", label: "Profile themes", icon: "theme", group: "shop", hint: "A theme recolours the page and puts on its matching items." },
   { id: "art", label: "Your own art", icon: "art", group: "yours", hint: "Try your own background or avatar before you make it." },
+  { id: "artwork", label: "Artwork", icon: "artwork", group: "yours", hint: "Cut your background into Artwork showcase pieces that line up with it on Steam." },
   { id: "showcases", label: "Showcases", icon: "showcases", group: "yours", hint: "The boxes down the left of your profile, top to bottom." },
   { id: "wearing", label: "Wearing now", icon: "wearing", group: "yours", hint: "What's on the preview, where it came from, and links to buy it." },
 ];

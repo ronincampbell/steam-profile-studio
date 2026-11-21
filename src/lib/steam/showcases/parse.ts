@@ -98,9 +98,13 @@ function parseArtwork(block: HTMLElement, title: string): ArtworkShowcase {
   };
   const primarySlot = block.querySelector(".screenshot_showcase_primary");
   const primary = image(primarySlot);
+  // Long artwork (uploaded as a wide image) is asked for 506px wide with no
+  // letterbox; normal artwork is letterboxed into 480×480.
+  const long = primary ? /[?&]imw=506\b/.test(primary.image) && !/letterbox=true/.test(primary.image) : false;
   return {
     kind: "artwork",
     title,
+    ...(long ? { mode: "long" as const } : {}),
     primary: primary ? { ...primary, name: text(primarySlot?.querySelector(".screenshot_showcase_itemname")) } : null,
     small: block
       .querySelectorAll(".screenshot_showcase_smallscreenshot")

@@ -8,8 +8,11 @@
  */
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ArtworkPanel } from "@/components/ArtworkWorkflow/ArtworkPanel";
+import { otherShowcases, useArtworkPlanner } from "@/components/ArtworkWorkflow/useArtworkPlanner";
 import { ItemBrowser } from "@/components/ItemBrowser/ItemBrowser";
-import { ProfilePreview } from "@/components/ProfilePreview/ProfilePreview";
+import { ProfilePreview, type PreviewLook } from "@/components/ProfilePreview/ProfilePreview";
+import type { BackgroundSource } from "@/lib/artwork/crop";
 import {
   addShowcase,
   fromProfile,
@@ -65,6 +68,17 @@ export function Studio() {
     setShowcaseEdits({ steamId, list: change(showcaseList) });
   }
 
+  // Artwork that lines up with the background (src/components/ArtworkWorkflow).
+  const artworkSource = useMemo(() => backgroundSource(look.background), [look.background]);
+  const planner = useArtworkPlanner(artworkSource);
+  const backgroundName = custom.background
+    ? "your background"
+    : ("background" in tryOn ? tryOn.background : profile.equipped.background)?.name ?? "background";
+  const baseItems =
+    showcaseList ??
+    (state.status === "ready" ? showcases?.showcases.map((showcase, i) => ({ id: String(i), showcase, source: "profile" as const })) : undefined);
+  const previewItems = planner.state.enabled ? planner.withPlanner(baseItems ?? []) : (showcaseList ?? undefined);
+
   const current = useMemo(() => {
     const out: Partial<Record<Slot, Cosmetic | undefined>> = {};
     for (const slot of ["background", "avatarFrame", "animatedAvatar", "theme"] as Slot[]) {
@@ -107,7 +121,6 @@ export function Studio() {
     router.replace(`${pathname}?${params}`, { scroll: false });
   }
 
-
   function renderPanel(id: PanelId): ReactNode {
     switch (id) {
       case "wearing":
@@ -128,6 +141,16 @@ export function Studio() {
         );
       case "art":
         return <CustomArtPicker custom={custom} onChange={setCustom} />;
+      case "artwork":
+        return (
+          <ArtworkPanel
+            inPanel
+            planner={planner}
+            source={artworkSource}
+            backgroundName={backgroundName}
+            otherShowcases={otherShowcases(baseItems ?? []).map((i) => i.showcase.title)}
+          />
+        );
       case "showcases":
         return showcaseList ? (
           <ShowcaseList
@@ -169,9 +192,10 @@ export function Studio() {
             <ProfilePreview
               look={look}
               showcases={state.status === "ready" ? showcases : undefined}
-              showcaseItems={showcaseList ?? undefined}
+              showcaseItems={previewItems}
               showcaseEditing={
-                showcaseList
+                // While planning artwork its own position picker moves it, so drag editing is off.
+                showcaseList && !planner.state.enabled
                   ? {
                       onMove: (from, to) => editShowcases((l) => moveShowcase(l, from, to)),
                       onRemove: (id) => editShowcases((l) => removeShowcase(l, id)),
@@ -184,6 +208,12 @@ export function Studio() {
       />
     </div>
   );
+}
+
+function backgroundSource(bg: PreviewLook["background"]): BackgroundSource | undefined {
+  const video = bg?.video?.webm ?? bg?.video?.mp4;
+  if (video) return { kind: "video", url: video, poster: bg?.image };
+  return bg?.image ? { kind: "image", url: bg.image } : undefined;
 }
 
 function StatusLine({ state }: { state: ProfileState }) {

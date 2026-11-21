@@ -10,6 +10,7 @@ export type IconName =
   | "avatar"
   | "theme"
   | "art"
+  | "artwork"
   | "showcases"
   | "wearing"
   | "pin"
@@ -28,6 +29,8 @@ const PATHS: Record<IconName, string> = {
   theme: "M12 3c3.5 4.2 6 7.4 6 10.5a6 6 0 0 1-12 0C6 10.4 8.5 7.2 12 3z M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5",
   // Arrow up out of a tray.
   art: "M12 15V4 M7.5 8.5 12 4l4.5 4.5 M4 14v5h16v-5",
+  // A big artwork piece and two small ones, with a landscape.
+  artwork: "M3 4h11v16H3z M17 4h4v7h-4z M17 13h4v7h-4z M3 15l3.5-3.5 3 3 2-2 2.5 2.5",
   // Stacked showcase boxes.
   showcases: "M3 4h18v7H3z M3 14h8v6H3z M14 14h7v6h-7z",
   // Layers: what's on the profile now.
