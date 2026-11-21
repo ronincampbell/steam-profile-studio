@@ -15,7 +15,7 @@ export interface LayoutProps {
   preview: ReactNode;
   notices: ReactNode;
   /** Who's on the preview, for the toolbar's "Previewing" line. */
-  subject: { name: string; avatar: string; level: number | null } | null;
+  subject: { name: string; avatar: string } | null;
   /** A small number on a menu entry, e.g. how many slots you're trying things on in. */
   badges: Partial<Record<PanelId, number>>;
 }

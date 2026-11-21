@@ -57,7 +57,7 @@ export function Icon({ name, size = 20, ...rest }: { name: IconName; size?: numb
   );
 }
 
-/** The app's mark: a profile card inside an avatar-frame corner. */
+/** The app's mark: a little profile card (avatar square and text lines). */
 export function LogoMark({ size = 40 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden>
@@ -70,7 +70,6 @@ export function LogoMark({ size = 40 }: { size?: number }) {
       <rect x="1" y="1" width="38" height="38" rx="10" fill="#141a23" stroke="url(#sps-mark)" strokeWidth="2" />
       <rect x="9" y="9" width="12" height="12" rx="2.5" fill="url(#sps-mark)" />
       <path d="M24 11h7 M24 16h5 M9 26h22 M9 31h14" stroke="#c6d4df" strokeWidth="2.2" strokeLinecap="round" />
-      <path d="M6 13V7a1 1 0 0 1 1-1h6" stroke="#fff" strokeWidth="2" strokeLinecap="round" fill="none" opacity=".9" />
     </svg>
   );
 }

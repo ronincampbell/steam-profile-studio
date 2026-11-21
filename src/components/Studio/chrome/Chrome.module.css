@@ -39,15 +39,13 @@
   clip-path: inset(50%);
 }
 
-/* ---------- Header (104px, every layout) ---------- */
+/* ---------- Header (104px) ---------- */
 
 .header {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 40;
   height: 104px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   padding: 0 32px;
   font-family: var(--c-font);
   color: var(--c-text);
@@ -59,26 +57,28 @@
   box-shadow: inset 0 -1px 0 var(--c-line);
 }
 
-.sticky {
-  position: sticky;
-  top: 0;
-}
-
-.headerRow {
+/* Two rows sharing columns: logo | search | Copy link, then who's being
+   previewed | the menu. Sharing columns lets the menu start where the
+   search bar does. */
+.headerGrid {
   width: 100%;
   max-width: 1360px;
+  height: 100%;
   margin: 0 auto;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: 60px 44px;
   align-items: center;
-  gap: 28px;
+  column-gap: 28px;
 }
 
-.headerTwoRow {
-  justify-content: flex-start;
-}
-.headerTwoRow .headerRow {
-  height: 60px;
+/* The line between the two rows. */
+.rowRule {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  align-self: start;
+  height: 1px;
+  background: var(--c-line);
 }
 
 .brand {
@@ -105,23 +105,17 @@
 
 .wordmarkMain {
   margin-top: 4px;
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  background: linear-gradient(90deg, #ffffff 30%, #a9dcff 70%, #c8b8ff);
-  background-clip: text;
-  color: transparent;
-}
-
-.headerTwoRow .wordmarkMain {
-  font-size: 19px;
+  color: #ffffff;
 }
 
 .search {
   justify-self: center;
   width: 100%;
   max-width: 680px;
-  height: 44px;
+  height: 40px;
   display: flex;
   align-items: center;
   padding: 0 4px 0 16px;
@@ -137,9 +131,6 @@
   background: rgba(255, 255, 255, 0.07);
   border-color: rgba(102, 192, 244, 0.7);
   box-shadow: 0 0 0 4px rgba(102, 192, 244, 0.14);
-}
-.headerTwoRow .search {
-  height: 40px;
 }
 
 .searchIcon {
@@ -165,7 +156,7 @@
 
 .searchButton {
   flex: none;
-  height: 34px;
+  height: 30px;
   padding: 0 18px;
   font: inherit;
   font-size: 13.5px;
@@ -176,9 +167,6 @@
   border-radius: 999px;
   cursor: pointer;
   transition: filter 0.15s;
-}
-.headerTwoRow .searchButton {
-  height: 30px;
 }
 .searchButton:hover {
   filter: brightness(1.1);
@@ -297,19 +285,22 @@
   display: contents;
 }
 
-.toolRow {
-  width: 100%;
-  max-width: 1360px;
-  height: 44px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  border-top: 1px solid var(--c-line);
+/* The menu's cell spans the same column as the search bar, so the menu
+   can be pushed right by the gap between the column and the (centred,
+   at most 680px) search bar. The first button's icon then sits on the
+   search bar's left edge. The menu may run on past the column's right,
+   into the empty space under Copy link. */
+.toolCell {
+  grid-row: 2;
+  grid-column: 2;
+  align-self: stretch;
+  min-width: 0;
+  container-type: inline-size;
 }
 
 .subject {
+  grid-row: 2;
+  grid-column: 1;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -326,20 +317,15 @@
   color: var(--c-text);
 }
 
-.levelChip {
-  padding: 1px 7px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--c-accent);
-  border: 1px solid rgba(102, 192, 244, 0.4);
-  border-radius: 999px;
-}
-
 .tools {
+  --tool-pad: 9px;
   display: flex;
   align-items: center;
   gap: 2px;
+  width: max-content;
   height: 100%;
+  /* Less the first button's own left padding, so its icon is on the edge. */
+  margin-left: calc(max(0px, (100cqw - 680px) / 2) - var(--tool-pad));
 }
 
 .toolItem {
@@ -349,7 +335,7 @@
 .toolRule {
   width: 1px;
   height: 18px;
-  margin: 0 8px;
+  margin: 0 6px;
   background: var(--c-line-strong);
 }
 
@@ -359,7 +345,7 @@
   align-items: center;
   gap: 7px;
   height: 100%;
-  padding: 0 11px;
+  padding: 0 var(--tool-pad);
   font: inherit;
   font-size: 13px;
   color: var(--c-muted);
@@ -481,19 +467,23 @@
 
 /* ---------- Smaller screens ---------- */
 
-@media (max-width: 1100px) {
+/* Below this the menu's labels don't fit beside the logo: icons only
+   (each button has its name as a tooltip). */
+@media (max-width: 1260px) {
   .header {
     padding: 0 20px;
   }
-  .headerRow {
-    gap: 16px;
+  .headerGrid {
+    column-gap: 16px;
   }
   .wordmark,
-  .subject span:not(.levelChip) {
+  .subject span {
     display: none;
   }
+  .tools {
+    --tool-pad: 8px;
+  }
   .toolButton {
-    padding: 0 8px;
     font-size: 0;
     gap: 0;
   }
@@ -506,10 +496,11 @@
     height: auto;
     padding: 12px 16px;
   }
-  .headerRow {
+  .headerGrid {
     grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: 48px 44px;
   }
-  .headerRow > .ghostButton {
+  .headerGrid > .ghostButton {
     display: none;
   }
   /* The header is taller here, so the toolbar's panel comes up from the bottom instead. */

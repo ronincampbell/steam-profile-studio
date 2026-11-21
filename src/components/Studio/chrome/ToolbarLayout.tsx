@@ -55,43 +55,39 @@ export function ToolbarLayout({ form, renderPanel, preview, notices, badges, sub
     setActive(active === id ? null : id);
   }
 
-  const menu = (
-    <div className={styles.toolRow}>
-      <div className={styles.subject}>
-        {subject ? (
-          <>
-            <img src={subject.avatar} alt="" width={22} height={22} />
-            <span>
-              Previewing <strong>{subject.name}</strong>
-            </span>
-            {subject.level !== null && <span className={styles.levelChip}>Lv {subject.level}</span>}
-          </>
-        ) : (
-          <span>Previewing a blank profile</span>
-        )}
-      </div>
-      <nav className={styles.tools} aria-label="Studio tools">
-        {MENU.map((m, i) => (
-          <span key={m.id} className={styles.toolItem}>
-            {i > 0 && MENU[i - 1].group !== m.group && <span className={styles.toolRule} />}
-            <button
-              ref={(el) => {
-                buttons.current[m.id] = el;
-              }}
-              type="button"
-              className={styles.toolButton}
-              aria-expanded={active === m.id}
-              title={m.label}
-              onClick={() => toggle(m.id)}
-            >
-              <Icon name={m.icon} size={17} />
-              {m.label}
-              <Count n={badges[m.id]} />
-            </button>
-          </span>
-        ))}
-      </nav>
-    </div>
+  const subjectLine = subject ? (
+    <>
+      <img src={subject.avatar} alt="" width={22} height={22} />
+      <span>
+        Previewing <strong>{subject.name}</strong>
+      </span>
+    </>
+  ) : (
+    <span>Previewing a blank profile</span>
+  );
+
+  const tools = (
+    <nav className={styles.tools} aria-label="Studio tools">
+      {MENU.map((m, i) => (
+        <span key={m.id} className={styles.toolItem}>
+          {i > 0 && MENU[i - 1].group !== m.group && <span className={styles.toolRule} />}
+          <button
+            ref={(el) => {
+              buttons.current[m.id] = el;
+            }}
+            type="button"
+            className={styles.toolButton}
+            aria-expanded={active === m.id}
+            title={m.label}
+            onClick={() => toggle(m.id)}
+          >
+            <Icon name={m.icon} size={17} />
+            {m.label}
+            <Count n={badges[m.id]} />
+          </button>
+        </span>
+      ))}
+    </nav>
   );
 
   const open = active !== null && anchor !== null;
@@ -100,7 +96,7 @@ export function ToolbarLayout({ form, renderPanel, preview, notices, badges, sub
   return (
     <>
       <div ref={zone} className={styles.toolbarZone}>
-        <SiteHeader form={form} below={menu} sticky />
+        <SiteHeader form={form} subject={subjectLine} tools={tools} />
         <div
           className={`${styles.dropPanel} ${open ? styles.dropOpen : ""} ${sliding ? styles.dropSliding : ""}`}
           style={style}

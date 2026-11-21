@@ -18,17 +18,18 @@ export interface ProfileFormProps {
 
 interface Props {
   form: ProfileFormProps;
-  /** A second row under the brand and search (the toolbar layout's menu). */
-  below?: ReactNode;
-  sticky?: boolean;
+  /** Second row, under the logo: who's on the preview. */
+  subject: ReactNode;
+  /** Second row, under the search: the menu. It starts where the search bar starts. */
+  tools: ReactNode;
 }
 
-export function SiteHeader({ form, below, sticky }: Props) {
+export function SiteHeader({ form, subject, tools }: Props) {
   return (
-    <header className={`${styles.header} ${below ? styles.headerTwoRow : ""} ${sticky ? styles.sticky : ""}`}>
-      <div className={styles.headerRow}>
+    <header className={styles.header}>
+      <div className={styles.headerGrid}>
         <Link className={styles.brand} href="/" aria-label="Steam Profile Studio home">
-          <LogoMark size={below ? 34 : 40} />
+          <LogoMark size={34} />
           <span className={styles.wordmark}>
             <span className={styles.wordmarkTop}>Steam Profile</span>
             <span className={styles.wordmarkMain}>Studio</span>
@@ -36,8 +37,10 @@ export function SiteHeader({ form, below, sticky }: Props) {
         </Link>
         <ProfileForm {...form} />
         <CopyLink />
+        <span className={styles.rowRule} aria-hidden />
+        <div className={styles.subject}>{subject}</div>
+        <div className={styles.toolCell}>{tools}</div>
       </div>
-      {below}
     </header>
   );
 }

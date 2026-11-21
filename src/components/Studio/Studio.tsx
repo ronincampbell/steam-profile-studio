@@ -155,7 +155,7 @@ export function Studio() {
     <div className={chrome.chrome}>
       <ToolbarLayout
         form={{ draft, onDraftChange: setDraft, onSubmit: submit, loading: state.status === "loading" }}
-        subject={state.status === "ready" ? { name: profile.name, avatar: profile.avatar, level: profile.level } : null}
+        subject={state.status === "ready" ? { name: profile.name, avatar: profile.avatar } : null}
         renderPanel={renderPanel}
         badges={{ wearing: Object.keys(tryOn).length, art: (custom.background ? 1 : 0) + (custom.avatar ? 1 : 0) }}
         notices={
