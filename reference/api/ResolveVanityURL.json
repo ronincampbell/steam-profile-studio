@@ -1,0 +1,12 @@
+{
+  "_captured_at": "2026-11-21T10:41:49.230Z",
+  "_request": "https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/?key=REDACTED&vanityurl=Fuzzycast",
+  "_status": 200,
+  "_used_key": true,
+  "response": {
+    "response": {
+      "steamid": "76561198220645184",
+      "success": 1
+    }
+  }
+}

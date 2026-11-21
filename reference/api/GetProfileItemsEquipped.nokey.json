@@ -1,0 +1,51 @@
+{
+  "_captured_at": "2026-11-21T10:41:49.743Z",
+  "_request": "https://api.steampowered.com/IPlayerService/GetProfileItemsEquipped/v1/?steamid=76561198220645184&language=english",
+  "_status": 200,
+  "_used_key": false,
+  "response": {
+    "response": {
+      "profile_background": {
+        "communityitemid": "16034300449",
+        "image_large": "items/1492660/f53947e25201d549d9281bf395e383e17c640587.jpg",
+        "name": "Glitch Sansui-zu (animated)",
+        "item_title": "Glitch Sansui-zu",
+        "item_description": "Art by Zennyan.",
+        "appid": 1492660,
+        "item_type": 9,
+        "item_class": 3,
+        "movie_webm": "items/1492660/3b67d75c3161ff8ebb1501f4436b839ea490e050.webm",
+        "movie_mp4": "items/1492660/70c3ff97957a8a23fdf7a688f2583d5462fd8c4c.mp4",
+        "movie_webm_small": "items/1492660/6b5de5dc65217174e8540068f58e4666b6527063.webm",
+        "movie_mp4_small": "items/1492660/9358b42f28abd5b6353aa31026b4575620bdd506.mp4",
+        "equipped_flags": 1
+      },
+      "mini_profile_background": {
+        "communityitemid": "39234335103",
+        "image_large": "items/774171/9ad58d002851ae8adbdad02a97e510520f1da983.jpg",
+        "name": "MUSE RADIO",
+        "item_title": "MUSE RADIO",
+        "item_description": "",
+        "appid": 774171,
+        "item_type": 51,
+        "item_class": 13,
+        "movie_webm": "items/774171/8e7ba050b61d1a428e025532b923f2012e8ad20f.webm",
+        "movie_mp4": "items/774171/cf35fb788161f4836e30497c1ff4916fada9d530.mp4"
+      },
+      "avatar_frame": {
+        "communityitemid": "34509228597",
+        "image_small": "items/774171/f9997653542df9f7814d0bb9f9d24b10c4b1a289.png",
+        "image_large": "items/774171/89707f721655a080b91d56669aa9bd165ca74222.png",
+        "name": "Musedash 98.ver",
+        "item_title": "Musedash 98.ver",
+        "item_description": "",
+        "appid": 774171,
+        "item_type": 55,
+        "item_class": 14
+      },
+      "animated_avatar": {},
+      "profile_modifier": {},
+      "steam_deck_keyboard_skin": {}
+    }
+  }
+}

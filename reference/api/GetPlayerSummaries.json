@@ -1,0 +1,31 @@
+{
+  "_captured_at": "2026-11-21T10:41:49.359Z",
+  "_request": "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=REDACTED&steamids=76561198220645184",
+  "_status": 200,
+  "_used_key": true,
+  "response": {
+    "response": {
+      "players": [
+        {
+          "steamid": "76561198220645184",
+          "communityvisibilitystate": 3,
+          "profilestate": 1,
+          "personaname": "Fuzzycast",
+          "commentpermission": 1,
+          "profileurl": "https://steamcommunity.com/id/Fuzzycast/",
+          "avatar": "https://avatars.steamstatic.com/7a0d41286fbdaec5d200908e9f90a60d6ed1184c.jpg",
+          "avatarmedium": "https://avatars.steamstatic.com/7a0d41286fbdaec5d200908e9f90a60d6ed1184c_medium.jpg",
+          "avatarfull": "https://avatars.steamstatic.com/7a0d41286fbdaec5d200908e9f90a60d6ed1184c_full.jpg",
+          "avatarhash": "7a0d41286fbdaec5d200908e9f90a60d6ed1184c",
+          "lastlogoff": 1794711334,
+          "personastate": 1,
+          "realname": "Fuzzycast",
+          "primaryclanid": "103582791470937936",
+          "timecreated": 1427600391,
+          "personastateflags": 0,
+          "loccountrycode": "AU"
+        }
+      ]
+    }
+  }
+}
