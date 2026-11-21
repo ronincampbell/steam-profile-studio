@@ -284,22 +284,30 @@
   display: block;
 }
 
+/* The guide's text column. Steam has no rule here; ours keeps the column
+   beside the artwork (a new block formatting context next to the float), so
+   text that runs long never slides in under the art. */
+.guideDetails {
+  overflow: hidden;
+}
+
 /* .showcase_item_detail_title */
 .detailTitle {
-  /* Exactly Steam's font list, without our usual Arial step. Guide titles
-     are often fancy Unicode letters (𝓒𝓮𝓵𝓮𝓼𝓽𝓮) that neither Motiva nor
-     Arial has, so the browser borrows a system font for them. Which one it
-     picks can depend on the font list, and on Windows our longer list gave a
-     wider font than Steam's: the title wrapped to two lines and pushed the
-     last description line under the artwork. */
+  /* Steam's own font list. Guide titles are often fancy Unicode letters
+     (𝓒𝓮𝓵𝓮𝓼𝓽𝓮) that neither Motiva nor Arial has, so each computer borrows a
+     system font for them, and some (Ronin's Linux PC) pick one wide enough to
+     wrap the title onto a second line. That pushed the text column taller than
+     the 160px artwork. Steam's page shows it on one line, so we hold it to one
+     line and cut it off with "…" (the full title is in the hover text). */
   font-family: "Motiva Sans", sans-serif;
   font-weight: 200;
   font-size: 24px;
   padding-top: 10px;
   color: #ffffff;
   line-height: 29px;
-  max-height: 58px;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* .guide_showcase_contributors */
