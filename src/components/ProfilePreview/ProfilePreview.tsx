@@ -19,7 +19,7 @@ import { levelBadge } from "@/lib/steam/level";
 import { themeCssVars } from "@/lib/steam/themes";
 import type { Video } from "@/lib/steam/types";
 import type { ProfileShowcases } from "@/lib/steam/showcases/types";
-import { Showcases } from "@/components/Showcases/Showcases";
+import { Showcases, type ShowcaseEditing, type ShowcaseItem } from "@/components/Showcases/Showcases";
 import styles from "./ProfilePreview.module.css";
 
 /** Everything the header draws. Built from a Profile plus whatever the user is trying on. */
@@ -56,11 +56,19 @@ function countryName(code: string): string {
 export function ProfilePreview({
   look,
   showcases,
+  showcaseItems,
+  showcaseEditing,
 }: {
   look: PreviewLook;
   /** The profile's showcases: null while loading, undefined with no profile loaded. */
   showcases?: ProfileShowcases | null;
+  /** The showcases to draw, when they've been edited. Defaults to `showcases` as Steam sent them. */
+  showcaseItems?: ShowcaseItem[];
+  /** Reorder and remove controls over each showcase. */
+  showcaseEditing?: ShowcaseEditing;
 }) {
+  const items =
+    showcaseItems ?? showcases?.showcases.map((showcase, i) => ({ id: String(i), showcase, source: "profile" as const }));
   const bg = look.background;
   const hasVideo = Boolean(bg?.video?.webm || bg?.video?.mp4);
   const imageRatio = useImageRatio(bg?.image);
@@ -161,8 +169,8 @@ export function ProfilePreview({
             {/* div.profile_leftcol: showcases. The right column (badges,
                 groups, friends) isn't part of the preview yet. */}
             <div className={styles.leftcol}>
-              {showcases?.showcases.length ? <Showcases showcases={showcases.showcases} /> : null}
-              <div className={styles.contentNote}>{showcasesNote(showcases)}</div>
+              {items?.length ? <Showcases items={items} editing={showcaseEditing} /> : null}
+              <div className={styles.contentNote}>{showcasesNote(showcases, items, Boolean(showcaseItems))}</div>
             </div>
             <div className={styles.clearBoth} />
           </div>
@@ -172,7 +180,15 @@ export function ProfilePreview({
   );
 }
 
-function showcasesNote(showcases: ProfileShowcases | null | undefined): string {
+function showcasesNote(
+  showcases: ProfileShowcases | null | undefined,
+  items: ShowcaseItem[] | undefined,
+  edited: boolean,
+): string {
+  if (edited && items) {
+    if (!items.length) return "No showcases. Add one from the Showcases panel below.";
+    if (showcases?.visibility === "public") return "Badges, groups, friends and comments aren't part of the preview yet.";
+  }
   if (showcases === undefined) return "Paste a profile to see its showcases.";
   if (showcases === null) return "Loading showcases…";
   switch (showcases.visibility) {
