@@ -10,10 +10,18 @@ import { useMemo, useState, type FormEvent } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ItemBrowser } from "@/components/ItemBrowser/ItemBrowser";
 import { ProfilePreview } from "@/components/ProfilePreview/ProfilePreview";
+import {
+  addShowcase,
+  fromProfile,
+  moveShowcase,
+  removeShowcase,
+  type EditorShowcase,
+} from "@/lib/studio/showcaseEditor";
 import { buildLook, PLACEHOLDER_PROFILE, type CustomArt, type Slot, type TryOn } from "@/lib/studio/look";
 import type { Cosmetic, ItemType, ShopItem } from "@/lib/steam/types";
 import { CustomArtPicker } from "./CustomArtPicker";
 import { FitToWidth } from "./FitToWidth";
+import { ShowcaseList } from "./ShowcaseList";
 import { SlotBar } from "./SlotBar";
 import { useProfile, type ProfileState } from "./useProfile";
 import { useShowcases } from "./useShowcases";
@@ -37,7 +45,20 @@ export function Studio() {
 
   const profile = state.status === "ready" ? state.profile : PLACEHOLDER_PROFILE;
   const look = useMemo(() => buildLook(profile, tryOn, custom), [profile, tryOn, custom]);
-  const showcases = useShowcases(state.status === "ready" ? state.profile.steamId : null);
+  const steamId = state.status === "ready" ? state.profile.steamId : null;
+  const showcases = useShowcases(steamId);
+
+  // Showcase edits live only in this tab. They belong to one profile: loading
+  // another starts again from that profile's own showcases.
+  const profileShowcases = useMemo(() => showcases?.showcases ?? [], [showcases]);
+  const initialShowcases = useMemo(() => (showcases ? fromProfile(showcases.showcases) : null), [showcases]);
+  const [showcaseEdits, setShowcaseEdits] = useState<{ steamId: string; list: EditorShowcase[] } | null>(null);
+  const edited = showcaseEdits !== null && showcaseEdits.steamId === steamId;
+  const showcaseList = edited ? showcaseEdits.list : initialShowcases;
+  function editShowcases(change: (list: EditorShowcase[]) => EditorShowcase[]) {
+    if (!steamId || !showcaseList) return;
+    setShowcaseEdits({ steamId, list: change(showcaseList) });
+  }
 
   const current = useMemo(() => {
     const out: Partial<Record<Slot, Cosmetic | undefined>> = {};
@@ -104,7 +125,19 @@ export function Studio() {
       </header>
 
       <FitToWidth>
-        <ProfilePreview look={look} showcases={state.status === "ready" ? showcases : undefined} />
+        <ProfilePreview
+          look={look}
+          showcases={state.status === "ready" ? showcases : undefined}
+          showcaseItems={showcaseList ?? undefined}
+          showcaseEditing={
+            showcaseList
+              ? {
+                  onMove: (from, to) => editShowcases((l) => moveShowcase(l, from, to)),
+                  onRemove: (id) => editShowcases((l) => removeShowcase(l, id)),
+                }
+              : undefined
+          }
+        />
       </FitToWidth>
 
       <div className={styles.controls}>
@@ -120,6 +153,17 @@ export function Studio() {
           }}
         />
         <CustomArtPicker custom={custom} onChange={setCustom} />
+        {showcaseList && (
+          <ShowcaseList
+            list={showcaseList}
+            profileShowcases={profileShowcases}
+            edited={edited}
+            onMove={(from, to) => editShowcases((l) => moveShowcase(l, from, to))}
+            onRemove={(id) => editShowcases((l) => removeShowcase(l, id))}
+            onAdd={(type) => editShowcases((l) => addShowcase(l, type, profileShowcases, { name: profile.name }))}
+            onReset={() => setShowcaseEdits(null)}
+          />
+        )}
       </div>
 
       <ItemBrowser current={current} onApply={apply} />
