@@ -286,7 +286,13 @@
 
 /* .showcase_item_detail_title */
 .detailTitle {
-  font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
+  /* Exactly Steam's font list, without our usual Arial step. Guide titles
+     are often fancy Unicode letters (𝓒𝓮𝓵𝓮𝓼𝓽𝓮) that neither Motiva nor
+     Arial has, so the browser borrows a system font for them. Which one it
+     picks can depend on the font list, and on Windows our longer list gave a
+     wider font than Steam's: the title wrapped to two lines and pushed the
+     last description line under the artwork. */
+  font-family: "Motiva Sans", sans-serif;
   font-weight: 200;
   font-size: 24px;
   padding-top: 10px;
@@ -299,7 +305,7 @@
 /* .guide_showcase_contributors */
 .guideContributors {
   margin-bottom: 8px;
-  line-height: 19px; /* matches Motiva Sans at 13px in the reference */
+  line-height: 21px; /* matches Steam's own guide showcase (Ronin's screenshot, 21 Nov) */
 }
 
 /* .guide_showcase_appinfo */
