@@ -1,0 +1,232 @@
+{
+  "_captured_at": "2026-11-21T11:20:00.000Z",
+  "_request": "https://api.steampowered.com/IPlayerService/GetProfileCustomization/v1/?steamid=76561198220645184",
+  "_status": 200,
+  "_used_key": false,
+  "response": {
+    "response": {
+      "customizations": [
+        {
+          "customization_type": 13,
+          "large": false,
+          "slots": [
+            {
+              "slot": 0,
+              "publishedfileid": "2365002180"
+            },
+            {
+              "slot": 1,
+              "publishedfileid": "2364631422"
+            },
+            {
+              "slot": 2,
+              "publishedfileid": "2364631742"
+            },
+            {
+              "slot": 3,
+              "publishedfileid": "2364631961"
+            }
+          ],
+          "active": true,
+          "customization_style": 0,
+          "purchaseid": "0",
+          "level": 1
+        },
+        {
+          "customization_type": 2,
+          "large": false,
+          "slots": [
+            {
+              "slot": 0,
+              "appid": 1422450
+            },
+            {
+              "slot": 1,
+              "appid": 823500
+            },
+            {
+              "slot": 2,
+              "appid": 546560
+            },
+            {
+              "slot": 3,
+              "appid": 870780
+            },
+            {
+              "slot": 4,
+              "appid": 420530
+            },
+            {
+              "slot": 5,
+              "appid": 753640
+            },
+            {
+              "slot": 6,
+              "appid": 312520
+            },
+            {
+              "slot": 7,
+              "appid": 632470
+            },
+            {
+              "slot": 8,
+              "appid": 481510
+            },
+            {
+              "slot": 9,
+              "appid": 620
+            },
+            {
+              "slot": 10,
+              "appid": 2863640
+            },
+            {
+              "slot": 11,
+              "appid": 427520
+            }
+          ],
+          "active": true,
+          "customization_style": 0,
+          "purchaseid": "0",
+          "level": 3
+        },
+        {
+          "customization_type": 15,
+          "large": false,
+          "slots": [
+            {
+              "slot": 0,
+              "appid": 504230,
+              "publishedfileid": "3671816678"
+            }
+          ],
+          "active": true,
+          "customization_style": 0,
+          "purchaseid": "0",
+          "level": 1
+        },
+        {
+          "customization_type": 23,
+          "large": false,
+          "slots": [
+            {
+              "slot": 0,
+              "appid": 1245620
+            },
+            {
+              "slot": 1,
+              "appid": 1260390
+            },
+            {
+              "slot": 2,
+              "appid": 3017860
+            },
+            {
+              "slot": 3,
+              "appid": 730
+            }
+          ],
+          "active": true,
+          "customization_style": 0,
+          "purchaseid": "0",
+          "level": 2
+        },
+        {
+          "customization_type": 24,
+          "large": false,
+          "slots": [
+            {
+              "slot": 0,
+              "replay_year": 2025
+            }
+          ],
+          "active": true,
+          "customization_style": 0,
+          "purchaseid": "0",
+          "level": 1
+        },
+        {
+          "customization_type": 17,
+          "large": false,
+          "slots": [
+            {
+              "slot": 0,
+              "appid": 312520,
+              "title": "1_20"
+            },
+            {
+              "slot": 1,
+              "appid": 367520,
+              "title": "6_9"
+            },
+            {
+              "slot": 2,
+              "appid": 823500,
+              "title": "1_4"
+            },
+            {
+              "slot": 3,
+              "appid": 546560,
+              "title": "1_20"
+            },
+            {
+              "slot": 4,
+              "appid": 620,
+              "title": "0_23"
+            },
+            {
+              "slot": 5,
+              "appid": 1245620,
+              "title": "1_0"
+            },
+            {
+              "slot": 6,
+              "appid": 427520,
+              "title": "2_24"
+            }
+          ],
+          "active": true,
+          "customization_style": 0,
+          "purchaseid": "0",
+          "level": 1
+        },
+        {
+          "customization_type": 5,
+          "large": false,
+          "slots": [
+            {
+              "slot": 0
+            },
+            {
+              "slot": 1
+            },
+            {
+              "slot": 2
+            },
+            {
+              "slot": 3
+            },
+            {
+              "slot": 4
+            },
+            {
+              "slot": 5
+            }
+          ],
+          "active": true,
+          "customization_style": 0,
+          "purchaseid": "0",
+          "level": 1
+        }
+      ],
+      "slots_available": 8,
+      "profile_theme": {
+        "theme_id": "Steel",
+        "title": "#ProfileTheme_Steel"
+      },
+      "profile_preferences": {
+        "hide_profile_awards": false
+      }
+    }
+  }
+}

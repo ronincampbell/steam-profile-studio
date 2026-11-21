@@ -116,6 +116,9 @@ await call("GetSteamLevel", "IPlayerService", "GetSteamLevel", 1, { steamid });
 await call("GetProfileItemsEquipped", "IPlayerService", "GetProfileItemsEquipped", 1, { steamid, language: "english" });
 await call("GetProfileItemsEquipped.nokey", "IPlayerService", "GetProfileItemsEquipped", 1, { steamid, language: "english" }, { withKey: false });
 
+// Profile theme and showcases (undocumented). Works without a key.
+await call("GetProfileCustomization.nokey", "IPlayerService", "GetProfileCustomization", 1, { steamid }, { withKey: false });
+
 // 4. Points Shop catalogue (undocumented). count must be 100-1000.
 // First: unfiltered, without a key, to see whether a key is needed at all.
 await call("QueryRewardItems.nokey", "ILoyaltyRewardsService", "QueryRewardItems", 1, { count: 100, language: "english" }, { withKey: false });
