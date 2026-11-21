@@ -165,14 +165,19 @@ describe("parseProfilePage edge cases", () => {
     const p = parseProfilePage(
       `<html><body class="flat_page profile_page private_profile responsive_page "><div class="profile_leftcol"></div></body></html>`,
     );
-    expect(p).toEqual({ isPrivate: true, showcases: [] });
+    expect(p).toEqual({ isProfilePage: true, isPrivate: true, showcases: [] });
   });
 
   it("returns no showcases when the page has no showcase area", () => {
     expect(parseProfilePage("<html><body class=\"profile_page\"></body></html>")).toEqual({
+      isProfilePage: true,
       isPrivate: false,
       showcases: [],
     });
+  });
+
+  it("knows when the page isn't a profile at all (Steam's error page)", () => {
+    expect(parseProfilePage("<html><body><h2>An error was encountered</h2></body></html>").isProfilePage).toBe(false);
   });
 
   it("treats every stat and slot as optional", () => {

@@ -7,7 +7,8 @@
  * `parseMoreShowcase` for any showcase its own parsers don't recognise.
  */
 import { parse, type HTMLElement } from "node-html-parser";
-import { classes, hasClass, imageMaxWidth, parseAchievements, parseRibbons, parseStats, text } from "./parse";
+import { classes, hasClass, text } from "./dom";
+import { imageMaxWidth, parseAchievements, parseRibbons, parseStats } from "./parse";
 import type {
   AwardsShowcase,
   CustomTextShowcase,
