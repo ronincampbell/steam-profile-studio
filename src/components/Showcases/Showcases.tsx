@@ -285,8 +285,8 @@ function FavoriteGuide({ showcase }: { showcase: FavoriteGuideShowcase }) {
           <a href={g.href} target="_blank" rel="noreferrer">
             <img className={styles.workshopItemImage} src={g.image} alt="" />
           </a>
-          <div>
-            <div className={styles.detailTitle}>
+          <div className={styles.guideDetails}>
+            <div className={styles.detailTitle} title={g.name}>
               <a href={g.href} target="_blank" rel="noreferrer">
                 {g.name}
               </a>
