@@ -14,12 +14,29 @@ import type {
   CompletionistShowcase,
   FavoriteGuideShowcase,
   GameCollectorShowcase,
+  RareAchievementShowcase,
   ReplayShowcase,
+  ScreenshotShowcase,
   Showcase,
   ShowcaseStat,
 } from "@/lib/steam/showcases/types";
 import styles from "./Showcases.module.css";
 import replay from "./Replay.module.css";
+import more from "./MoreShowcases.module.css";
+import {
+  AwardsView,
+  CustomTextView,
+  FavoriteGameView,
+  FavoriteGroupView,
+  ItemShowcaseView,
+  MyGuidesView,
+  MyWorkshopView,
+  OwnerBar,
+  ReviewView,
+  SalienView,
+  TradeShowcaseView,
+  WorkshopItemView,
+} from "./MoreShowcases";
 
 export function Showcases({ showcases }: { showcases: Showcase[] }) {
   return (
@@ -32,13 +49,36 @@ export function Showcases({ showcases }: { showcases: Showcase[] }) {
 }
 
 function ShowcaseBox({ showcase }: { showcase: Showcase }) {
-  const isArt = showcase.kind === "artwork";
+  // Artwork and Featured Artwork are both `.myart` on Steam, whose CSS hides the header.
+  const isArt = showcase.kind === "artwork" || showcase.kind === "featuredArtwork";
   return (
     <div className={`${styles.customization} ${isArt ? styles.myart : ""}`} data-showcase={showcase.kind}>
       {/* Steam hides the Artwork showcase's header with CSS; so do we. */}
-      {!isArt && <div className={styles.header}>{showcase.title}</div>}
+      {!isArt && (
+        <div className={`${styles.header} ${showcase.kind === "customText" ? more.ellipsis : ""}`}>
+          {showcase.title}
+        </div>
+      )}
+      {/* My Workshop and My Guides put the owner's bar between the header and the block. */}
+      {showcase.kind === "myWorkshop" && <OwnerBar owner={showcase.owner} />}
+      {showcase.kind === "myGuides" && <OwnerBar owner={showcase.owner} guides />}
       <div className={`${styles.block} ${showcase.kind === "replay" ? styles.replayBlock : ""}`}>
-        {showcase.kind === "artwork" && <Artwork showcase={showcase} />}
+        {(showcase.kind === "artwork" ||
+          showcase.kind === "screenshot" ||
+          showcase.kind === "video" ||
+          showcase.kind === "featuredArtwork") && <Artwork showcase={showcase} />}
+        {showcase.kind === "rareAchievement" && <Achievement showcase={showcase} />}
+        {showcase.kind === "item" && <ItemShowcaseView showcase={showcase} />}
+        {showcase.kind === "trade" && <TradeShowcaseView showcase={showcase} />}
+        {showcase.kind === "favoriteGame" && <FavoriteGameView showcase={showcase} />}
+        {showcase.kind === "customText" && <CustomTextView showcase={showcase} />}
+        {showcase.kind === "favoriteGroup" && <FavoriteGroupView showcase={showcase} />}
+        {showcase.kind === "review" && <ReviewView showcase={showcase} />}
+        {showcase.kind === "workshopItem" && <WorkshopItemView showcase={showcase} />}
+        {showcase.kind === "myWorkshop" && <MyWorkshopView showcase={showcase} />}
+        {showcase.kind === "myGuides" && <MyGuidesView showcase={showcase} />}
+        {showcase.kind === "salien" && <SalienView showcase={showcase} />}
+        {showcase.kind === "awards" && <AwardsView showcase={showcase} />}
         {showcase.kind === "gameCollector" && <GameCollector showcase={showcase} />}
         {showcase.kind === "badgeCollector" && <BadgeCollector showcase={showcase} />}
         {showcase.kind === "favoriteGuide" && <FavoriteGuide showcase={showcase} />}
@@ -86,29 +126,73 @@ function Stats({ stats, wrap = false }: { stats: ShowcaseStat[]; wrap?: boolean 
   );
 }
 
-function Artwork({ showcase }: { showcase: ArtworkShowcase }) {
+/**
+ * Artwork, and the showcases that share its markup: Screenshot, Video and
+ * Featured Artwork (one wide `.single` image, no small ones).
+ */
+function Artwork({ showcase }: { showcase: ArtworkShowcase | ScreenshotShowcase }) {
   const { primary, small } = showcase;
+  const single = showcase.kind === "featuredArtwork";
+  const video = showcase.kind === "video";
+  // Steam puts the play icon on the large video only.
+  const playIcon = video && (
+    <img
+      className={more.playVideoIcon}
+      src="https://community.fastly.steamstatic.com/public/shared/images/apphubs/play_icon80.png"
+      alt=""
+    />
+  );
   return (
     <div className={styles.screenshotShowcase}>
       {primary && (
-        <div className={`${styles.screenshotPrimary} ${styles.slot}`}>
+        <div className={`${styles.screenshotPrimary} ${single ? more.single : ""} ${styles.slot}`}>
           <a className={styles.screenshot} href={primary.href} target="_blank" rel="noreferrer">
-            <img width="100%" style={{ maxWidth: 480 }} src={primary.image} alt={primary.name} />
+            {playIcon}
+            {/* Featured Artwork's image has no width="100%" on Steam: it shows at its own size. */}
+            <img
+              width={single ? undefined : "100%"}
+              style={{ maxWidth: primary.maxWidth ?? 480 }}
+              src={primary.image}
+              alt={primary.name}
+            />
           </a>
           <div className={styles.screenshotItemName}>{primary.name}</div>
-          <div className={styles.screenshotStats} />
+          <div className={styles.screenshotStats}>
+            {primary.stats?.map((st, i) => (
+              <span key={i} className={more.screenshotStat} title={st.name}>
+                {st.icon ? (
+                  <img className={more.statIcon} src={st.icon} alt="" />
+                ) : (
+                  <span className={`${more.statIcon} ${more.favoriteIcon}`} />
+                )}{" "}
+                {st.value}
+              </span>
+            ))}
+          </div>
         </div>
       )}
-      <div className={styles.screenshotRightCol}>
-        {small.map((s, i) => (
-          <div key={i} className={`${styles.smallScreenshot} ${styles.slot}`}>
-            <a className={styles.screenshot} href={s.href} target="_blank" rel="noreferrer">
-              <img width="100%" style={{ maxWidth: 100 }} src={s.image} alt="" />
+      {!single && (
+        <div className={styles.screenshotRightCol}>
+          {small.map((s, i) => (
+            <div key={i} className={`${styles.smallScreenshot} ${styles.slot}`}>
+              <a className={styles.screenshot} href={s.href} target="_blank" rel="noreferrer">
+                <img width="100%" style={{ maxWidth: s.maxWidth ?? 100 }} src={s.image} alt="" />
+              </a>
+            </div>
+          ))}
+          {showcase.more && (
+            <a
+              className={`${styles.smallScreenshot} ${more.screenshotCount}`}
+              href={showcase.more.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <div className={styles.screenshot}>{showcase.more.text}</div>
             </a>
-          </div>
-        ))}
-      </div>
-      <div className={styles.clearBoth} />
+          )}
+        </div>
+      )}
+      {!single && <div className={styles.clearBoth} />}
     </div>
   );
 }
@@ -255,7 +339,9 @@ function Completionist({ showcase }: { showcase: CompletionistShowcase }) {
   );
 }
 
-function Achievement({ showcase }: { showcase: AchievementShowcase }) {
+/** Achievement, and Rarest Achievement (same markup, but Steam picks the tiles, so they aren't slots). */
+function Achievement({ showcase }: { showcase: AchievementShowcase | RareAchievementShowcase }) {
+  const slot = showcase.kind === "achievement" ? styles.slot : "";
   return (
     <>
       <div className={styles.achievementShowcase}>
@@ -264,7 +350,7 @@ function Achievement({ showcase }: { showcase: AchievementShowcase }) {
             {showcase.achievements.map((a, i) => (
               <div
                 key={i}
-                className={`${styles.slot} ${styles.achievement} ${a.rare ? styles.rare : ""}`}
+                className={`${slot} ${styles.achievement} ${a.rare ? styles.rare : ""}`}
                 title={[a.name, a.description, a.game, a.percent].filter(Boolean).join("\n")}
               >
                 {a.rare && (

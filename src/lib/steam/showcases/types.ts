@@ -24,15 +24,38 @@ export interface ArtworkImage {
   /** Steam's resized, letterboxed image. */
   image: string;
   publishedFileId?: string;
+  /** The image's inline max-width on Steam (480, 506, 630…), when it has one. */
+  maxWidth?: number;
+}
+
+/** The "Up Votes 57" style counts under a large artwork, screenshot or video. */
+export interface ScreenshotStat {
+  /** Steam's hover text: "Up Votes", "Comments" or "Favorites". */
+  name: string;
+  value: string;
+  /** Icon image; absent for Favorites, which Steam draws from a CSS sprite. */
+  icon?: string;
 }
 
 export interface ArtworkShowcase {
   kind: "artwork";
   title: string;
   /** The large image on the left, with its title (Steam shows it under the image). */
-  primary: (ArtworkImage & { name: string }) | null;
+  primary: (ArtworkImage & { name: string; stats?: ScreenshotStat[] }) | null;
   /** Up to 3 small images on the right. */
   small: ArtworkImage[];
+  /** The "+ 41" tile under the small images, linking to all of them. */
+  more?: { text: string; href: string };
+}
+
+/**
+ * Screenshot Showcase (type 7), Video Showcase (14) and Featured Artwork (22)
+ * use the Artwork showcase's markup. Featured Artwork has one wide image
+ * (`.screenshot_showcase_primary.single`) and no small ones; videos have a
+ * play icon over each image.
+ */
+export interface ScreenshotShowcase extends Omit<ArtworkShowcase, "kind"> {
+  kind: "screenshot" | "video" | "featuredArtwork";
 }
 
 export interface GameCollectorShowcase {
@@ -129,6 +152,171 @@ export interface AchievementShowcase {
   stats: ShowcaseStat[];
 }
 
+/** Rarest Achievement Showcase (type 1): Steam picks the player's rarest achievements. */
+export interface RareAchievementShowcase extends Omit<AchievementShowcase, "kind"> {
+  kind: "rareAchievement";
+}
+
+/** One inventory item tile (Item Showcase and Items Up For Trade). */
+export interface EconomyItem {
+  /** The item in the owner's inventory. */
+  href: string;
+  image: string;
+  /** Steam's 2x image, when it sends one. */
+  image2x?: string;
+  /** Rarity colours Steam sets inline on the tile. */
+  borderColor?: string;
+  backgroundColor?: string;
+}
+
+export interface ItemShowcase {
+  kind: "item";
+  title: string;
+  items: EconomyItem[];
+  /** "1,695 Items Owned", shown after the items. */
+  count?: ShowcaseStat;
+}
+
+export interface TradeShowcase {
+  kind: "trade";
+  title: string;
+  items: EconomyItem[];
+  /** Items Owned, Trades Made, Market Transactions. */
+  stats: ShowcaseStat[];
+  /** The player's note, as cleaned HTML (see sanitizeNotes). */
+  notes?: string;
+}
+
+/** The achievement, badge and review strip under a Favorite Game. */
+export interface GameInfoStats {
+  achievements?: {
+    /** The completion trophy, as in Completionist. */
+    ribbons: CompletionRibbonGroup[];
+    /** "38 / 54 Achievements" */
+    summary: string;
+    href: string;
+    /** "2 Rare" */
+    rare?: string;
+    /** Bar segments: how many achievements each colour covers, then the locked rest. */
+    bar: { segments: { variant: string; weight: number }[]; locked: number };
+    icons: { image: string; name: string; href: string }[];
+    /** The "+33" tile after the icons. */
+    more?: { text: string; href: string };
+  };
+  badge?: { href: string; icon: string; name: string; xp: string };
+  /** "Review 1" style links, with Steam's icon type (recommendation, guide, screenshot…). */
+  files: { type: string; text: string; href: string }[];
+}
+
+export interface FavoriteGameShowcase {
+  kind: "favoriteGame";
+  title: string;
+  game: { href: string; image: string; name: string; adultContent: boolean } | null;
+  /** Hours played, Achievements. */
+  stats: ShowcaseStat[];
+  info?: GameInfoStats;
+}
+
+export interface CustomTextShowcase {
+  kind: "customText";
+  /** The player's own title. */
+  title: string;
+  /** Cleaned HTML (see sanitizeNotes). */
+  notes: string;
+}
+
+export interface FavoriteGroupShowcase {
+  kind: "favoriteGroup";
+  title: string;
+  group: {
+    href: string;
+    avatar: string;
+    name: string;
+    /** " - Public Group" */
+    suffix: string;
+    /** Cleaned HTML (see sanitizeNotes); often empty. */
+    description: string;
+    /** Members, In-Game, Online, In Chat. `variant` is Steam's extra class (ingame, online, inchat). */
+    stats: (ShowcaseStat & { variant?: string })[];
+  } | null;
+}
+
+export interface ReviewShowcase {
+  kind: "review";
+  title: string;
+  game: { href: string; image: string; name: string; playtime: string; adultContent: boolean } | null;
+  /** The review text, as cleaned HTML (see sanitizeNotes). */
+  notes: string;
+  /** "Leave a comment" button. */
+  comment?: { href: string; label: string };
+}
+
+export interface WorkshopItemShowcase {
+  kind: "workshopItem";
+  title: string;
+  item: {
+    href: string;
+    /** Preview, letterboxed by Steam to fit 160×160. */
+    image: string;
+    name: string;
+    description: string;
+    stars?: { image: string; text: string };
+    app?: { name: string; href: string; icon: string };
+    /** "Created by - " */
+    creditPrefix: string;
+    authors: { name: string; href: string }[];
+    /** Text between author links (" and ", ", "). */
+    authorSeparators: string[];
+  } | null;
+}
+
+export interface MyWorkshopShowcase {
+  kind: "myWorkshop";
+  title: string;
+  /** The bar above the items: the player's avatar and "<name>'s Workshop". */
+  owner: { href: string; avatar: string; status: string; name: string; workshopHref: string };
+  items: { href: string; image: string; name: string; appIcon?: string }[];
+  stats: ShowcaseStat[];
+}
+
+export interface MyGuidesShowcase {
+  kind: "myGuides";
+  title: string;
+  /** Same bar as My Workshop, linking to the player's guides. */
+  owner: MyWorkshopShowcase["owner"];
+  guides: {
+    href: string;
+    /** Preview, letterboxed by Steam to fit 66×66. */
+    image: string;
+    appIcon?: string;
+    name: string;
+    /** "By <name>" */
+    author: string;
+    /** Steam alternates `left` on the slots of the left column. */
+    left: boolean;
+  }[];
+  stats: ShowcaseStat[];
+}
+
+export interface SalienShowcase {
+  kind: "salien";
+  title: string;
+  /** Layers of the Salien, by Steam's element id (body, arms, eyes, legs, mouth, shirt, hat). */
+  parts: { id: string; image: string }[];
+  cryotube: { back?: string; front?: string };
+  badge?: { href: string; image: string };
+  header: { text: string; href: string };
+  /** Level Reached, Bosses Fought, Experience Earned (label above value here). */
+  stats: ShowcaseStat[];
+}
+
+export interface AwardsShowcase {
+  kind: "awards";
+  title: string;
+  awards: { name: string; image: string; animated?: string; count: string }[];
+  stats: ShowcaseStat[];
+}
+
 /** A showcase the preview doesn't draw yet: shown as its title bar only. */
 export interface UnsupportedShowcase {
   kind: "unsupported";
@@ -145,6 +333,19 @@ export type Showcase =
   | CompletionistShowcase
   | ReplayShowcase
   | AchievementShowcase
+  | RareAchievementShowcase
+  | ScreenshotShowcase
+  | ItemShowcase
+  | TradeShowcase
+  | FavoriteGameShowcase
+  | CustomTextShowcase
+  | FavoriteGroupShowcase
+  | ReviewShowcase
+  | WorkshopItemShowcase
+  | MyWorkshopShowcase
+  | MyGuidesShowcase
+  | SalienShowcase
+  | AwardsShowcase
   | UnsupportedShowcase;
 
 export type ShowcaseKind = Showcase["kind"];

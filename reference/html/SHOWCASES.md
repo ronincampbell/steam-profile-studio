@@ -212,31 +212,81 @@ Steam spells the header "Favorite Guide".
   **only** source of which badges are shown. (Badge Collector shows the
   rarest badges automatically; unconfirmed, but it fits the empty slots.)
 
-### Other showcase types (not on this profile)
+### The other showcase types (captured 21 Nov 2026 from other public profiles)
 
-From `EProfileCustomizationType` (Valve's protobufs, see above). The CSS
-class families are what Steam's `profilev2.css` defines and are **hints
-only**: I haven't seen their markup, so each needs a real profile captured
-before a parser is written.
+The 7 types above are all Fuzzycast has. For the rest, a thread found public
+profiles that use them **without loading any profile pages**: it walked
+friend lists through the Web API (`GetFriendList`, `GetPlayerSummaries`) and
+asked `GetProfileCustomization` (no key, api.steampowered.com, not
+rate-limited like the community site) which showcase types each public
+profile uses. About 4,600 profiles turned up every type except the two
+Greenlight ones. Then it loaded just **9 profile pages**, one every 45
+seconds, chosen to cover every type at least twice (no 429s). On all 9,
+every showcase on the page parses to a kind, and the kinds match the API's
+type list in order (the API also lists past-year Steam Replays the page
+doesn't show).
 
-| Type | Enum name | Likely root class (from CSS, unconfirmed) |
-|---|---|---|
-| 1 | RareAchievementShowcase | `.achievement_showcase`? (older version of 17) |
-| 3 | ItemShowcase | `.item_showcase`, `.item_showcase_item` |
-| 4 | TradeShowcase | `.trade_showcase`, `.trade_showcase_items`, `.showcase_stats_trading` |
-| 6 | FavoriteGame | `.favoritegame_showcase`, `.favoritegame_showcase_game` |
-| 7 | ScreenshotShowcase | `.screenshot_showcase` (same as Artwork) |
-| 8 | CustomText (Custom Info Box) | `.customtext_showcase` |
-| 9 | FavoriteGroup | `.favoritegroup_showcase_group`, `.favoritegroup_*` |
-| 10 | Recommendation (Review) | `.recommendation_showcase` |
-| 11 | WorkshopItem (Favourite Workshop item) | `.workshop_showcase_item`, `.workshop_showcase_*` |
-| 12 | MyWorkshop | `.myworkshop_showcase_header`, `.workshop_showcase_multiitem` |
-| 14 | VideoShowcase | `.screenshot_showcase` + `.play_video_icon`? |
-| 16 | MyGuides | `.myguide_showcase_item*` |
-| 18, 19 | Greenlight, MyGreenlight | retired with Greenlight; probably never seen |
-| 20 | Salien | `.showcase_salien*` (2018 summer sale event) |
-| 21 | LoyaltyRewardReactions (Points Shop awards) | `.awards_showcase`, `.showcase_award*` |
-| 22 | SingleArtworkShowcase (Featured Artwork) | `.myart`? |
+Those pages are strangers' profiles, so they are **not** in the repo. Each
+type's markup is kept in `showcases/` as one anonymised showcase, cut out by
+`scripts/anonymise-showcase.mjs`: player-written text is replaced word for
+word with "lorem" (BBCode structure kept), profile/group links point at
+`/id/example`, Workshop ids are 0 and avatars are Steam's default. Steam's
+markup, classes, inline styles, item and badge images are left as served.
+
+What was **confirmed** for every type below: the full markup (from the real
+pages), every class's CSS (from profilev2.css, shared_global.css,
+globalv2.css, buttons.css), and the rendered result: Steam's own page,
+rendered with Steam's CSS and Motiva Sans in Chromium, and our preview of
+the same page come out the same height for every showcase on all 9 profiles,
+except where a line of text wraps differently in Arial or an image the cloud
+can't load (YouTube thumbnails) changes the height.
+`showcase-types/new-showcases-vs-steam.png` in the project's shared files
+shows each fixture next to Steam's own rendering of it.
+
+Shared pieces they reuse: `showcase_content_bg`, `showcase_stats_row`,
+`showcase_slot`, and `showcase_notes` (player text, `max-height: 600px`,
+scrolls). Player text is BBCode turned into HTML by Steam (`bb_h1`,
+`bb_link` through `steamcommunity.com/linkfilter/`, `bb_spoiler`, emoticon
+`<img class="emoticon">`); the parser keeps only those tags and classes
+(`sanitizeNotes`).
+
+| Type | Showcase (Steam's title) | How to tell it apart | Fixture |
+|---|---|---|---|
+| 1 | Rarest Achievement Showcase | Same root as Achievement (`.achievement_showcase`), but the tiles have **no `showcase_slot`** and the first has `first`; Steam picks them (rarest first, all `rare` here). Up to 21 seen | `rare-achievement.html` |
+| 3 | Item Showcase | `.item_showcase > div > .showcase_slot_row`: `.item_showcase_item` tiles (96×96 image, rarity `border-color`/`background-color` inline, `srcset` 2x except animated items) then `a.showcase_stat.item_count_stat` "Items Owned". Up to 21 tiles seen | `item.html` |
+| 4 | Items Up For Trade | `.trade_showcase`: `.showcase_slot_row.trade_showcase_items` (same tiles, plus `tradable_item`), then a `showcase_content_bg` with `.showcase_stats_row.showcase_stats_trading` (Items Owned, Trades Made, Market Transactions) and an optional `.showcase_notes` | `trade.html`, `trade-bbcode.html` |
+| 6 | Favorite Game | `.favoritegame_showcase` with `.favoritegame_showcase_game` (184×69 capsule, title), a stats row (Hours played, Achievements), and a `.game_info_stats` strip shared with Recent Activity: trophy (34px), "38 / 54 Achievements", gold "2 Rare", a segmented bar sized by an inline `grid-template-columns: minmax(1px, 38fr) 16fr`, up to 5 achievement icons + "+33", an optional game badge (`.game_info_achievements_badge`), and "Review 1"-style links | `favorite-game.html`, `favorite-game-badge.html` |
+| 7 | Screenshot Showcase | Artwork markup with `.profile_customization.myscreenshots`; the header is **not** hidden. Stats under the big image (Up Votes, Comments, Favorites) | `screenshot.html` |
+| 8 | Custom Info Box | `.customtext_showcase > .showcase_content_bg.showcase_notes`; the header is the player's own title (`.ellipsis`) | `custom-text.html` |
+| 9 | Favorite Group | `.favoritegroup_showcase_group`: 157×157 avatar, name row ("name - Public Group"), description, and a stats row pinned to the bottom (Members, In-Game green, Online blue, In Chat on the theme colour) | `favorite-group.html` |
+| 10 | Review Showcase | `.recommendation_showcase > .showcase_content_bg.showcase_slot`: capsule, game name, "23 Hours played", the review text (`.showcase_notes`), then a "Leave a comment" `btn_grey_black` button | `review.html` |
+| 11 | Workshop Showcase (favourite item) | **Uses the Favorite Game root `.favoritegame_showcase`**, with a `.workshop_showcase_item` inside: 160px preview, title, description, and a bottom row (stars, game, "Created by - A and B") | `workshop-item.html` |
+| 12 | Workshop Showcase (player's own) | `.myworkshop_showcase`, with an owner bar (`.myworkshop_showcase_header`: avatar, "<name>'s Workshop") **between the title bar and the block**. Up to 5 items (`max-width: 20%`), each with a 32px game icon, then Submissions/Followers | `my-workshop.html` |
+| 14 | Video Showcase | Artwork markup with `.myvideos`; a play icon (`play_icon80.png`) on the **large** video only; thumbnails are YouTube's, so the cloud can't load them | `video.html` |
+| 16 | Guide Showcase | `.myguide_showcase`: owner bar with `.guides` (black gradient), `.myguide_showcase_item_ctn` tiles at 48% width (66px preview + 18px game icon, title, "By <name>"), then Guides/Followers | `my-guides.html` |
+| 18, 19 | Greenlight, My Greenlight | Retired with Greenlight in 2017: not one of ~4,600 profiles had them. Not built; they stay title-bar-only | none |
+| 20 | Salien Stats | `.salien_showcase`: the 2018 Salien in its cryotube (stacked images with fixed ids), the event badge, and a centred stats box ("Steam Summer Saliens 2018"; Level Reached, Bosses Fought, then a `<br>` and Experience Earned) with the label **above** the value | `salien.html` |
+| 21 | Awards Showcase | `.awards_showcase`: a grid (`repeat(auto-fit, minmax(110px, 1fr))`) of 75px award icons with counts (an animated version on hover, `data-animate-on-hover-src`), then Awards Received/Given | `awards.html` |
+| 22 | Featured Artwork Showcase | `.myart` (header hidden) with one `.screenshot_showcase_primary.single` image up to 630px wide and no right column | `featured-artwork.html` |
+
+The Artwork showcase's **"+ 41" tile is confirmed** for visitors:
+`a.screenshot_showcase_smallscreenshot.screenshot_count` after the small
+images, linking to all the player's artwork (`artwork-more.html`). Screenshot
+and Video showcases have the same tile. Badge Collector also showed a
+`customization_style: 3` variant with 18 badges and a "Foil Badges Earned"
+stat; the existing renderer draws it (6 per row).
+
+**Still inferred** (not seen on a real page):
+
+- Whether a profile with **no theme** gets Steam's `DefaultTheme` body class.
+  Steam's CSS draws the Favorite Game achievement bar brighter and the trophy
+  fully opaque on `DefaultTheme`; the preview does that only when the
+  profile has no theme. (Every captured profile had a theme.)
+- Empty or owner-only states (`openslot`, "+ Add a Showcase") and hidden
+  game details: visitors never see them.
+- Text line heights: where Steam leaves them at "normal", they were measured
+  with Motiva Sans in Chromium on Linux. Windows may differ by a pixel; the
+  Windows numbers from the reference screenshot are kept where they exist.
 
 ## 3. Rendering: can each one be rebuilt from the scraped HTML?
 
@@ -385,8 +435,7 @@ match the API's types, and log a warning when Steam's markup drifts.
 
 ### Not confirmed (needs a real example before building)
 
-- When the Artwork "+ N" count tile appears.
-- Markup for the 17 showcase types not on this profile.
+- Greenlight showcases (18, 19): retired, never seen.
 - How hidden game details or inventory change the stats rows.
 - Whether `GetProfileCustomization` hides showcases on private profiles.
 - The exact 429 limit for steamcommunity.com.

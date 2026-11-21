@@ -9,6 +9,7 @@
  * run against the captured page in reference/html/.
  */
 import { parse, type HTMLElement } from "node-html-parser";
+import { parseMoreShowcase } from "./parseMore";
 import type {
   AchievementShowcase,
   ArtworkShowcase,
@@ -46,16 +47,16 @@ export function parseProfilePage(html: string): ParsedProfilePage {
  * node-html-parser's classList, which can pick up `class="…"` text from
  * inside other attributes (Steam's data-tooltip-html holds whole HTML snippets).
  */
-function classes(el: HTMLElement | null | undefined): string[] {
+export function classes(el: HTMLElement | null | undefined): string[] {
   return (el?.getAttribute("class") ?? "").split(/\s+/).filter(Boolean);
 }
 
-function hasClass(el: HTMLElement | null | undefined, name: string): boolean {
+export function hasClass(el: HTMLElement | null | undefined, name: string): boolean {
   return classes(el).includes(name);
 }
 
 /** Whitespace-collapsed text of an element ("\n\t\tGame Collector\t" → "Game Collector"). */
-function text(el: HTMLElement | null | undefined): string {
+export function text(el: HTMLElement | null | undefined): string {
   return (el?.text ?? "").replace(/\s+/g, " ").trim();
 }
 
@@ -64,7 +65,8 @@ function parseShowcase(el: HTMLElement): Showcase | null {
   const block = el.querySelector(".profile_customization_block");
   if (!block) return null;
 
-  if (hasClass(el, "myart") && block.querySelector(".screenshot_showcase")) {
+  // Featured Artwork is also `myart`, but with one `.single` image: parseMore handles it.
+  if (hasClass(el, "myart") && block.querySelector(".screenshot_showcase") && !block.querySelector(".single")) {
     return parseArtwork(block, title);
   }
   if (block.querySelector(".gamecollector_showcase")) return parseGameCollector(block, title);
@@ -72,6 +74,9 @@ function parseShowcase(el: HTMLElement): Showcase | null {
   if (block.querySelector(".favoriteguide_showcase")) return parseFavoriteGuide(block, title);
   if (block.querySelector(".showcase_achievementscompletionist_games")) return parseCompletionist(block, title);
   if (hasClass(el, "replay_showcase") && block.querySelector(".replay")) return parseReplay(el, block, title);
+  if (block.querySelector(".achievement_showcase .showcase_slot")) return parseAchievement(block, title);
+  const more = parseMoreShowcase(el, block, title);
+  if (more) return more;
   if (block.querySelector(".achievement_showcase")) return parseAchievement(block, title);
 
   // Not drawn yet: keep its title so the page order stays right, and record
@@ -82,7 +87,13 @@ function parseShowcase(el: HTMLElement): Showcase | null {
   return { kind: "unsupported", title, rootClass };
 }
 
-function parseStats(scope: HTMLElement | null): ShowcaseStat[] {
+/** An image's inline `max-width: 480px;`, as a number. */
+export function imageMaxWidth(img: HTMLElement | null | undefined): number | undefined {
+  const m = (img?.getAttribute("style") ?? "").match(/max-width:\s*(\d+)px/);
+  return m ? Number(m[1]) : undefined;
+}
+
+export function parseStats(scope: HTMLElement | null): ShowcaseStat[] {
   if (!scope) return [];
   return scope.querySelectorAll(".showcase_stat").map((s) => {
     const stat: ShowcaseStat = { value: text(s.querySelector(".value")), label: text(s.querySelector(".label")) };
@@ -100,18 +111,38 @@ function parseArtwork(block: HTMLElement, title: string): ArtworkShowcase {
     const src = a?.querySelector("img")?.getAttribute("src");
     if (!a || !src) return null;
     const publishedFileId = a.getAttribute("data-publishedfileid");
-    return { href: a.getAttribute("href") ?? "", image: src, ...(publishedFileId ? { publishedFileId } : {}) };
+    const maxWidth = imageMaxWidth(a.querySelector("img"));
+    return {
+      href: a.getAttribute("href") ?? "",
+      image: src,
+      ...(publishedFileId ? { publishedFileId } : {}),
+      ...(maxWidth ? { maxWidth } : {}),
+    };
   };
   const primarySlot = block.querySelector(".screenshot_showcase_primary");
   const primary = image(primarySlot);
+  const stats = (primarySlot?.querySelectorAll(".screenshot_showcase_stat") ?? []).map((s) => {
+    const icon = s.querySelector("img")?.getAttribute("src");
+    return { name: s.getAttribute("title") ?? "", value: text(s), ...(icon ? { icon } : {}) };
+  });
+  // "+ 41": Steam links to the rest of the player's artwork (seen on
+  // visitors' view of a profile with more than 4 artworks).
+  const moreEl = block.querySelector(".screenshot_count");
   return {
     kind: "artwork",
     title,
-    primary: primary ? { ...primary, name: text(primarySlot?.querySelector(".screenshot_showcase_itemname")) } : null,
+    primary: primary
+      ? {
+          ...primary,
+          name: text(primarySlot?.querySelector(".screenshot_showcase_itemname")),
+          ...(stats.length ? { stats } : {}),
+        }
+      : null,
     small: block
-      .querySelectorAll(".screenshot_showcase_smallscreenshot")
+      .querySelectorAll(".screenshot_showcase_smallscreenshot.showcase_slot")
       .map(image)
       .filter((i): i is NonNullable<typeof i> => i !== null),
+    ...(moreEl ? { more: { text: text(moreEl), href: moreEl.getAttribute("href") ?? "" } } : {}),
   };
 }
 
@@ -191,11 +222,12 @@ function parseFavoriteGuide(block: HTMLElement, title: string): FavoriteGuideSho
   };
 }
 
-function parseRibbons(scope: HTMLElement | null): CompletionRibbonGroup[] {
+export function parseRibbons(scope: HTMLElement | null): CompletionRibbonGroup[] {
   if (!scope) return [];
   return scope.querySelectorAll(".showcase_completion_ribbon_group").map((g) => {
-    const variant =
-      classes(g).find((c) => c !== "showcase_completion_ribbon_group") ?? "base";
+    // "base empty" (a game with no achievements earned yet) is drawn grey.
+    const extra = classes(g).filter((c) => c !== "showcase_completion_ribbon_group");
+    const variant = extra.includes("empty") ? "empty" : (extra[0] ?? "base");
     const group: CompletionRibbonGroup = { variant, trophies: g.querySelectorAll(".showcase_completion_ribbon").length };
     const count = text(g.querySelector(".showcase_completion_ribbon_count"));
     if (count) group.count = count;
@@ -270,9 +302,12 @@ function parseReplay(el: HTMLElement, block: HTMLElement, title: string): Replay
 }
 
 function parseAchievement(block: HTMLElement, title: string): AchievementShowcase {
+  return { kind: "achievement", title, ...parseAchievements(block) };
+}
+
+/** The tiles and stats of the Achievement and Rarest Achievement showcases. */
+export function parseAchievements(block: HTMLElement): Omit<AchievementShowcase, "kind" | "title"> {
   return {
-    kind: "achievement",
-    title,
     achievements: block.querySelectorAll(".showcase_achievement").flatMap((slot) => {
       const a = slot.querySelector("a");
       const image = a?.querySelector("img")?.getAttribute("src");

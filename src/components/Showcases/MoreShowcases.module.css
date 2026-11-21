@@ -1,0 +1,1070 @@
+/*
+ * The showcase types beyond Fuzzycast's 7. Values are Steam's, from
+ * profilev2.css, shared_global.css, globalv2.css and buttons.css (21 Nov
+ * 2026); each rule names the Steam selector it copies. Shared pieces (title
+ * bar, content panel, stats row, slots, achievement tiles, trophies) come
+ * from Showcases.module.css.
+ *
+ * Line heights: as in Showcases.module.css, text that Steam leaves at
+ * "normal" gets an explicit line height, so boxes keep Steam's height with
+ * the Arial fallback too. Those lines say "measured": they come from Steam's
+ * own page and CSS rendered with Motiva Sans in Chromium on Linux (21 Nov
+ * 2026). Windows can lay Motiva out a pixel or two differently, so where the
+ * Windows reference screenshot gave a number (Showcases.module.css) that
+ * one is kept.
+ */
+
+/* .ellipsis (globalv2.css) */
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* .whiteLink (globalv2.css) */
+.whiteLink {
+  color: #ebebeb;
+}
+
+/* ---------- Screenshot, Video, Featured Artwork (Artwork markup) ---------- */
+
+/* .screenshot_showcase_primary.single */
+.single {
+  float: none;
+  width: 100%;
+  min-height: 100px;
+  max-width: 100%;
+  margin-inline-end: 0px;
+}
+
+/* .screenshot_showcase .showcase_slot .play_video_icon */
+.playVideoIcon {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 50%;
+  margin-top: -30px;
+  margin-inline-start: -40px;
+  z-index: 2;
+}
+
+/* .screenshot_showcase_smallscreenshot.screenshot_count: the "+ 41" tile */
+.screenshotCount {
+  display: block;
+  height: 57px;
+  line-height: 57px;
+  background-color: #222223;
+}
+
+/* Steam's class beats its plain `a` colour; here `.area a` is more specific, so qualify. */
+a.screenshotCount[href] {
+  color: #ffffff;
+}
+
+/* .screenshot_showcase_stat */
+.screenshotStat {
+  margin-inline-end: 12px;
+  cursor: default;
+}
+
+/* .screenshot_showcase_stats .screenshot_showcase_staticon */
+.statIcon {
+  vertical-align: text-bottom;
+}
+
+/* .screenshot_showcase_staticon.favorite */
+.favoriteIcon {
+  display: inline-block;
+  background-image: url("https://community.fastly.steamstatic.com/public/images/sharedfiles/ico_fav_tiled.png");
+  background-repeat: no-repeat;
+  background-position: 0 -65px;
+  width: 17px;
+  height: 17px;
+}
+
+/* ---------- Player-written text ---------- */
+
+/* .showcase_notes */
+.notes {
+  word-wrap: break-word;
+  overflow: hidden;
+  overflow-y: auto;
+  max-height: 600px;
+  line-height: 19px; /* measured: Motiva Sans at 13px */
+}
+
+/* .showcase_notes a:hover */
+.notes a:hover {
+  text-decoration: underline;
+}
+
+/* BBCode (shared_global.css) */
+.notes :global(.bb_h1) {
+  font-size: 20px;
+  line-height: 23px;
+  color: #5aa9d6;
+  font-weight: normal;
+  margin-bottom: 10px;
+  clear: both;
+}
+
+/* .customtext_showcase .bb_h1 */
+.customText .notes :global(.bb_h1) {
+  border-bottom: 1px dotted #666666;
+}
+
+.notes :global(.bb_h2) {
+  color: #5aa9d6;
+  margin-bottom: 6px;
+  margin-top: 8px;
+  font-size: 18px;
+  line-height: 21px;
+  font-weight: 400;
+  clear: both;
+}
+
+.notes :global(.bb_h3) {
+  color: #5aa9d6;
+  margin-bottom: 6px;
+  margin-top: 8px;
+  font-size: 16px;
+  line-height: 19px;
+  font-weight: 300;
+  clear: both;
+}
+
+.notes :global(.bb_strike) {
+  text-decoration: line-through;
+}
+
+.notes :global(.bb_spoiler) {
+  color: #000000;
+  background-color: #000000;
+  padding: 0px 8px;
+}
+
+.notes :global(.bb_spoiler):hover {
+  color: #ffffff;
+}
+
+.notes :global(.bb_spoiler) > span {
+  visibility: hidden;
+}
+
+.notes :global(.bb_spoiler):hover > span {
+  visibility: visible;
+}
+
+.notes :global(.bb_blockquote) {
+  border: 1px solid #56707f;
+  border-radius: 3px;
+  padding: 12px;
+  margin: 8px;
+  font-size: 92%;
+  display: table;
+  word-break: break-word;
+}
+
+.notes :global(.bb_code) {
+  border: 1px solid #535354;
+  border-radius: 3px;
+  padding: 12px;
+  margin: 8px;
+  font-size: 11px;
+  font-family: Consolas, monospace;
+}
+
+.notes :global(.bb_link_host) {
+  font-size: 10px;
+  color: #7e8391;
+  padding: 4px;
+  top: -1px;
+}
+
+/* ---------- Item Showcase, Items Up For Trade ---------- */
+
+/* .item_showcase .showcase_slot_row, .trade_showcase .showcase_slot_row */
+.slotRow {
+  margin-inline-start: -5px;
+}
+
+/* .item_showcase_item */
+.item {
+  width: 96px;
+  height: 96px;
+  line-height: 96px;
+  margin-inline-start: 5px;
+  margin-bottom: 5px;
+  border: 1px solid #3a3a3a;
+}
+
+/* .item_showcase_item img.item_image */
+.itemImage {
+  width: 96px;
+  height: 96px;
+}
+
+/* .item_showcase .item_count_stat */
+.itemCount {
+  float: inline-start;
+  padding-top: 14px;
+  max-width: 30%;
+}
+
+/* .item_showcase .item_count_stat > div */
+.itemCount > div {
+  padding-inline-start: 12px;
+}
+
+/* .trade_showcase_items */
+.tradeItems {
+  margin-bottom: 10px;
+}
+
+/* .showcase_stats_trading */
+.statsTrading {
+  margin-bottom: 12px;
+}
+
+/* ---------- Favorite Game, Review ---------- */
+
+/* .favoritegame_showcase_game */
+.favoriteGame {
+  position: relative;
+  height: 69px;
+  padding-inline-start: 200px;
+  margin-bottom: 22px;
+}
+
+/* .favoritegame_showcase_game.showcase_slot */
+.favoriteGame.slotNoFloat {
+  float: none;
+}
+
+/* .favoritegame_showcase_game .favorite_game_cap */
+.gameCap {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+}
+
+.gameCap,
+.gameCap img {
+  width: 184px;
+  height: 69px;
+}
+
+/* .app_has_adult_content, .app_has_adult_content img.game_capsule (shared_global.css):
+   Steam blurs these for visitors */
+.adultContent {
+  overflow: hidden;
+}
+
+.adultContent img {
+  filter: blur(30px);
+}
+
+/* .favorite_game_playtime */
+.playtime {
+  color: #9b9b9b;
+  font-size: 17px;
+  line-height: 24px; /* measured: Motiva Sans at 17px */
+}
+
+/* .recommendation_showcase .showcase_slot */
+.reviewSlot {
+  float: none;
+}
+
+/* .favoritegame_showcase .game_info_stats */
+.gameInfoStats {
+  padding: 9px 11px 10px;
+  background-color: var(--gradient-background);
+  border-radius: 3px;
+  margin-top: 9px;
+}
+
+/* .game_info_stats_rule */
+.statsRule {
+  border-top: 1px solid rgba(0, 0, 0, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
+  height: 1px;
+  margin: 10px 0;
+}
+
+/* .game_info_achievements_only_ctn */
+.achievementsOnly {
+  position: relative;
+}
+
+/* .game_info_achievements */
+.gameInfoAchievements {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* .game_info_achievements_badge */
+.achievementsBadge {
+  display: flex;
+  column-gap: 24px;
+}
+
+/* .game_info_achievements_badge .game_info_achievements */
+.achievementsBadge .gameInfoAchievements {
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+/* .game_info_achievements_badge .achievement_icons */
+.achievementsBadge .achievementIcons {
+  flex-basis: 100%;
+}
+
+/* .game_info_achievements_summary_area */
+.summaryArea {
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* .game_info_achievement_summary */
+.summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+  padding: 0 2px;
+  line-height: 19px; /* measured: Motiva Sans at 13px */
+}
+
+/* .game_info_achievement_summary a.whiteLink */
+.summary a {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* .game_info_achievement_summary .num_rare */
+.numRare {
+  flex: none;
+  color: #d5af44;
+}
+
+/* .achievement_progress_bar_ctn; .game_info_achievements_summary_area .achievement_progress_bar_ctn */
+.progressBar {
+  height: 8px;
+  padding: 1px;
+  display: block;
+  width: auto;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  box-shadow: 1px 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+/* .achievement_progress_bar_ctn .achievement_segmented_bar */
+.segmentedBar {
+  display: grid;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/*
+ * .achievement_segmented_bar .segment.base / .dlc. Steam uses brighter
+ * colours on the default theme and a shine on every other theme
+ * (body:not(.DefaultTheme)); themes.ts sets these variables per theme.
+ */
+.segment_base,
+.segment_dlc {
+  background-image: var(
+    --achievement-segment-shine,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, color-mix(in srgb, var(--color-showcase-header) 10%, transparent) 30%)
+  );
+}
+
+.segment_base {
+  background-color: var(--achievement-segment-base, #1a9fff73);
+}
+
+.segment_dlc {
+  background-color: var(--achievement-segment-dlc, #ab59b973);
+}
+
+/* .game_info_achievements_ribbons */
+.gameInfoRibbons {
+  display: flex;
+  flex: none;
+}
+
+/* .game_info_achievements_ribbons .showcase_completion_ribbon_group */
+.gameInfoRibbons .gameInfoRibbonGroup {
+  --trophy-base: 34px;
+}
+
+/* body:not(.DefaultTheme) .game_info_achievements_ribbons .showcase_completion_ribbon_group:not(.empty) */
+.gameInfoRibbons .gameInfoRibbonGroup:not(.ribbonEmpty) {
+  opacity: var(--achievement-ribbon-opacity, 0.75);
+}
+
+/* .achievement_icons */
+.achievementIcons {
+  flex: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* .game_info_achievement */
+.gameInfoAchievement {
+  vertical-align: top;
+  display: inline-block;
+  margin-inline-start: 4px;
+}
+
+.gameInfoAchievement:first-child {
+  margin-inline-start: 0;
+}
+
+.gameInfoAchievement,
+.gameInfoAchievement img {
+  width: 32px;
+  height: 32px;
+}
+
+/* .game_info_achievement.plus_more */
+.gameInfoAchievement.plusMore {
+  height: 30px;
+  width: 30px;
+  border: 1px solid #212121;
+  background-color: #222223;
+  line-height: 30px;
+  color: #ffffff;
+  text-align: center;
+  box-shadow: 1px 1px 1px #353535;
+  cursor: pointer;
+}
+
+/* .game_info_badge_border; .game_info_achievements_badge .game_info_badge_border */
+.badgeBorder {
+  border: 1px solid #212121;
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.3);
+  width: 282px;
+  box-shadow: 1px 1px 0 #343944;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: auto;
+  min-height: 48px;
+}
+
+/* .game_info_badge */
+.gameBadge {
+  position: relative;
+  padding: 7px;
+}
+
+/* .game_info_badge_icon */
+.gameBadgeIcon {
+  position: absolute;
+  top: 7px;
+  inset-inline-start: 7px;
+}
+
+/* .game_info_badge_icon img.badge_icon.small */
+.gameBadgeIcon img {
+  width: 36px;
+  height: 36px;
+}
+
+/* .game_info_badge_description */
+.gameBadgeDescription {
+  padding-inline-start: 52px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  line-height: 17px; /* measured: Motiva Sans at 12px */
+}
+
+/* .game_info_badge_description .name */
+.gameBadgeName {
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 19px; /* measured: Motiva Sans at 13px */
+}
+
+/* .game_info_stats_publishedfilecounts .published_file_count_ctn */
+.fileCount {
+  display: inline-block;
+}
+
+/* .game_info_stats_publishedfilecounts .published_file_link */
+.fileLink {
+  margin-inline-end: 12px;
+  white-space: nowrap;
+  line-height: 19px;
+}
+
+.fileLink:hover {
+  text-decoration: underline;
+}
+
+/* .published_file_icon */
+.fileIcon {
+  width: 19px;
+  height: 19px;
+  display: inline-block;
+  margin-inline-end: 4px;
+  background-image: url("https://community.fastly.steamstatic.com/public/images/profile/icons_content.png?v=2");
+  background-position: center;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+
+.fileIcon_workshop_item {
+  background-position: 0 center;
+}
+
+.fileIcon_video {
+  background-position: -19px center;
+}
+
+.fileIcon_screenshot {
+  background-position: -38px center;
+}
+
+.fileIcon_guide {
+  background-position: -57px center;
+}
+
+.fileIcon_recommendation {
+  background-position: -76px center;
+}
+
+.fileIcon_artwork {
+  background-position: -95px center;
+}
+
+/* .btn_grey_black (buttons.css) */
+.btnGreyBlack {
+  border-radius: 2px;
+  border: none;
+  padding: 1px;
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: none !important;
+  color: #67c1f5 !important;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.btnGreyBlack > span {
+  border-radius: 2px;
+  display: block;
+  background: transparent;
+  /* .btn_small_thin > span */
+  padding: 0 5px;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.btnGreyBlack:hover {
+  color: #fff !important;
+  background: rgba(102, 192, 244, 0.4);
+}
+
+/* .ico16, .ico16.comment */
+.ico16Comment {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: url(https://community.fastly.steamstatic.com/public/shared/images/buttons/icons_16.png?v=5);
+  background-position: 0px 0px;
+  vertical-align: text-top;
+}
+
+/* .ico_hover:hover .ico16.comment */
+.btnGreyBlack:hover .ico16Comment {
+  background-position: -16px 0px;
+}
+
+/* ---------- Favorite Group ---------- */
+
+/* .favoritegroup_showcase_group */
+.group {
+  position: relative;
+  height: 157px;
+  padding-inline-start: 166px;
+  margin-bottom: 22px;
+}
+
+/* .favoritegroup_showcase_group.showcase_slot */
+.group.slotNoFloat {
+  float: none;
+}
+
+/* .favoritegroup_showcase_group .favoritegroup_avatar */
+.groupAvatar {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  width: 157px;
+  height: 157px;
+}
+
+.groupAvatar img {
+  width: 157px;
+  height: 157px;
+}
+
+/* .favoritegroup_showcase_group .favoritegroup_content */
+.groupContent {
+  position: relative;
+  height: 157px;
+}
+
+/* .favoritegroup_showcase_group .favoritegroup_namerow */
+.groupNameRow {
+  font-size: 16px;
+  color: #828282;
+  vertical-align: bottom;
+  line-height: 32px;
+}
+
+/* .favoritegroup_namerow .favoritegroup_name */
+.groupName {
+  font-size: 24px;
+  font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
+  font-weight: 200;
+}
+
+/* .favoritegroup_stats.showcase_stats_row */
+.groupStats {
+  position: absolute;
+  bottom: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
+}
+
+/* .showcase_stats_row.favoritegroup_stats .showcase_stat */
+.groupStats .groupStat {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin-inline-start: 22px;
+}
+
+.groupStats .groupStat:first-child {
+  margin-inline-start: 0;
+}
+
+/* .showcase_stats_row.favoritegroup_stats .showcase_stat .value */
+.groupStats .groupStat .groupStatValue {
+  font-size: 0.64em;
+  line-height: 31px; /* measured: Motiva Sans at 21.76px */
+}
+
+/* .showcase_stat.favoritegroup_ingame .value */
+.groupStat_ingame .groupStatValue {
+  color: #8bc53f;
+}
+
+/* .showcase_stat.favoritegroup_online .value */
+.groupStat_online .groupStatValue {
+  color: #62a7e3;
+}
+
+/* .showcase_stat.favoritegroup_inchat */
+.groupStats .groupStat_inchat {
+  background-color: var(--color-showcase-header);
+  border-radius: 3px;
+  padding-inline-start: 12px;
+  padding-inline-end: 12px;
+  cursor: pointer;
+}
+
+/* ---------- Workshop item ---------- */
+
+/* .workshop_showcase_item */
+.workshopItem {
+  height: 160px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* .workshop_showcase_item.showcase_slot */
+.workshopItem.slotNoFloat {
+  float: none;
+}
+
+/* .workshop_showcase_item img.workshop_showcase_item_image */
+.workshopItemImage {
+  float: inline-start;
+  width: 160px;
+  max-width: 40%;
+  margin-inline-end: 8px;
+  display: block;
+}
+
+/* .workshop_showcase_right_col */
+.workshopRightCol {
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+}
+
+/* .workshop_showcase_details_row */
+.workshopDetailsRow {
+  position: absolute;
+  inset-inline-start: 0;
+  bottom: 0;
+  inset-inline-end: 0;
+  padding-top: 10px;
+  background-image: url("https://community.fastly.steamstatic.com/public/images/profile/showcase_content_fade.png");
+  background-position: center top;
+  background-repeat: repeat-x;
+}
+
+/* .workshop_showcase_details_content */
+.workshopDetailsContent {
+  background-color: #0e0e0e;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* .workshop_showcase_app_details */
+.workshopAppDetails {
+  line-height: 32px;
+}
+
+/* .workshop_showcase_stars */
+.workshopStars {
+  float: inline-end;
+}
+
+/* .workshop_showcase_app */
+.workshopApp {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* .workshop_showcase_app_details .workshop_showcase_app img */
+.workshopApp img {
+  vertical-align: middle;
+}
+
+/* .workshop_showcase_item_description: no rule of its own in Steam's CSS */
+.workshopDescription {
+  line-height: 19px; /* measured: Motiva Sans at 13px */
+}
+
+/* .workshop_showcase_creator_details: no rule of its own in Steam's CSS */
+.workshopCreator {
+  line-height: 19px; /* measured: Motiva Sans at 13px */
+}
+
+/* ---------- My Workshop, My Guides ---------- */
+
+/* .myworkshop_showcase_header */
+.ownerBar {
+  width: 600px;
+  height: 38px;
+  padding: 10px;
+  line-height: 38px;
+  margin: 10px;
+}
+
+/* .myworkshop_showcase_header.guides (the later `background` wins in Steam's rule) */
+.ownerBarGuides {
+  padding: 8px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #000000 5%, #282828 95%);
+}
+
+/* .myworkshop_showcase_header .playerAvatar; .playerAvatar (shared_global.css) */
+.ownerAvatar {
+  float: inline-start;
+  margin-inline-end: 10px;
+  width: 34px;
+  height: 34px;
+  position: relative;
+  border-radius: 0;
+  padding: 1px;
+}
+
+.ownerAvatar img {
+  width: 32px;
+  height: 32px;
+  padding: 1px;
+  border-radius: 0;
+  border: none;
+}
+
+/* .playerAvatar.offline / .online / .in-game (shared_global.css) */
+.avatar_offline {
+  background: linear-gradient(to bottom, rgba(106, 106, 106, 1) 5%, rgba(85, 85, 85, 1) 95%);
+}
+
+.avatar_offline img {
+  background: linear-gradient(to bottom, #515151 5%, #474747 95%);
+}
+
+.avatar_online {
+  background: linear-gradient(to bottom, rgba(83, 164, 196, 1) 5%, rgba(69, 128, 151, 1) 95%);
+}
+
+.avatar_online img {
+  background: linear-gradient(to bottom, #41778f 5%, #3d697b 95%);
+}
+
+.avatar_in-game {
+  background: linear-gradient(to bottom, rgba(143, 185, 59, 1) 5%, rgba(110, 140, 49, 1) 95%);
+}
+
+.avatar_in-game img {
+  background: linear-gradient(to bottom, #66812e 5%, #59702b 95%);
+}
+
+/* .myworkshop_showcase_header .myworkshop_playerName */
+.ownerBar .ownerName {
+  font-size: 24px;
+  font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
+  font-weight: 200;
+  color: #ffffff;
+}
+
+/* .workshop_showcase_mutiitem_ctn (sic) */
+.multiItemCtn {
+  float: inline-start;
+  max-width: 20%;
+}
+
+/* .workshop_showcase_multiitem.showcase_slot */
+.multiItem {
+  position: relative;
+  float: none;
+  margin: 2px;
+  overflow: hidden;
+}
+
+/* .workshop_showcase_multiitem img.workshop_showcase_item_image */
+.multiItem .multiItemImage {
+  width: 100%;
+  /* Steam leaves the image inline, so the line's descent adds space under
+     it; that's 5px with Motiva Sans (measured), so pin it for any font. */
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* .workshop_showcase_mini_app */
+.miniApp {
+  position: absolute;
+  inset-inline-end: 0;
+  bottom: 0;
+}
+
+.miniApp,
+.miniApp img {
+  height: 32px;
+  width: 32px;
+}
+
+/* .guide_showcase_img_ctn .workshop_showcase_mini_app */
+.guideImage .miniApp,
+.guideImage .miniApp img {
+  width: 18px;
+  height: 18px;
+}
+
+/* .myguide_showcase_item_ctn */
+.guideCtn {
+  width: 48%;
+  margin-inline-end: 1%;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid transparent;
+  border-radius: 3px;
+  margin-bottom: 7px;
+}
+
+/* .myguide_showcase_item_overlay */
+.guideOverlay {
+  display: block;
+}
+
+/* .myguide_showcase_item */
+.guideItem {
+  padding: 10px;
+  height: 68px;
+}
+
+.guideItem:hover {
+  border-color: #97c0e3;
+}
+
+/* .guide_showcase_img_ctn */
+.guideImage {
+  float: inline-start;
+  position: relative;
+  width: 66px;
+  max-width: 25%;
+  margin-inline-end: 8px;
+}
+
+/* .guide_showcase_img_ctn img.guide_showcase_image */
+.guideImage .guideImg {
+  width: 100%;
+  display: block;
+}
+
+/* .guide_showcase_item_content */
+.guideContent {
+  overflow: hidden;
+}
+
+/* .guide_showcase_title */
+.guideTitle {
+  font-size: 14px;
+  color: #ffffff;
+  line-height: 20px; /* measured: Motiva Sans at 14px */
+}
+
+/* .guide_showcase_author */
+.guideAuthor {
+  color: #828282;
+  line-height: 19px; /* measured: Motiva Sans at 13px */
+}
+
+/* ---------- Salien ---------- */
+
+/* .showcase_salien */
+.salien {
+  float: inline-start;
+  width: 150px;
+  height: 275px;
+}
+
+/* #showcase_salien_cryotube_back */
+.cryotubeBack {
+  position: absolute;
+  z-index: 0;
+  max-width: 100%;
+  top: 0;
+  inset-inline-start: 0;
+}
+
+/* #showcase_salien_cryotube_front */
+.cryotubeFront {
+  position: absolute;
+  z-index: 1;
+  max-width: 100%;
+  display: block;
+}
+
+/* .showcase_salien_cont */
+.salienCont {
+  float: inline-start;
+  width: 76.6%;
+  height: 100%;
+  display: block;
+  position: relative;
+  top: 15%;
+  inset-inline-start: 11%;
+}
+
+/* #showcase_salien_body … #showcase_salien_hat */
+.salienPart {
+  position: absolute;
+  z-index: 1;
+  max-width: 100%;
+}
+
+.salienPart_body {
+  z-index: 0;
+}
+
+.salienPart_shirt {
+  top: 16.25%;
+}
+
+.salienPart_hat {
+  top: -1.85%;
+}
+
+/* .showcase_salienbadge_cont */
+.salienBadgeCont {
+  float: inline-end;
+  height: 150px;
+  white-space: nowrap;
+  margin: 1em 0;
+}
+
+/* .showcase_salienbadge */
+.salienBadge {
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}
+
+/* .showcase_salienbadge_image */
+.salienBadgeImage {
+  vertical-align: middle;
+}
+
+/* .showcase_stats_salien */
+.salienStats {
+  float: inline-start;
+  text-align: center;
+}
+
+/* .showcase_stats_salien_header */
+.salienStatsHeader {
+  font-size: 18px;
+  margin-bottom: 24px;
+  line-height: 26px; /* measured: Motiva Sans at 18px */
+}
+
+/* .showcase_stats_row .showcase_stats_salien .showcase_stat */
+.salienStats .salienStat {
+  margin-inline-start: 20px;
+  margin-inline-end: 20px;
+}
+
+/* ---------- Awards ---------- */
+
+/* .awards_showcase .showcase_content_bg */
+.awardsGrid {
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+}
+
+/* .showcase_award */
+.award {
+  padding: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  gap: 5px;
+  user-select: none;
+}
+
+/* .showcase_award_icon */
+.awardIcon {
+  width: 75px;
+  height: 75px;
+}
+
+/* .showcase_award_count: no rule of its own in Steam's CSS */
+.awardCount {
+  line-height: 19px; /* measured: Motiva Sans at 13px */
+}
