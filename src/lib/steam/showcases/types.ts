@@ -33,6 +33,12 @@ export interface ArtworkShowcase {
   primary: (ArtworkImage & { name: string }) | null;
   /** Up to 3 small images on the right. */
   small: ArtworkImage[];
+  /**
+   * "long": images uploaded as wide images, which Steam shows at full height,
+   * 506px and 100px wide, without letterboxing (reference/ARTWORK_WORKFLOW.md §1).
+   * Missing means normal: fitted into 480×480 and 100×80 boxes.
+   */
+  mode?: "normal" | "long";
 }
 
 export interface GameCollectorShowcase {

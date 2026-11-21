@@ -751,3 +751,9 @@
 .editable.dropAfter::after {
   box-shadow: inset 0 -4px 0 #66c0f4;
 }
+
+/* Artwork planner: show where each image slot is. Not part of Steam's page. */
+.outlineImages .screenshot img {
+  outline: 1px dashed #66c0f4;
+  outline-offset: -1px;
+}

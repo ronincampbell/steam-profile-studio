@@ -30,7 +30,9 @@ export interface ShowcaseItem {
   id: string;
   showcase: Showcase;
   /** "placeholder": Steam's markup for this type isn't captured, so a marked box is drawn instead. */
-  source?: "profile" | "sample" | "placeholder";
+  source?: "profile" | "sample" | "placeholder" | "planner";
+  /** Outline each image, to show where the slots are. */
+  outlineImages?: boolean;
 }
 
 /** Editing controls. Without them the showcases are drawn exactly as Steam does. */
@@ -98,7 +100,7 @@ function ShowcaseBox({ item, editing }: { item: ShowcaseItem; editing?: BoxEditi
     : "";
   return (
     <div
-      className={`${styles.customization} ${isArt ? styles.myart : ""} ${editClasses}`}
+      className={`${styles.customization} ${isArt ? styles.myart : ""} ${item.outlineImages ? styles.outlineImages : ""} ${editClasses}`}
       data-showcase={showcase.kind}
       data-source={item.source}
       {...editing?.targetProps}
@@ -205,12 +207,19 @@ function Stats({ stats, wrap = false }: { stats: ShowcaseStat[]; wrap?: boolean 
 
 function Artwork({ showcase }: { showcase: ArtworkShowcase }) {
   const { primary, small } = showcase;
+  const long = showcase.mode === "long";
   return (
     <div className={styles.screenshotShowcase}>
       {primary && (
         <div className={`${styles.screenshotPrimary} ${styles.slot}`}>
           <a className={styles.screenshot} href={primary.href} target="_blank" rel="noreferrer">
-            <img width="100%" style={{ maxWidth: 480 }} src={primary.image} alt={primary.name} />
+            <img
+              width="100%"
+              style={{ maxWidth: long ? 506 : 480 }}
+              src={primary.image}
+              alt={primary.name}
+              data-artwork-slot="main"
+            />
           </a>
           <div className={styles.screenshotItemName}>{primary.name}</div>
           <div className={styles.screenshotStats} />
@@ -220,7 +229,7 @@ function Artwork({ showcase }: { showcase: ArtworkShowcase }) {
         {small.map((s, i) => (
           <div key={i} className={`${styles.smallScreenshot} ${styles.slot}`}>
             <a className={styles.screenshot} href={s.href} target="_blank" rel="noreferrer">
-              <img width="100%" style={{ maxWidth: 100 }} src={s.image} alt="" />
+              <img width="100%" style={{ maxWidth: 100 }} src={s.image} alt="" data-artwork-slot={i} />
             </a>
           </div>
         ))}
