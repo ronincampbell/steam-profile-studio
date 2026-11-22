@@ -57,7 +57,7 @@ function usePaged<T>(
       const res = await fetch(`${path}?${toParams(query!, cursor)}`);
       const body = await res.json().catch(() => ({}));
       if (!res.ok)
-        throw new Error(body.error ?? `Couldn't load items (${res.status})`);
+        throw new Error(body.error ?? "Couldn't load items. Try again.");
       return read(body);
     },
     // `key` covers everything in `query`.

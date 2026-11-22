@@ -59,7 +59,7 @@ export const LONG = {
   defaultHeight: 824,
 } as const;
 
-/** Steam's reported artwork upload limit (unconfirmed: forum posts, 2022–24). */
+/** Steam's artwork upload limit (confirmed by a test upload, 22 Nov 2026). */
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 
 /** The tallest long image that stays on the background. */

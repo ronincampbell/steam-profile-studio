@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
   const appid = params.get("appid") ?? "";
   const defid = params.get("defid") ?? "";
-  if (!ID.test(appid) || !ID.test(defid) || Number(appid) <= 0) return error("Need a numeric appid and defid", 400);
+  if (!ID.test(appid) || !ID.test(defid) || Number(appid) <= 0) return error("Unknown item.", 400);
 
   try {
     const items = await getBundle(Number(appid), Number(defid));

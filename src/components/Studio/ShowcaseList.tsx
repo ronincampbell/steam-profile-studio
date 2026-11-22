@@ -3,23 +3,26 @@
  * The Showcases panel: the preview's showcases as a list you can drag to
  * reorder, remove from, or add any of Steam's 24 showcase types to.
  */
-import { useState } from "react";
-import type { Showcase } from "@/lib/steam/showcases/types";
 import { SHOWCASE_TYPES } from "@/lib/studio/showcaseCatalog";
 import type { EditorShowcase, ShowcaseSource } from "@/lib/studio/showcaseEditor";
 import { useReorderDrag } from "./useReorderDrag";
 import styles from "./Studio.module.css";
 
+/** Only sample content is marked: the profile's own showcases need no label. */
 const SOURCE_LABEL: Record<ShowcaseSource, string> = {
-  profile: "your data",
-  sample: "sample content",
-  placeholder: "placeholder",
+  profile: "",
+  sample: "Sample",
+  placeholder: "",
 };
+
+/**
+ * The types you can add: only ones Steam still offers and the preview can
+ * draw. Retired types (Greenlight, Saliens) still show if a profile has them.
+ */
+const ADDABLE = SHOWCASE_TYPES.filter((t) => t.kind && !t.retired);
 
 interface Props {
   list: EditorShowcase[];
-  /** The profile's own showcases, to say which types it has. */
-  profileShowcases: Showcase[];
   edited: boolean;
   onMove: (from: number, to: number) => void;
   onRemove: (id: string) => void;
@@ -27,10 +30,8 @@ interface Props {
   onReset: () => void;
 }
 
-export function ShowcaseList({ list, profileShowcases, edited, onMove, onRemove, onAdd, onReset }: Props) {
+export function ShowcaseList({ list, edited, onMove, onRemove, onAdd, onReset }: Props) {
   const drag = useReorderDrag(onMove);
-  const [pick, setPick] = useState("");
-  const kinds = new Set(profileShowcases.map((s) => s.kind));
 
   return (
     <section className={styles.showcasePanel} aria-label="Showcases">
@@ -64,9 +65,7 @@ export function ShowcaseList({ list, profileShowcases, edited, onMove, onRemove,
                 <span className={styles.slotName} title={item.showcase.title}>
                   {item.showcase.title}
                 </span>
-                <span className={styles.slotSource}>
-                  {SOURCE_LABEL[item.source]}
-                </span>
+                <span className={styles.slotSource}>{SOURCE_LABEL[item.source]}</span>
                 <span className={styles.slotActions}>
                   <button
                     type="button"
@@ -94,41 +93,25 @@ export function ShowcaseList({ list, profileShowcases, edited, onMove, onRemove,
         </ol>
       )}
 
-      <form
-        className={styles.custom}
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!pick) return;
-          onAdd(Number(pick));
-          setPick("");
-        }}
-      >
+      <div className={styles.custom}>
         <label className={styles.srOnly} htmlFor="add-showcase">
           Add a showcase
         </label>
-        <select id="add-showcase" className={styles.select} value={pick} onChange={(e) => setPick(e.target.value)}>
+        {/* Adds on pick, then resets to the prompt so the same type can be added again. */}
+        <select
+          id="add-showcase"
+          className={styles.select}
+          value=""
+          onChange={(e) => e.target.value && onAdd(Number(e.target.value))}
+        >
           <option value="">Add a showcase…</option>
-          <optgroup label="Drawn like Steam">
-            {SHOWCASE_TYPES.filter((t) => t.kind).map((t) => (
-              <option key={t.type} value={t.type}>
-                {t.label} {kinds.has(t.kind!) ? "(your data)" : "(sample content)"}
-                {t.retired ? " (retired by Steam)" : ""}
-              </option>
-            ))}
-          </optgroup>
-          <optgroup label="Placeholder">
-            {SHOWCASE_TYPES.filter((t) => !t.kind).map((t) => (
-              <option key={t.type} value={t.type}>
-                {t.label}
-                {t.retired ? " (retired by Steam)" : ""}
-              </option>
-            ))}
-          </optgroup>
+          {ADDABLE.map((t) => (
+            <option key={t.type} value={t.type}>
+              {t.label}
+            </option>
+          ))}
         </select>
-        <button type="submit" className={styles.fileButton} disabled={!pick}>
-          Add
-        </button>
-      </form>
+      </div>
     </section>
   );
 }

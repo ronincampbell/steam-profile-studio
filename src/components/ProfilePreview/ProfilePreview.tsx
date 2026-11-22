@@ -202,7 +202,7 @@ function showcasesNote(
   // is empty only because nothing arrived, so say why instead.
   const waiting = showcases?.visibility === "unavailable" || showcases?.visibility === "private";
   if (edited && items && !(waiting && !items.length)) {
-    if (!items.length) return "No showcases. Add one from Showcases in the toolbar above.";
+    if (!items.length) return "No showcases.";
     if (showcases?.visibility === "public") return null;
   }
   if (showcases === undefined) return "Paste a profile to see its showcases.";

@@ -84,9 +84,9 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
       }
       let clips: Map<string, Blob> | undefined;
       if (animated && withClips && clipsPossible && source) {
-        setBusy("Recording one loop of the background for the source clips… 0%");
+        setBusy("Recording the video clips… 0%");
         clips = await recordClips(source.url, slots, (f) =>
-          setBusy(`Recording one loop of the background for the source clips… ${Math.round(f * 100)}%`),
+          setBusy(`Recording the video clips… ${Math.round(f * 100)}%`),
         );
       }
       setBusy("Zipping…");
@@ -150,7 +150,7 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
         </h2>
         <span className={styles.note}>for &ldquo;{backgroundName}&rdquo;</span>
         <button className={styles.linkButton} onClick={() => update({ enabled: false })}>
-          {inPanel ? "Take it off the preview" : "Close"}
+          {inPanel ? "Turn off" : "Close"}
         </button>
       </div>
 
@@ -220,14 +220,14 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
         </div>
       </div>
 
-      {/* 3. Frame, for animated backgrounds */}
+      {/* 3. Animated backgrounds: which still, and GIFs/clips */}
       {animated && (
         <div className={styles.step}>
           <span className={styles.stepNumber}>3</span>
           <div className={styles.stepBody}>
-            <span className={styles.stepTitle}>Still frame</span>
+            <span className={styles.stepTitle}>Animated background</span>
             <label className={styles.slider}>
-              <span>Frame</span>
+              <span>Still image from</span>
               <input
                 type="range"
                 min={0}
@@ -241,19 +241,15 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
             </label>
             <label className={styles.check}>
               <input type="checkbox" checked={withGifs} onChange={(e) => setWithGifs(e.target.checked)} />
-              Animated GIFs of one loop, under the upload limit
+              Also download animated GIFs, ready to upload
             </label>
             {clipsPossible ? (
               <label className={styles.check}>
                 <input type="checkbox" checked={withClips} onChange={(e) => setWithClips(e.target.checked)} />
-                Full-quality WebM clips, to make your own GIFs
+                Also download video clips, to make your own GIFs
               </label>
             ) : null}
-            {withGifs && (
-              <span className={styles.note}>
-                GIFs loop on their own on Steam, so they won&rsquo;t stay exactly in step with the background.
-              </span>
-            )}
+            {withGifs && <span className={styles.note}>The GIFs drift out of sync with the background over time.</span>}
           </div>
         </div>
       )}

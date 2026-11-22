@@ -15,6 +15,7 @@ Owner: Ronin (Melbourne, AUD, metric). If you're about to guess at something tha
 - **Audience:** public shareable link, so:
   - the Steam API key lives only in server code (`STEAM_API_KEY` in `.env.local` and Vercel env vars) and never reaches the browser;
   - cache Steam responses server-side (catalogue for about 24 h, profiles for about 10 min) to stay well within rate limits.
+- **UI text:** terse, in Steam's and players' words, never ours (no "placeholder", "cached", "API"…). `src/uiCopy.test.ts` fails on banned dev words; reword rather than allow-list.
 - **Styling:** CSS Modules by default, because exact pixel matching is easier with plain CSS. Ask Ronin before switching to Tailwind or a UI kit.
 
 ## MVP "done" definition

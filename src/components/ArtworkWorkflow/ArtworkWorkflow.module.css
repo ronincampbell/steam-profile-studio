@@ -281,38 +281,20 @@
   counter-increment: guide;
 }
 .guideHead {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 6px;
-  align-items: baseline;
+  display: block;
   color: #ffffff;
-  cursor: pointer;
 }
-.guideHead input {
-  accent-color: #66c0f4;
-}
-.guideHead span:first-of-type::before {
+.guideHead::before {
   content: counter(guide) ". ";
 }
-.guideDone .guideHead span:first-of-type {
-  color: #8f98a0;
-  text-decoration: line-through;
-}
 .guideText {
-  margin: 2px 0 0 22px;
+  margin: 2px 0 0 14px;
   font-size: 12px;
   color: #acb2b8;
 }
 .guideText a {
   color: #66c0f4;
   word-break: break-all;
-}
-.tag {
-  padding: 0 6px;
-  font-size: 11px;
-  color: #e8c36a;
-  border: 1px solid rgba(232, 195, 106, 0.5);
-  border-radius: 9px;
 }
 .code {
   min-width: 0;
