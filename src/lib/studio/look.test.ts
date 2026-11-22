@@ -40,19 +40,11 @@ describe("buildLook", () => {
     expect(buildLook(profile, { theme: null }).themeId).toBeUndefined();
   });
 
-  it("puts custom art over everything in its slot", () => {
-    const look = buildLook(profile, { animatedAvatar: anim }, {
-      avatar: "blob:avatar",
-      background: { url: "blob:bg", kind: "image" },
-    });
+  it("puts your own avatar over the profile's, animated or not", () => {
+    const look = buildLook(profile, { animatedAvatar: anim }, { avatar: "blob:avatar" });
     expect(look.avatar).toBe("blob:avatar");
     expect(look.animatedAvatar).toBeUndefined();
-    expect(look.background).toEqual({ image: "blob:bg" });
-    expect(buildLook(profile, {}, { background: { url: "blob:v", kind: "video", mime: "video/mp4" } }).background).toEqual({
-      video: { mp4: "blob:v" },
-    });
-    expect(buildLook(profile, {}, { background: { url: "blob:w", kind: "video", mime: "video/webm" } }).background).toEqual({
-      video: { webm: "blob:w" },
-    });
+    // There's no custom background on Steam, so the item's background stays.
+    expect(look.background).toEqual({ image: "bg.jpg", video: { webm: "bg.webm" } });
   });
 });

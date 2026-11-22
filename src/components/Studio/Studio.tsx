@@ -25,13 +25,13 @@ import type { Cosmetic, ItemType, ShopItem } from "@/lib/steam/types";
 import type { PanelId } from "./chrome/menu";
 import { ToolbarLayout } from "./chrome/ToolbarLayout";
 import chrome from "./chrome/Chrome.module.css";
-import { CustomArtPicker } from "./CustomArtPicker";
 import { FitToWidth } from "./FitToWidth";
 import { ShowcasesNotice } from "./ShowcasesNotice";
 import { ShowcaseList } from "./ShowcaseList";
 import { SlotBar } from "./SlotBar";
 import { useProfile, type ProfileState } from "./useProfile";
 import { useShowcases } from "./useShowcases";
+import { YourArtPanel } from "./YourArtPanel";
 import styles from "./Studio.module.css";
 
 const SLOT_BY_TYPE: Partial<Record<ItemType, Slot>> = {
@@ -71,9 +71,7 @@ export function Studio() {
   // Artwork that lines up with the background (src/components/ArtworkWorkflow).
   const artworkSource = useMemo(() => backgroundSource(look.background), [look.background]);
   const planner = useArtworkPlanner(artworkSource);
-  const backgroundName = custom.background
-    ? "your background"
-    : ("background" in tryOn ? tryOn.background : profile.equipped.background)?.name ?? "background";
+  const backgroundName = ("background" in tryOn ? tryOn.background : profile.equipped.background)?.name ?? "background";
   const baseItems =
     showcaseList ??
     (state.status === "ready" ? showcases?.showcases.map((showcase, i) => ({ id: String(i), showcase, source: "profile" as const })) : undefined);
@@ -140,7 +138,7 @@ export function Studio() {
           />
         );
       case "art":
-        return <CustomArtPicker custom={custom} onChange={setCustom} />;
+        return <YourArtPanel custom={custom} onChange={setCustom} planner={planner} />;
       case "artwork":
         return (
           <ArtworkPanel
@@ -189,7 +187,7 @@ export function Studio() {
         form={{ draft, onDraftChange: setDraft, onSubmit: submit, loading: state.status === "loading" }}
         subject={state.status === "ready" ? { name: profile.name, avatar: profile.avatar } : null}
         renderPanel={renderPanel}
-        badges={{ wearing: Object.keys(tryOn).length, art: (custom.background ? 1 : 0) + (custom.avatar ? 1 : 0) }}
+        badges={{ wearing: Object.keys(tryOn).length, art: (custom.avatar ? 1 : 0) + planner.slots.filter((s) => planner.finished.has(s.id)).length }}
         notices={
           <>
             <StatusLine state={state} />

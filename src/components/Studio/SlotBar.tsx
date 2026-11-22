@@ -28,8 +28,7 @@ export function SlotBar({ profile, tryOn, custom, onRemove, onReset }: Props) {
       {SLOTS.map(({ slot, label }) => {
         const tried = slot in tryOn;
         const item: Cosmetic | null | undefined = tried ? tryOn[slot] : profile.equipped[slot];
-        const overridden =
-          (slot === "background" && custom.background) || (slot === "animatedAvatar" && custom.avatar);
+        const overridden = slot === "animatedAvatar" && custom.avatar;
         const name =
           slot === "theme" && !item
             ? themeName(tried ? undefined : profile.themeId)

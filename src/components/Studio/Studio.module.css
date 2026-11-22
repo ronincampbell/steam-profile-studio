@@ -219,3 +219,84 @@
     display: none;
   }
 }
+
+/* ---------- Your own art panel ---------- */
+
+.yourArt {
+  display: grid;
+  gap: 14px;
+  font-size: 13px;
+}
+
+.yourArtHead {
+  min-width: 112px;
+  color: #ffffff;
+}
+
+.yourArtShowcase {
+  display: grid;
+  gap: 8px;
+}
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid rgba(103, 193, 245, 0.35);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.segmented button {
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 12px;
+  color: #c6d4df;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.segmented button + button {
+  border-left: 1px solid rgba(103, 193, 245, 0.35);
+}
+.segmented button[aria-checked="true"] {
+  color: #ffffff;
+  background: rgba(103, 193, 245, 0.25);
+}
+
+.artSlots {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.artSlot {
+  display: grid;
+  grid-template-columns: 112px 64px minmax(0, 1fr) auto 36px;
+  gap: 10px;
+  align-items: center;
+}
+.artSlot .customNote {
+  flex-basis: auto;
+}
+
+.artSlotLabel {
+  color: #c6d4df;
+}
+
+.artSlotFile {
+  overflow: hidden;
+  color: #8f98a0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.artSlot .fileButton {
+  padding: 4px 10px;
+  text-align: center;
+}
+
+.artShowcaseHead {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
