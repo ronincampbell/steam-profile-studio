@@ -54,7 +54,7 @@ export function drawGuideOverlay(ctx: CanvasRenderingContext2D, slots: ArtworkSl
   ctx.fillStyle = "#c6d4df";
   ctx.font = "13px Arial, Helvetica, sans-serif";
   ctx.fillText(
-    "Shaded: Steam's profile column. Positions assume the Artwork showcase is placed as in the app, window 910–1920px wide.",
+    "Shaded: Steam's profile column. Lines up in windows 910–1920px wide.",
     COLUMN.x + 8,
     COLUMN.top - 25,
   );

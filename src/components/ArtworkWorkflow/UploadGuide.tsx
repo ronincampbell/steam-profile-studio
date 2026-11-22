@@ -41,7 +41,7 @@ export function UploadGuide({
             <input type="checkbox" checked={done.has(step.id)} onChange={() => toggle(step.id)} />
             <span>{step.title}</span>
             {step.unconfirmed && (
-              <span className={styles.tag} title="From community guides and forum posts. We haven't tested it with a real upload yet.">
+              <span className={styles.tag} title="Community trick, not tested with a real upload">
                 not yet tested
               </span>
             )}

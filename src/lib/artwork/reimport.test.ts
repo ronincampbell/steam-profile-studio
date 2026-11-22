@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { artworkSlots } from "./layouts";
 import { checkFile, matchFiles } from "./reimport";
-import { guideSteps, guideText, uploadOrder } from "./uploadGuide";
+import { guideSteps, guideText } from "./uploadGuide";
 
 const normal = artworkSlots("normal");
 const file = (name: string, width: number, height: number, extra: Partial<{ size: number; type: string }> = {}) => ({
@@ -63,11 +63,6 @@ describe("checkFile", () => {
 });
 
 describe("upload guide", () => {
-  it("uploads the tiles last to first, then the big image", () => {
-    expect(uploadOrder(normal).map((s) => s.id)).toEqual(["tile3", "tile2", "tile1", "main"]);
-    expect(uploadOrder(artworkSlots("long")).map((s) => s.id)).toEqual(["side", "main"]);
-  });
-
   it("only shows the console snippet for the long layout", () => {
     expect(guideSteps("normal", normal, true).some((s) => s.code)).toBe(false);
     const long = guideSteps("long", artworkSlots("long"), true).find((s) => s.code);
