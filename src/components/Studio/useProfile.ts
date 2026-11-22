@@ -20,7 +20,7 @@ export function useProfile(query: string | null): ProfileState {
     fetch(`/api/profile?q=${encodeURIComponent(query)}`, { signal: controller.signal })
       .then(async (res) => {
         const body = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(body.error ?? `Something went wrong (${res.status})`);
+        if (!res.ok) throw new Error(body.error ?? "Something went wrong. Try again.");
         setResult({ query, profile: body as Profile });
       })
       .catch((e: Error) => {

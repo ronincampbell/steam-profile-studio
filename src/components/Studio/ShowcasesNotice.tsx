@@ -33,15 +33,15 @@ export function ShowcasesNotice({ state }: { state: ShowcasesState }) {
   if (showcases.staleBecause) {
     return (
       <p className={styles.notice} role="status">
-        {showcases.staleBecause === "rate-limited" ? "Steam is busy" : "Steam didn't answer just now"}, so the
-        showcases are a cached copy from {ago}.
+        {showcases.staleBecause === "rate-limited" ? "Steam is busy" : "Steam didn't answer just now"}, so these
+        showcases are from {ago}.
       </p>
     );
   }
   if (age > FRESH_MS) {
     return (
       <p className={styles.notice} role="status">
-        Showing a cached copy of the showcases from {ago}. A fresh one will show next time.
+        These showcases are from {ago}.
       </p>
     );
   }
