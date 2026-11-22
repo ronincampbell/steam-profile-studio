@@ -15,6 +15,7 @@ import {
   SHOWCASE_AREA_Y,
   ARTWORK_IMAGE_OFFSET,
   LONG,
+  STEAM_BG_WIDTH,
   artworkSlots,
   maxLongHeight,
   type ArtworkLayout,
@@ -43,6 +44,8 @@ export interface FinishedArt {
   width: number;
   height: number;
   url: string;
+  /** Set when the app cut this piece out of a full-size picture, so it can be downloaded. */
+  blob?: Blob;
 }
 
 export interface PlannerState {
@@ -191,14 +194,20 @@ export function useArtworkPlanner(source: BackgroundSource | undefined) {
         const url = URL.createObjectURL(file);
         try {
           const img = await loadImage(url);
-          return { name: file.name, type: file.type, size: file.size, width: img.naturalWidth, height: img.naturalHeight, url };
+          const art = { name: file.name, type: file.type, size: file.size, width: img.naturalWidth, height: img.naturalHeight, url };
+          // A whole 1920px-wide picture (the .psd template exported flat): cut it into the pieces.
+          if (isFullSize(art, slots)) {
+            URL.revokeObjectURL(url);
+            return cutFullSize(img, file.name, slots);
+          }
+          return [art];
         } catch {
           URL.revokeObjectURL(url);
           return null;
         }
       }),
     );
-    const ok = read.filter((f): f is FinishedArt => f !== null);
+    const ok = read.filter((f): f is FinishedArt[] => f !== null).flat();
     const bad = files.filter((_, i) => !read[i]).map((f) => `${f.name} (not an image this browser can open)`);
     const { matches, unmatched: left } = matchFiles(slots, ok);
     setFinished((old) => {
@@ -211,7 +220,7 @@ export function useArtworkPlanner(source: BackgroundSource | undefined) {
       return next;
     });
     left.forEach((f) => URL.revokeObjectURL(f.url));
-    setUnmatched([...bad, ...left.map((f) => `${f.name} (${f.width}×${f.height}: no slot that size, and no 01_/02_ prefix)`)]);
+    setUnmatched([...bad, ...left.map((f) => `${f.name} (${f.width}×${f.height}: no slot that size, no 01_/02_ prefix, and not a whole 1920px-wide picture)`)]);
     setRestartKey((k) => k + 1);
   }
 
@@ -303,6 +312,30 @@ export function useArtworkPlanner(source: BackgroundSource | undefined) {
 }
 
 export type ArtworkPlanner = ReturnType<typeof useArtworkPlanner>;
+
+/** A picture as wide as Steam draws the background and tall enough to cover every slot. */
+export function isFullSize(file: { width: number; height: number }, slots: ArtworkSlot[]): boolean {
+  return file.width === STEAM_BG_WIDTH && file.height >= Math.max(...slots.map((s) => s.y + s.height));
+}
+
+/** Cut a full-size picture into one PNG per slot, named like the exported pieces. */
+async function cutFullSize(img: HTMLImageElement, sourceName: string, slots: ArtworkSlot[]): Promise<FinishedArt[]> {
+  const frame = frameOf(img);
+  return Promise.all(
+    slots.map(async (slot) => {
+      const blob = await canvasToPng(cropToCanvas(frame, slot));
+      return {
+        name: `${slot.fileName} (cut from ${sourceName})`,
+        type: "image/png",
+        size: blob.size,
+        width: slot.width,
+        height: slot.height,
+        url: URL.createObjectURL(blob),
+        blob,
+      };
+    }),
+  );
+}
 
 /** The showcases the planner's Artwork showcase sits among (any other Artwork showcase makes way for it). */
 export function otherShowcases(items: ShowcaseItem[]): ShowcaseItem[] {

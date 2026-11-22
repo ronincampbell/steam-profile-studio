@@ -171,6 +171,23 @@
   filter: none;
 }
 
+.secondaryButton {
+  padding: 6px 14px;
+  font: inherit;
+  color: #ffffff;
+  background: rgba(103, 193, 245, 0.2);
+  border: 1px solid rgba(103, 193, 245, 0.4);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.secondaryButton:hover {
+  background: rgba(103, 193, 245, 0.35);
+}
+.secondaryButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .linkButton {
   padding: 0;
   font: inherit;
