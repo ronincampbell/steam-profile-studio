@@ -1,0 +1,82 @@
+/*
+ * Player-written text that Steam turns from BBCode into HTML (bb_* classes),
+ * as in Steam's shared_global.css. Put the `bb` class on the element whose
+ * HTML is the cleaned text (sanitizeNotes): showcase notes, the profile summary.
+ */
+
+.bb :global(.bb_h1) {
+  font-size: 20px;
+  line-height: 23px;
+  color: #5aa9d6;
+  font-weight: normal;
+  margin-bottom: 10px;
+  clear: both;
+}
+
+.bb :global(.bb_h2) {
+  color: #5aa9d6;
+  margin-bottom: 6px;
+  margin-top: 8px;
+  font-size: 18px;
+  line-height: 21px;
+  font-weight: 400;
+  clear: both;
+}
+
+.bb :global(.bb_h3) {
+  color: #5aa9d6;
+  margin-bottom: 6px;
+  margin-top: 8px;
+  font-size: 16px;
+  line-height: 19px;
+  font-weight: 300;
+  clear: both;
+}
+
+.bb :global(.bb_strike) {
+  text-decoration: line-through;
+}
+
+.bb :global(.bb_spoiler) {
+  color: #000000;
+  background-color: #000000;
+  padding: 0px 8px;
+}
+
+.bb :global(.bb_spoiler):hover {
+  color: #ffffff;
+}
+
+.bb :global(.bb_spoiler) > span {
+  visibility: hidden;
+}
+
+.bb :global(.bb_spoiler):hover > span {
+  visibility: visible;
+}
+
+.bb :global(.bb_blockquote) {
+  border: 1px solid #56707f;
+  border-radius: 3px;
+  padding: 12px;
+  margin: 8px;
+  font-size: 92%;
+  display: table;
+  word-break: break-word;
+}
+
+.bb :global(.bb_code) {
+  border: 1px solid #535354;
+  border-radius: 3px;
+  padding: 12px;
+  margin: 8px;
+  font-size: 11px;
+  font-family: Consolas, monospace;
+}
+
+.bb :global(.bb_link_host) {
+  font-size: 10px;
+  color: #7e8391;
+  padding: 4px;
+  top: -1px;
+}

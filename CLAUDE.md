@@ -41,7 +41,7 @@ First step on the data side: write a small script that calls each endpoint for R
 ## Architecture sketch
 
 - `src/app/api/profile/route.ts`: parse the input, resolve the SteamID, fetch summary, level and equipped items, return one normalised object. Cached.
-- `src/app/api/profile/showcases/route.ts`: `?id=<steamid64>`, the parsed showcases and right-hand column (`sidebar`: status, awards, badges, counts, groups, top friends, plus the header's favourite badge) from the public profile page (`src/lib/steam/showcases/`). Separate so the header never waits on it. Cached. Friends show with real names and avatars, as on Steam (Ronin's call, 21 Nov: no hide toggle).
+- `src/app/api/profile/showcases/route.ts`: `?id=<steamid64>`, the parsed showcases, the header's profile summary (bio, cleaned by `sanitizeNotes`) and right-hand column (`sidebar`: status, awards, badges, counts, groups, top friends, plus the header's favourite badge) from the public profile page (`src/lib/steam/showcases/`). Separate so the header never waits on it. Cached. Friends show with real names and avatars, as on Steam (Ronin's call, 21 Nov: no hide toggle).
 - `src/app/api/items/route.ts`: fetch and normalise the Points Shop catalogue by item type. Cached.
 - `src/lib/steam/`: typed fetch helpers, one per endpoint, plus input parsing (`/id/<vanity>`, `/profiles/<steamid64>`, a bare 17-digit ID, a bare vanity name).
 - `src/components/ProfilePreview/`: layered render, from the bottom up:

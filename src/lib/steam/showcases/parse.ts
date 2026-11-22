@@ -10,7 +10,7 @@
  */
 import { parse, type HTMLElement } from "node-html-parser";
 import { classes, hasClass, text } from "./dom";
-import { parseMoreShowcase } from "./parseMore";
+import { parseMoreShowcase, sanitizeNotes } from "./parseMore";
 import { parseComments, parseRecentActivity } from "./activity";
 import { parseSidebar } from "./sidebar";
 import type {
@@ -38,6 +38,8 @@ export interface ParsedProfilePage {
   /** Steam marks private (and, to visitors, friends-only) profiles with this body class. */
   isPrivate: boolean;
   showcases: Showcase[];
+  /** The profile summary (bio) in the header, as safe HTML. Missing when it's empty. */
+  summary?: string;
   /** The right-hand column and favourite badge; missing when the page has none (private). */
   sidebar?: ProfileSidebar;
   /** Recent Activity and comments, under the showcases. Missing on private pages. */
@@ -52,7 +54,13 @@ export function parseProfilePage(html: string): ParsedProfilePage {
   const sidebar = isPrivate ? undefined : parseSidebar(root);
   const recentActivity = isPrivate ? undefined : parseRecentActivity(root);
   const comments = isPrivate ? undefined : parseComments(root);
-  const extras = { sidebar, recentActivity, comments };
+  // The header has a desktop and a mobile copy of the summary; they're the same.
+  const summary =
+    sanitizeNotes(
+      root.querySelector(".profile_header_summary.desktop .profile_summary") ??
+        root.querySelector(".profile_header_summary .profile_summary"),
+    ) || undefined;
+  const extras = { summary, sidebar, recentActivity, comments };
   const area = root.querySelector(".profile_customization_area");
   if (!area) return { isProfilePage, isPrivate, showcases: [], ...extras };
 

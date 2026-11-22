@@ -97,87 +97,11 @@ a.screenshotCount[href] {
   text-decoration: underline;
 }
 
-/* BBCode (shared_global.css) */
-.notes :global(.bb_h1) {
-  font-size: 20px;
-  line-height: 23px;
-  color: #5aa9d6;
-  font-weight: normal;
-  margin-bottom: 10px;
-  clear: both;
-}
+/* BBCode itself is styled by src/components/BBCode.module.css. */
 
 /* .customtext_showcase .bb_h1 */
 .customText .notes :global(.bb_h1) {
   border-bottom: 1px dotted #666666;
-}
-
-.notes :global(.bb_h2) {
-  color: #5aa9d6;
-  margin-bottom: 6px;
-  margin-top: 8px;
-  font-size: 18px;
-  line-height: 21px;
-  font-weight: 400;
-  clear: both;
-}
-
-.notes :global(.bb_h3) {
-  color: #5aa9d6;
-  margin-bottom: 6px;
-  margin-top: 8px;
-  font-size: 16px;
-  line-height: 19px;
-  font-weight: 300;
-  clear: both;
-}
-
-.notes :global(.bb_strike) {
-  text-decoration: line-through;
-}
-
-.notes :global(.bb_spoiler) {
-  color: #000000;
-  background-color: #000000;
-  padding: 0px 8px;
-}
-
-.notes :global(.bb_spoiler):hover {
-  color: #ffffff;
-}
-
-.notes :global(.bb_spoiler) > span {
-  visibility: hidden;
-}
-
-.notes :global(.bb_spoiler):hover > span {
-  visibility: visible;
-}
-
-.notes :global(.bb_blockquote) {
-  border: 1px solid #56707f;
-  border-radius: 3px;
-  padding: 12px;
-  margin: 8px;
-  font-size: 92%;
-  display: table;
-  word-break: break-word;
-}
-
-.notes :global(.bb_code) {
-  border: 1px solid #535354;
-  border-radius: 3px;
-  padding: 12px;
-  margin: 8px;
-  font-size: 11px;
-  font-family: Consolas, monospace;
-}
-
-.notes :global(.bb_link_host) {
-  font-size: 10px;
-  color: #7e8391;
-  padding: 4px;
-  top: -1px;
 }
 
 /* ---------- Item Showcase, Items Up For Trade ---------- */
