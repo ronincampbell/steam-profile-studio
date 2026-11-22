@@ -374,6 +374,8 @@ export interface ProfileShowcases {
    * a page that wasn't a profile).
    */
   staleBecause?: "rate-limited" | "steam-error";
+  /** The profile summary (bio) in the header, as safe HTML. Missing when it's empty. */
+  summary?: string;
   /** The right-hand column and the favourite badge, read from the same page. */
   sidebar?: ProfileSidebar;
   /** The Recent Activity box under the showcases. Missing when Steam shows none. */

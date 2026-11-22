@@ -26,6 +26,7 @@ import type {
 } from "@/lib/steam/showcases/types";
 import base from "./Showcases.module.css";
 import styles from "./MoreShowcases.module.css";
+import bbcode from "@/components/BBCode.module.css";
 
 const ext = { target: "_blank", rel: "noreferrer" } as const;
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
@@ -78,7 +79,7 @@ function StatsRow({ stats, className }: { stats: ShowcaseStat[]; className?: str
 
 /** Player-written text, already cleaned by the parser (sanitizeNotes). */
 function Notes({ html, className }: { html: string; className?: string }) {
-  return <div className={cx(styles.notes, className)} dangerouslySetInnerHTML={{ __html: html }} />;
+  return <div className={cx(styles.notes, bbcode.bb, className)} dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 function Ribbons({ groups, groupClass, emptyClass }: { groups: CompletionRibbonGroup[]; groupClass?: string; emptyClass?: string }) {

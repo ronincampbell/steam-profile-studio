@@ -7,7 +7,7 @@
  *   2. profile background: image, or a looping muted video if animated
  *   3. avatar: static, or the animated avatar's GIF
  *   4. avatar frame (animated APNG; static PNG for reduced-motion users)
- *   5. name, real name + country, level badge and favourite badge
+ *   5. name, real name + country, summary (bio), level badge and favourite badge
  * then the page content: showcases on the left, the right-hand column
  * (status, badges, counts, groups, friends) on the right.
  *
@@ -24,6 +24,7 @@ import type { ProfileShowcases } from "@/lib/steam/showcases/types";
 import { Showcases, type ShowcaseEditing, type ShowcaseItem } from "@/components/Showcases/Showcases";
 import { CommentsBox, RecentActivityBox } from "./Activity";
 import { HeaderFavoriteBadge, Sidebar } from "./Sidebar";
+import { ProfileSummary } from "./Summary";
 import styles from "./ProfilePreview.module.css";
 
 /** Everything the header draws. Built from a Profile plus whatever the user is trying on. */
@@ -161,6 +162,7 @@ export function ProfilePreview({
                       </div>
                     )}
                   </div>
+                  {showcases?.summary && <ProfileSummary html={showcases.summary} />}
                 </div>
 
                 <div className={styles.badgeInfo}>
