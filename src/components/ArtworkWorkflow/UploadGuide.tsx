@@ -12,12 +12,15 @@ export function UploadGuide({
   layout,
   slots,
   showcaseFirst,
+  animated = false,
 }: {
   layout: ArtworkLayout;
   slots: ArtworkSlot[];
   showcaseFirst: boolean;
+  /** Guide the upload of the animated GIFs instead of the PNGs. */
+  animated?: boolean;
 }) {
-  const steps = guideSteps(layout, slots, showcaseFirst);
+  const steps = guideSteps(layout, slots, showcaseFirst, animated);
   const [done, setDone] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState(false);
 

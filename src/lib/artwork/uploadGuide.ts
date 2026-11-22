@@ -36,8 +36,13 @@ export function uploadOrder(slots: ArtworkSlot[]): ArtworkSlot[] {
   return [...rest, ...main];
 }
 
-export function guideSteps(layout: ArtworkLayout, slots: ArtworkSlot[], showcaseFirst: boolean): GuideStep[] {
+/**
+ * @param animated the upload is the animated GIFs (an animated background),
+ *   not the PNG pieces
+ */
+export function guideSteps(layout: ArtworkLayout, slots: ArtworkSlot[], showcaseFirst: boolean, animated = false): GuideStep[] {
   const order = uploadOrder(slots);
+  const fileOf = (s: ArtworkSlot) => (animated ? s.fileName.replace(/\.png$/, ".gif") : s.fileName);
   const mb = MAX_UPLOAD_BYTES / 1024 / 1024;
   const steps: GuideStep[] = [
     {
@@ -54,9 +59,15 @@ export function guideSteps(layout: ArtworkLayout, slots: ArtworkSlot[], showcase
       id: "files",
       title: `Upload the ${slots.length} files one at a time, in this order`,
       body: [
-        ...order.map((s, i) => `${i + 1}. ${s.fileName} (${s.label.toLowerCase()})`),
+        ...order.map((s, i) => `${i + 1}. ${fileOf(s)} (${s.label.toLowerCase()})`),
         `The order doesn't decide which slot a picture lands in (you pick that in step ${layout === "long" ? 5 : 4}). It just puts the big image at the top of Steam's picker, where it's easy to find.`,
         `Upload each file exactly as exported. Any other size gets black bars and is re-saved as a blurry JPEG. Keep each file under ${mb} MB, as PNG, JPG or GIF.`,
+        ...(animated
+          ? [
+              `For an animated background, upload the .gif files, not the .png stills. The GIFs are already sized to fit under ${mb} MB. If you edit one and it grows past that, save it with fewer frames or colours.`,
+              "Steam keeps GIFs animated but re-saves their colours, so a GIF can look a touch grainier on Steam than in your editor.",
+            ]
+          : []),
       ],
       unconfirmed: true,
     },
@@ -109,6 +120,11 @@ export function guideSteps(layout: ArtworkLayout, slots: ArtworkSlot[], showcase
       body: [
         "Open your profile in a private window, 910 to 1920 pixels wide. Wider windows stretch the background, so nothing lines up there, on anyone's profile.",
         "Black bars mean a file isn't the exact size. Everything shifted down means something above the showcase got taller.",
+        ...(animated
+          ? [
+              "Each GIF starts when it loads and loops on its own, so it won't stay exactly in step with the moving background. Each GIF's loop is as long as the background's, so the gap stays the same instead of growing. Reloading the page lines them up differently each time.",
+            ]
+          : []),
       ],
     },
   );
@@ -116,19 +132,36 @@ export function guideSteps(layout: ArtworkLayout, slots: ArtworkSlot[], showcase
 }
 
 /** The guide as plain text, for README.txt in the download. */
-export function guideText(layout: ArtworkLayout, slots: ArtworkSlot[], showcaseFirst: boolean, backgroundName: string): string {
+export function guideText(
+  layout: ArtworkLayout,
+  slots: ArtworkSlot[],
+  showcaseFirst: boolean,
+  backgroundName: string,
+  /** One line per exported GIF ("01_main_480x480.gif  4.6 MB, …"), for animated backgrounds. */
+  gifs?: string[],
+): string {
+  const animated = Boolean(gifs?.length);
   const lines = [
     `Steam Profile Studio: artwork pieces for "${backgroundName}"`,
     `Layout: Artwork showcase, ${layout === "long" ? "long" : "normal"}`,
     "",
     "WHAT'S IN HERE",
-    ...slots.map((s) => `  ${s.fileName}  ${s.label}, ${s.width}x${s.height}, background x ${s.x}, y ${s.y}`),
+    ...slots.map((s) => `  ${s.fileName}  ${s.label}, ${s.width}x${s.height}, background x ${s.x}, y ${s.y}${animated ? " (still)" : ""}`),
+    ...(gifs ?? []).map((g) => `  ${g}`),
     "  guide_full_background.png  the whole background with each slot outlined",
     "  layout.json  the same numbers, for scripts",
     "",
     "Paint over the pieces in any editor, keep each one exactly the same size,",
     "and save as PNG (or GIF for animation). Keep the file names, or at least",
     "the 01_, 02_ ... prefixes, so the app can put them back in the right slots.",
+    ...(animated
+      ? [
+          "",
+          "The .gif files are one loop of the animated background, cut to each slot",
+          "and ready to upload as they are. Or open them in your editor, add your art",
+          `on top, and keep each under ${MAX_UPLOAD_BYTES / 1024 / 1024} MB when you save.`,
+        ]
+      : []),
     "",
     "LAYERED .PSD (Photoshop, Photopea, GIMP, Krita)",
     "  The app's \"Layered .psd\" button gives the whole background with each",
@@ -152,7 +185,7 @@ export function guideText(layout: ArtworkLayout, slots: ArtworkSlot[], showcaseF
     "",
     "HOW TO PUT THEM ON STEAM",
   ];
-  guideSteps(layout, slots, showcaseFirst).forEach((step, i) => {
+  guideSteps(layout, slots, showcaseFirst, animated).forEach((step, i) => {
     lines.push("", `${i + 1}. ${step.title}${step.unconfirmed ? " (not yet tested by us)" : ""}`);
     for (const p of step.body) lines.push(`   ${p}`);
     if (step.code) lines.push("", `   ${step.code}`);
