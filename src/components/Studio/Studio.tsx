@@ -155,7 +155,6 @@ export function Studio() {
         return showcaseList ? (
           <ShowcaseList
             list={showcaseList}
-            profileShowcases={profileShowcases}
             edited={edited}
             onMove={(from, to) => editShowcases((l) => moveShowcase(l, from, to))}
             onRemove={(id) => editShowcases((l) => removeShowcase(l, id))}

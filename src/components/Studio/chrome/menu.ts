@@ -23,7 +23,7 @@ export const MENU: MenuEntry[] = [
   { id: "animated-avatar", label: "Animated avatars", short: "Avatars", icon: "avatar", group: "shop" },
   { id: "theme", label: "Profile themes", short: "Themes", icon: "theme", group: "shop" },
   { id: "art", label: "Your own art", short: "Your art", icon: "art", group: "yours" },
-  { id: "artwork", label: "Artwork", short: "Artwork", icon: "artwork", group: "yours" },
+  { id: "artwork", label: "Artwork showcase", short: "Artwork", icon: "artwork", group: "yours" },
   { id: "showcases", label: "Showcases", short: "Showcases", icon: "showcases", group: "yours" },
   { id: "wearing", label: "Wearing now", short: "Wearing now", icon: "wearing", group: "yours" },
 ];

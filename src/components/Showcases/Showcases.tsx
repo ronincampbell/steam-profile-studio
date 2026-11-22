@@ -158,8 +158,7 @@ function ShowcaseBox({ item, editing }: { item: ShowcaseItem; editing?: BoxEditi
         {showcase.kind === "unsupported" &&
           (item.source === "placeholder" ? (
             <div className={`${styles.contentBg} ${styles.placeholder}`}>
-              Placeholder. Steam&apos;s layout for this showcase hasn&apos;t been captured yet, so the preview
-              can&apos;t draw it.
+              This showcase isn&apos;t in the preview yet.
             </div>
           ) : (
             <div className={styles.unsupported}>This showcase isn&apos;t in the preview yet.</div>

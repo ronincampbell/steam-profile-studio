@@ -45,7 +45,7 @@ export async function steamGet<T>(
   const url = new URL(`${API}/${path}/`);
   if (key) {
     const apiKey = process.env.STEAM_API_KEY;
-    if (!apiKey) throw new SteamError("Server is missing STEAM_API_KEY", 500);
+    if (!apiKey) throw new SteamError("Steam lookups aren't set up on this site yet.", 500);
     url.searchParams.set("key", apiKey);
   }
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, String(v));
@@ -54,14 +54,14 @@ export async function steamGet<T>(
   try {
     res = await fetch(url, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(10_000) });
   } catch {
-    throw new SteamError("Couldn't reach Steam", 502);
+    throw new SteamError("Couldn't reach Steam. Try again in a minute.", 502);
   }
-  if (res.status === 429) throw new SteamError("Steam is rate limiting us, try again shortly", 503);
-  if (!res.ok) throw new SteamError(`Steam answered ${res.status}`, 502);
+  if (res.status === 429) throw new SteamError("Steam is busy. Try again in a minute.", 503);
+  if (!res.ok) throw new SteamError("Steam didn't answer. Try again in a minute.", 502);
   try {
     return (await res.json()) as T;
   } catch {
-    throw new SteamError("Steam sent something that wasn't JSON", 502);
+    throw new SteamError("Steam didn't answer. Try again in a minute.", 502);
   }
 }
 
