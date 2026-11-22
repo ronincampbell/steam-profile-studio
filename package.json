@@ -12,6 +12,7 @@
   "dependencies": {
     "@vercel/functions": "3.10.6",
     "fflate": "^0.8.2",
+    "gifenc": "^1.0.3",
     "next": "16.4.6",
     "node-html-parser": "^7.1.0",
     "react": "19.3.0",

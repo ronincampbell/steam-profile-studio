@@ -51,7 +51,7 @@ First step on the data side: write a small script that calls each endpoint for R
   4. avatar frame overlay
   5. name, level badge
 - `src/components/ItemBrowser/`: tabs per item type, search, click to apply, buy link.
-- `src/components/ArtworkWorkflow/` + `src/lib/artwork/`: artwork that lines up with the background (plan: `reference/ARTWORK_WORKFLOW.md`). Adds its own Artwork showcase to the preview (replacing the profile's), cuts the background pieces behind each slot in the browser, zips them with a guide image, layout.json and the upload guide, and previews finished art dropped back in. Slot numbers live only in `layouts.ts`.
+- `src/components/ArtworkWorkflow/` + `src/lib/artwork/`: artwork that lines up with the background (plan: `reference/ARTWORK_WORKFLOW.md`). Adds its own Artwork showcase to the preview (replacing the profile's), cuts the background pieces behind each slot in the browser (plus, for animated backgrounds, one-loop GIFs squeezed under the upload limit in `gifExport.ts`), zips them with a guide image, layout.json and the upload guide, and previews finished art dropped back in. Slot numbers live only in `layouts.ts`.
 - `/reference/`: Steam screenshots of real profiles at 100% zoom and raw API JSON. This is the source of truth for pixel matching.
 
 ## Schedule

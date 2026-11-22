@@ -13,6 +13,7 @@ import { canvasToPng } from "@/lib/artwork/crop";
 import { drawGuide } from "@/lib/artwork/guideImage";
 import { buildZip, download, zipName } from "@/lib/artwork/exportZip";
 import { canRecordClips, recordClips } from "@/lib/artwork/clips";
+import { describeGif, gifFileName, makeGifs, type FinishedGif } from "@/lib/artwork/gifExport";
 import type { BackgroundSource } from "@/lib/artwork/crop";
 import type { ArtworkPlanner } from "./useArtworkPlanner";
 import { UploadGuide } from "./UploadGuide";
@@ -32,7 +33,10 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
   const { state, update, slots } = planner;
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [withClips, setWithClips] = useState(true);
+  const [withGifs, setWithGifs] = useState(true);
+  const [withClips, setWithClips] = useState(false);
+  /** What the last download's GIFs came out as. */
+  const [gifResults, setGifResults] = useState<{ fileName: string; text: string; over: boolean }[] | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const animated = source?.kind === "video";
   const clipsPossible = animated && canRecordClips();
@@ -67,6 +71,16 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
     try {
       setBusy("Drawing the guide image…");
       const guide = await canvasToPng(drawGuide(planner.frame, slots));
+      let gifs: Map<(typeof slots)[number]["id"], FinishedGif> | undefined;
+      if (animated && withGifs && source) {
+        gifs = await makeGifs(source.url, slots, setBusy);
+        setGifResults(
+          slots.flatMap((s) => {
+            const g = gifs!.get(s.id);
+            return g ? [{ fileName: gifFileName(s), text: describeGif(g), over: g.overBudget }] : [];
+          }),
+        );
+      }
       let clips: Map<string, Blob> | undefined;
       if (animated && withClips && clipsPossible && source) {
         setBusy("Recording one loop of the background for the source clips… 0%");
@@ -85,6 +99,7 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
         pieces: planner.pieces,
         guide,
         clips: clips as Map<(typeof slots)[number]["id"], Blob> | undefined,
+        gifs,
       });
       download(zip, zipName(backgroundName, state.layout));
     } catch (e) {
@@ -199,13 +214,17 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
               <span className={styles.value}>{state.frameTime.toFixed(2)}s</span>
             </label>
             <span className={styles.note}>
-              Steam artwork can&rsquo;t be a video, so the pieces are a still from this moment. The preview&rsquo;s background
-              keeps moving behind them, which is how it looks on Steam too.
+              Steam artwork can&rsquo;t be a video. The pieces in the preview are a still from this moment, for painting
+              over. The preview&rsquo;s background keeps moving behind them, which is how a still looks on Steam too.
             </span>
+            <label className={styles.check}>
+              <input type="checkbox" checked={withGifs} onChange={(e) => setWithGifs(e.target.checked)} />
+              Also make each piece an animated GIF of one loop, ready to upload (kept under Steam&rsquo;s size limit)
+            </label>
             {clipsPossible ? (
               <label className={styles.check}>
                 <input type="checkbox" checked={withClips} onChange={(e) => setWithClips(e.target.checked)} />
-                Also include each piece as a looping video clip (WebM), to make your own GIF from
+                Also include full-quality video clips (WebM), to make your own GIFs in an editor
               </label>
             ) : (
               <span className={styles.note}>This browser can&rsquo;t record video clips, so only stills are included.</span>
@@ -244,8 +263,23 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
           {busy && <span className={styles.note}>{busy}</span>}
           {!planner.pieces && !busy && !planner.loadError && <span className={styles.note}>Cutting the background…</span>}
           {error && <p className={styles.error}>{error}</p>}
+          {animated && withGifs && gifResults && !busy && (
+            <ul className={styles.checks}>
+              {gifResults.map((g) => (
+                <li key={g.fileName} className={g.over ? styles.bad : styles.good}>
+                  <code>{g.fileName}</code> {g.text}
+                </li>
+              ))}
+            </ul>
+          )}
+          {animated && withGifs && (
+            <span className={styles.note}>
+              Making the GIFs reads every frame of one loop, then shrinks each GIF until it fits: fewer frames per second
+              first, then fewer colours. It takes a few seconds per piece.
+            </span>
+          )}
           <span className={styles.note}>
-            The zip has the pieces as PNGs at the exact size Steam shows them, a full-size guide image with the slots marked,
+            The zip has the pieces as PNGs{animated && withGifs ? " and animated GIFs" : ""} at the exact size Steam shows them, a full-size guide image with the slots marked,
             the numbers as layout.json, and these instructions as README.txt. Nothing is uploaded anywhere.
           </span>
         </div>
@@ -323,7 +357,7 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
         <span className={styles.stepNumber}>{animated ? 6 : 5}</span>
         <div className={styles.stepBody}>
           <span className={styles.stepTitle}>Put it on Steam</span>
-          <UploadGuide layout={state.layout} slots={slots} showcaseFirst={showcaseFirst} />
+          <UploadGuide layout={state.layout} slots={slots} showcaseFirst={showcaseFirst} animated={animated && withGifs} />
         </div>
       </div>
     </section>
