@@ -358,6 +358,31 @@
   color: var(--c-text);
 }
 
+/* When the names don't fit (ToolbarLayout measures): icons only, with
+   each name kept for screen readers and as the tooltip. */
+.toolsIconsOnly .toolButton {
+  gap: 0;
+}
+.toolsIconsOnly .toolLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Holds the invisible full-width copy of the menu that's measured. It
+   takes no space and can't make the page scroll sideways. */
+.toolsMeasure {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 /* How many slots you're trying something on in (on "Wearing now"). */
 .count {
   min-width: 17px;
@@ -467,8 +492,9 @@
 
 /* ---------- Smaller screens ---------- */
 
-/* Below this the menu's labels don't fit beside the logo: icons only
-   (each button has its name as a tooltip). */
+/* Laptop widths: a tighter header, without the wordmark or the "Previewing"
+   text, so the menu keeps its names. Whether the names still fit is
+   measured in ToolbarLayout. */
 @media (max-width: 1440px) {
   .header {
     padding: 0 20px;
@@ -482,10 +508,6 @@
   }
   .tools {
     --tool-pad: 8px;
-  }
-  .toolButton {
-    font-size: 0;
-    gap: 0;
   }
 }
 
