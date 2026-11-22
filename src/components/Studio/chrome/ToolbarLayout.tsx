@@ -31,6 +31,7 @@ import {
   useEscape,
   type LayoutProps,
 } from "./Panels";
+import { REPO_URL } from "./links";
 import { SiteHeader } from "./SiteHeader";
 import styles from "./Chrome.module.css";
 
@@ -172,7 +173,7 @@ export function ToolbarLayout({
       {preview}
       <footer className={styles.footer}>
         Not affiliated with Valve. Steam and item artwork belong to Valve and their creators.{" "}
-        <a href="https://github.com/ronincampbell/steam-profile-studio" target="_blank" rel="noreferrer">
+        <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
           GitHub
         </a>
       </footer>
