@@ -534,3 +534,14 @@
     margin: 0 2px;
   }
 }
+
+/* Under the preview, so it never moves anything Steam draws. */
+.footer {
+  padding: 28px 16px 36px;
+  font: 12px/1.5 var(--c-font);
+  color: var(--c-muted);
+  text-align: center;
+}
+.footer a {
+  color: var(--c-text);
+}

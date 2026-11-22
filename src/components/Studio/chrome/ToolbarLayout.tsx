@@ -170,6 +170,12 @@ export function ToolbarLayout({
         </div>
       </div>
       {preview}
+      <footer className={styles.footer}>
+        Not affiliated with Valve. Steam and item artwork belong to Valve and their creators.{" "}
+        <a href="https://github.com/ronincampbell/steam-profile-studio" target="_blank" rel="noreferrer">
+          GitHub
+        </a>
+      </footer>
       <div className={styles.toasts}>{notices}</div>
     </>
   );
