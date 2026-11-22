@@ -23,7 +23,7 @@ import {
 import { pointsShopAppUrl } from "./pointsShop";
 import { createShowcaseLoader } from "./showcases/resilient";
 import type { ProfileShowcases } from "./showcases/types";
-import { ITEM_TYPES, type CataloguePage, type ItemType, type Profile, type ShopItem } from "./types";
+import type { Profile, ShopItem } from "./types";
 
 const API = "https://api.steampowered.com";
 
@@ -37,7 +37,7 @@ export class SteamError extends Error {
   }
 }
 
-async function steamGet<T>(
+export async function steamGet<T>(
   path: string,
   params: Record<string, string | number>,
   { key = false }: { key?: boolean } = {},
@@ -147,41 +147,6 @@ export function getShowcases(steamId: string): Promise<ProfileShowcases> {
 }
 
 /* ---------- Catalogue ---------- */
-
-export interface CatalogueQuery {
-  type: ItemType;
-  cursor?: string;
-  search?: string;
-}
-
-/** One page (100 items) of the Points Shop catalogue for one item type. */
-export async function getCataloguePage({ type, cursor, search }: CatalogueQuery): Promise<CataloguePage> {
-  "use cache";
-  cacheLife("catalogue");
-
-  const params: Record<string, string | number> = {
-    count: 100,
-    language: "english",
-    "community_item_classes[0]": ITEM_TYPES[type],
-  };
-  if (cursor) params.cursor = cursor;
-  if (search) params.search_term = search;
-
-  const r = await steamGet<{
-    response: { definitions?: RawRewardItem[]; total_count?: number; next_cursor?: string };
-  }>("ILoyaltyRewardsService/QueryRewardItems/v1", params);
-
-  const defs = r.response.definitions ?? [];
-  const items = defs.map(normalizeRewardItem).filter((i): i is ShopItem => i !== null);
-  return {
-    type,
-    items,
-    total: r.response.total_count ?? items.length,
-    // Steam still hands back a cursor on the last page; only pass it on when
-    // this page was full.
-    nextCursor: defs.length >= 100 ? r.response.next_cursor : undefined,
-  };
-}
 
 /**
  * The items inside a profile bundle (a Points Shop "profile theme").

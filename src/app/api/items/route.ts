@@ -1,29 +1,21 @@
 /**
- * GET /api/items?type=<item type>&cursor=<next page>&q=<search>
+ * GET /api/items?type=<item type>&sort=popular|new&motion=animated|still
+ *   &vibe=<vibe>&app=<appid>&q=<search>&cursor=<next page>
  *
  * One page (up to 100) of Points Shop items of one type, normalised to
- * ShopItem (see src/lib/steam/types.ts). Types: background, mini-background,
- * avatar-frame, animated-avatar, theme. Cached for about a day.
+ * ShopItem (see src/lib/steam/types.ts), each with its game's name. Adult-only
+ * games are left out, as in the Points Shop. Cached for about a day.
  */
-import { getCataloguePage, SteamError } from "@/lib/steam/api";
-import { isItemType, ITEM_TYPES } from "@/lib/steam/types";
+import { SteamError } from "@/lib/steam/api";
+import { browseItems } from "@/lib/steam/catalogue";
+import { parseBrowseParams } from "@/lib/http/browseParams";
 import { cached, error } from "@/lib/http/json";
 
 export async function GET(request: Request) {
-  const params = new URL(request.url).searchParams;
-  const type = params.get("type");
-  if (!isItemType(type)) {
-    return error(`type must be one of: ${Object.keys(ITEM_TYPES).join(", ")}`, 400);
-  }
-
-  // Cursors are Steam's base64 strings; searches are free text. Bound both so
-  // nobody can push junk through to Steam.
-  const cursor = params.get("cursor")?.trim() || undefined;
-  if (cursor && !/^[A-Za-z0-9+/=_-]{1,200}$/.test(cursor)) return error("Bad cursor", 400);
-  const search = params.get("q")?.trim().slice(0, 100) || undefined;
-
+  const p = parseBrowseParams(new URL(request.url).searchParams);
+  if (typeof p === "string") return error(p, 400);
   try {
-    return cached(await getCataloguePage({ type, cursor, search }), 86_400);
+    return cached(await browseItems(p), 86_400);
   } catch (e) {
     if (e instanceof SteamError) return error(e.message, e.status);
     throw e;

@@ -31,6 +31,7 @@ Paste a public profile → it renders like Steam's profile header (name, avatar,
 | Currently equipped items | `IPlayerService/GetProfileItemsEquipped/v1` | undocumented; works without a key (verified 21 Nov). Asset paths are `items/<appid>/<file>` |
 | Profile theme (and showcase slots) | `IPlayerService/GetProfileCustomization/v1` | undocumented; works without a key (verified 21 Nov). `profile_theme.theme_id` (e.g. `Steel`) → Steam's `<id>Theme` body class; colours in `src/lib/steam/themes.ts` |
 | Points Shop catalogue | `ILoyaltyRewardsService/QueryRewardItems/v1` | undocumented; works without a key. `count` 100–1000, filter with `community_item_classes[0]=<n>` (3 background, 8 theme, 13 mini background, 14 frame, 15 animated avatar), page with `next_cursor`. Images/videos are bare filenames in `community_item_data` |
+| Browsing (Popular, animated/still, adult filter, game tags, owned games) | `QueryRewardItems` `sort=2&sort_descending=false` (Popular), `filters[0]=1`/`2` (animated/still), `excluded_content_descriptors` 3+4 (adult-only, as Steam does); `IStoreBrowseService/GetItems` (game names, store tags, capsules, no key); `IStoreService/GetTagList`; `IPlayerService/GetOwnedGames` (key) | verified 22 Nov from Steam's Points Shop JS. No include-by-tag filter, so `src/lib/steam/catalogue.ts` keeps each type's whole list in memory for a day and filters there; still backgrounds (~59k) page straight from Steam |
 | Buy links | `https://store.steampowered.com/points/shop/app/<appid>` | verified 21 Nov: **no per-item link exists**; this game page lists the item and the user clicks it. `pointsShopAppUrl()` |
 | Image/video URLs | `https://shared.fastly.steamstatic.com/community_assets/images/` | verified 21 Nov: catalogue → `items/<appid>/<file>`, equipped → `<path>`. `assetUrl()`, `catalogueAssetUrl()`. Old `cdn.*/steamcommunity/public/images` paths 404 |
 | Showcases (stretch) | public profile HTML (`steamcommunity.com/profiles/<id>/?l=english`); `GetProfileCustomization` only gives type numbers and order | verified 21 Nov, see `reference/html/SHOWCASES.md`. Only for public profiles. The site rate-limits fast (429), so always go through the cached `getShowcases()` |
@@ -42,7 +43,7 @@ First step on the data side: write a small script that calls each endpoint for R
 
 - `src/app/api/profile/route.ts`: parse the input, resolve the SteamID, fetch summary, level and equipped items, return one normalised object. Cached.
 - `src/app/api/profile/showcases/route.ts`: `?id=<steamid64>`, the parsed showcases and right-hand column (`sidebar`: status, awards, badges, counts, groups, top friends, plus the header's favourite badge) from the public profile page (`src/lib/steam/showcases/`). Separate so the header never waits on it. Cached. Friends show with real names and avatars, as on Steam (Ronin's call, 21 Nov: no hide toggle).
-- `src/app/api/items/route.ts`: fetch and normalise the Points Shop catalogue by item type. Cached.
+- `src/app/api/items/route.ts`: one page of Points Shop items by type, Popular or New, with vibe/game/search filters and each item's game name. `src/app/api/items/games/route.ts`: the same grouped by game, the loaded profile's games first. Both cached; logic in `src/lib/steam/catalogue.ts` and `browse.ts`.
 - `src/lib/steam/`: typed fetch helpers, one per endpoint, plus input parsing (`/id/<vanity>`, `/profiles/<steamid64>`, a bare 17-digit ID, a bare vanity name).
 - `src/components/ProfilePreview/`: layered render, from the bottom up:
   1. page/theme colours
@@ -50,7 +51,7 @@ First step on the data side: write a small script that calls each endpoint for R
   3. avatar (static or animated)
   4. avatar frame overlay
   5. name, level badge
-- `src/components/ItemBrowser/`: tabs per item type, search, click to apply, buy link.
+- `src/components/ItemBrowser/`: Popular / New / By game, vibe chips from store tags, Animated/Still for backgrounds, click a game name to see its items, click to apply, buy link.
 - `src/components/ArtworkWorkflow/` + `src/lib/artwork/`: artwork that lines up with the background (plan: `reference/ARTWORK_WORKFLOW.md`). Adds its own Artwork showcase to the preview (replacing the profile's), cuts the background pieces behind each slot in the browser (plus, for animated backgrounds, one-loop GIFs squeezed under the upload limit in `gifExport.ts`), zips them with a guide image, layout.json and the upload guide, and previews finished art dropped back in. Slot numbers live only in `layouts.ts`.
 - `/reference/`: Steam screenshots of real profiles at 100% zoom and raw API JSON. This is the source of truth for pixel matching.
 
