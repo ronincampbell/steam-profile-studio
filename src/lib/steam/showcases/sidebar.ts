@@ -19,11 +19,16 @@ export function parseSidebar(root: HTMLElement): ProfileSidebar | undefined {
 
   const inGame = col.querySelector(".profile_in_game");
   if (inGame) {
-    const detail = text(inGame.querySelector(".profile_in_game_name"));
+    // In a game: the game's name, empty for "In non-Steam game" (Steam still
+    // draws the empty line, and its margin). Offline and online have no line.
+    const name = inGame.querySelector(".profile_in_game_name");
+    // Only while the game has a joinable lobby: "steam://joinlobby/<appid>/…".
+    const joinGame = inGame.querySelector(".profile_in_game_joingame a")?.getAttribute("href");
     sidebar.status = {
       state: personaState(inGame),
       header: text(inGame.querySelector(".profile_in_game_header")),
-      ...(detail ? { detail } : {}),
+      ...(name ? { detail: text(name) } : {}),
+      ...(joinGame ? { joinGame } : {}),
     };
   }
 

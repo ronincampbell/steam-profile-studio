@@ -482,8 +482,21 @@ export interface SidebarFriend {
 
 export interface ProfileSidebar {
   favoriteBadge?: FavoriteBadge;
-  /** div.profile_in_game: "Currently Online", or "Currently In-Game" plus the game. */
-  status?: { state: PersonaState; header: string; detail?: string };
+  /**
+   * div.profile_in_game. Steam's wording, as a signed-out visitor sees it:
+   * "Currently Online" (also for Away, Snooze and the Looking to… states),
+   * "Currently Offline" (no "Last Online…" line: that's only shown when
+   * signed in), "Currently In-Game" plus the game, or "In non-Steam game"
+   * with an empty game line.
+   */
+  status?: {
+    state: PersonaState;
+    header: string;
+    /** The game line. "" for a non-Steam game; missing when not in a game. */
+    detail?: string;
+    /** The "Join Game" button's steam://joinlobby link, when there's a lobby to join. */
+    joinGame?: string;
+  };
   awards?: CountLink & { icons: { image: string; animatedImage?: string; tooltip: string }[] };
   badges?: CountLink & { icons: { href: string; image: string; tooltip: string[] }[] };
   /** Games, Inventory, Screenshots, Reviews, Artwork… in Steam's order. */

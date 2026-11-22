@@ -135,7 +135,8 @@ export function ProfilePreview({
           <div className={styles.headerBgTexture}>
             <div className={styles.header}>
               <div className={styles.headerContent}>
-                <Avatar look={look} />
+                {/* The profile page knows about non-Steam games; the Web API doesn't. */}
+                <Avatar look={look} status={sidebar?.status?.state ?? look.status} />
 
                 <div className={styles.centeredCol}>
                   <div className={styles.centeredPersona}>
@@ -236,11 +237,11 @@ function useImageRatio(src: string | undefined) {
   return loaded && loaded.src === src ? loaded.ratio : undefined;
 }
 
-function Avatar({ look }: { look: PreviewLook }) {
+function Avatar({ look, status }: { look: PreviewLook; status: PreviewLook["status"] }) {
   const anim = look.animatedAvatar;
   return (
     <div
-      className={`${styles.playerAvatar} ${styles[look.status === "in-game" ? "inGame" : look.status]}`}
+      className={`${styles.playerAvatar} ${styles[status === "in-game" ? "inGame" : status]}`}
     >
       <div className={styles.avatarInner}>
         {look.frame && (

@@ -88,3 +88,43 @@ describe("parseProfilePage", () => {
     expect(page.sidebar).toBeUndefined();
   });
 });
+
+/** Just the status box from a real profile page (markup captured 22 Nov 2026). */
+function statusOf(inner: string) {
+  const page = `<div class="profile_rightcol"><div class="responsive_status_info">${inner}</div></div>`;
+  return parseProfilePage(page).sidebar!.status;
+}
+
+describe("parseSidebar status wording", () => {
+  it("reads offline (signed-out visitors get no Last Online line)", () => {
+    expect(
+      statusOf(`<div class="profile_in_game persona offline">
+        <div class="profile_in_game_header">Currently Offline</div>
+      </div>`),
+    ).toEqual({ state: "offline", header: "Currently Offline" });
+  });
+
+  it("reads in-game with the game and a Join Game button", () => {
+    expect(
+      statusOf(`<div class="profile_in_game persona in-game">
+        <div class="profile_in_game_header">Currently In-Game</div>
+        <div class="profile_in_game_name">
+          GTFO
+        </div>
+        <div class="profile_in_game_joingame">
+          <a href="steam://joinlobby/493520/1/2" class="btn_green_white_innerfade btn_small_thin"><span>Join Game</span></a>
+        </div>
+      </div>`),
+    ).toEqual({ state: "in-game", header: "Currently In-Game", detail: "GTFO", joinGame: "steam://joinlobby/493520/1/2" });
+  });
+
+  it("keeps the empty game line for a non-Steam game", () => {
+    expect(
+      statusOf(`<div class="profile_in_game persona in-game">
+        <div class="profile_in_game_header">In non-Steam game</div>
+        <div class="profile_in_game_name">
+        </div>
+      </div>`),
+    ).toEqual({ state: "in-game", header: "In non-Steam game", detail: "" });
+  });
+});

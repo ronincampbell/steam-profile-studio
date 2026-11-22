@@ -67,7 +67,34 @@
 /* .profile_in_game_name */
 .inGameName {
   font-size: 15px;
+  /* Motiva Sans's own line height at 15px, so the fallback font lines up. */
+  line-height: 22px;
   margin-bottom: 12px;
+}
+
+/* .profile_in_game_joingame a.btn_green_white_innerfade.btn_small_thin (buttons.css) */
+.rightcol .joinGame {
+  display: inline-block;
+  padding: 1px;
+  border-radius: 2px;
+  color: #d2e885;
+  text-decoration: none;
+  background: linear-gradient(to bottom, #a4d007 5%, #536904 95%);
+}
+.rightcol .joinGame > span {
+  display: block;
+  padding: 0 5px;
+  font-size: 12px;
+  line-height: 20px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, #799905 5%, #536904 95%);
+}
+.rightcol .joinGame:hover {
+  color: #fff;
+  background: linear-gradient(to bottom, #b6d908 5%, #80a006 95%);
+}
+.rightcol .joinGame:hover > span {
+  background: linear-gradient(to bottom, #a1bf07 5%, #80a006 95%);
 }
 
 /* .profile_count_link (+ .ellipsis) */
