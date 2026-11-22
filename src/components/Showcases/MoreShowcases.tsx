@@ -109,7 +109,7 @@ function ItemTile({ item }: { item: EconomyItem }) {
   return (
     <div className={cx(base.slot, styles.item)} style={style}>
       <a href={item.href} {...ext}>
-        <img
+        <img loading="lazy"
           className={styles.itemImage}
           src={item.image}
           srcSet={item.image2x ? `${item.image} 1x, ${item.image2x} 2x` : undefined}
@@ -169,7 +169,7 @@ function GameCap({ game }: { game: { href: string; image: string; adultContent: 
   return (
     <div className={cx(styles.gameCap, game.adultContent && styles.adultContent)}>
       <a href={game.href} {...ext}>
-        <img src={game.image} alt="" />
+        <img loading="lazy" src={game.image} alt="" />
       </a>
     </div>
   );
@@ -235,7 +235,7 @@ export function GameInfo({ info }: { info: GameInfoStats }) {
             {i > 0 && " "}
             <div className={styles.gameInfoAchievement} title={icon.name}>
               <a href={icon.href} {...ext}>
-                <img src={icon.image} alt={icon.name} />
+                <img loading="lazy" src={icon.image} alt={icon.name} />
               </a>
             </div>
           </Fragment>
@@ -259,7 +259,7 @@ export function GameInfo({ info }: { info: GameInfoStats }) {
             <div className={styles.gameBadge}>
               <div className={styles.gameBadgeIcon}>
                 <a href={info.badge.href} {...ext}>
-                  <img src={info.badge.icon} alt="" />
+                  <img loading="lazy" src={info.badge.icon} alt="" />
                 </a>
               </div>
               <div className={styles.gameBadgeDescription}>
@@ -336,7 +336,7 @@ export function FavoriteGroupView({ showcase }: { showcase: FavoriteGroupShowcas
         <div className={cx(styles.group, base.slot, styles.slotNoFloat)}>
           <div className={styles.groupAvatar}>
             <a href={g.href} {...ext}>
-              <img src={g.avatar} alt="" />
+              <img loading="lazy" src={g.avatar} alt="" />
             </a>
           </div>
           <div className={styles.groupContent}>
@@ -374,8 +374,8 @@ export function WorkshopItemView({ showcase }: { showcase: WorkshopItemShowcase 
     <div>
       <div className={base.contentBg}>
         <div className={cx(styles.workshopItem, base.slot, styles.slotNoFloat)}>
-          <a href={item.href} {...ext}>
-            <img className={styles.workshopItemImage} src={item.image} alt="" />
+          <a href={item.href} {...ext} aria-hidden tabIndex={-1}>
+            <img loading="lazy" className={styles.workshopItemImage} src={item.image} alt="" />
           </a>
           <div className={styles.workshopRightCol}>
             <div>
@@ -391,13 +391,13 @@ export function WorkshopItemView({ showcase }: { showcase: WorkshopItemShowcase 
                 <div className={styles.workshopAppDetails}>
                   {item.stars && (
                     <div className={styles.workshopStars}>
-                      <img src={item.stars.image} alt="" /> {item.stars.text}
+                      <img loading="lazy" src={item.stars.image} alt="" /> {item.stars.text}
                     </div>
                   )}
                   {item.app && (
                     <div className={styles.workshopApp}>
-                      <a href={item.app.href} {...ext}>
-                        <img src={item.app.icon} alt="" />
+                      <a href={item.app.href} {...ext} aria-hidden tabIndex={-1}>
+                        <img loading="lazy" src={item.app.icon} alt="" />
                       </a>{" "}
                       <a className={styles.whiteLink} href={item.app.href} {...ext}>
                         {item.app.name}
@@ -435,7 +435,7 @@ export function OwnerBar({ owner, guides }: { owner: MyWorkshopShowcase["owner"]
     <div className={cx(styles.ownerBar, guides && styles.ownerBarGuides)}>
       <div className={cx(styles.ownerAvatar, styles[`avatar_${owner.status}`] ?? styles.avatar_offline)}>
         <a href={owner.href} {...ext}>
-          <img src={owner.avatar} alt="" />
+          <img loading="lazy" src={owner.avatar} alt="" />
         </a>
       </div>
       <a className={styles.ownerName} href={owner.workshopHref} {...ext}>
@@ -452,11 +452,11 @@ export function MyWorkshopView({ showcase }: { showcase: MyWorkshopShowcase }) {
         <div key={i} className={styles.multiItemCtn}>
           <div className={cx(base.slot, styles.multiItem)}>
             <a href={item.href} title={item.name} {...ext}>
-              <img className={styles.multiItemImage} src={item.image} alt={item.name} />
+              <img loading="lazy" className={styles.multiItemImage} src={item.image} alt={item.name} />
             </a>
             {item.appIcon && (
               <div className={styles.miniApp}>
-                <img src={item.appIcon} alt="" />
+                <img loading="lazy" src={item.appIcon} alt="" />
               </div>
             )}
           </div>
@@ -476,10 +476,10 @@ export function MyGuidesView({ showcase }: { showcase: MyGuidesShowcase }) {
           <a className={styles.guideOverlay} href={g.href} {...ext}>
             <div className={styles.guideItem}>
               <div className={styles.guideImage}>
-                <img className={styles.guideImg} src={g.image} alt="" />
+                <img loading="lazy" className={styles.guideImg} src={g.image} alt="" />
                 {g.appIcon && (
                   <div className={styles.miniApp}>
-                    <img src={g.appIcon} alt="" />
+                    <img loading="lazy" src={g.appIcon} alt="" />
                   </div>
                 )}
               </div>
@@ -504,19 +504,19 @@ export function SalienView({ showcase }: { showcase: SalienShowcase }) {
     <div>
       <div className={cx(base.contentBg, base.statsRow)}>
         <div className={cx(base.slot, styles.salien)}>
-          {showcase.cryotube.back && <img className={styles.cryotubeBack} src={showcase.cryotube.back} alt="" />}
+          {showcase.cryotube.back && <img loading="lazy" className={styles.cryotubeBack} src={showcase.cryotube.back} alt="" />}
           <div className={styles.salienCont}>
             {showcase.parts.map((p) => (
-              <img key={p.id} className={cx(styles.salienPart, styles[`salienPart_${p.id}`])} src={p.image} alt="" />
+              <img loading="lazy" key={p.id} className={cx(styles.salienPart, styles[`salienPart_${p.id}`])} src={p.image} alt="" />
             ))}
           </div>
-          {showcase.cryotube.front && <img className={styles.cryotubeFront} src={showcase.cryotube.front} alt="" />}
+          {showcase.cryotube.front && <img loading="lazy" className={styles.cryotubeFront} src={showcase.cryotube.front} alt="" />}
         </div>
         {showcase.badge && (
           <div className={styles.salienBadgeCont}>
             <a href={showcase.badge.href} {...ext}>
               <span className={styles.salienBadge} />
-              <img className={styles.salienBadgeImage} src={showcase.badge.image} alt="" />
+              <img loading="lazy" className={styles.salienBadgeImage} src={showcase.badge.image} alt="" />
             </a>
           </div>
         )}
@@ -549,7 +549,7 @@ export function AwardsView({ showcase }: { showcase: AwardsShowcase }) {
       <div className={cx(base.contentBg, styles.awardsGrid)}>
         {showcase.awards.map((a, i) => (
           <div key={i} className={cx(base.slot, styles.award)} title={a.name}>
-            <img
+            <img loading="lazy"
               className={styles.awardIcon}
               src={a.image}
               alt={a.name}

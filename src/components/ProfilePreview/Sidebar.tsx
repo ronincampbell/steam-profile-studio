@@ -44,7 +44,7 @@ export function Sidebar({ sidebar }: { sidebar: ProfileSidebar }) {
                 className={`${styles.badge} ${i === awards.icons.length - 1 ? styles.last : ""}`}
                 title={icon.tooltip}
               >
-                <img className={styles.awardIcon} src={icon.image} alt="" />
+                <img loading="lazy" className={styles.awardIcon} src={icon.image} alt="" />
               </div>
             ))}
             <div className={styles.clear} />
@@ -63,7 +63,7 @@ export function Sidebar({ sidebar }: { sidebar: ProfileSidebar }) {
                 title={icon.tooltip.join("\n")}
               >
                 <a href={icon.href} target="_blank" rel="noreferrer">
-                  <img src={icon.image} alt={icon.tooltip[0] ?? ""} />
+                  <img loading="lazy" src={icon.image} alt={icon.tooltip[0] ?? ""} />
                 </a>
               </div>
             ))}
@@ -88,8 +88,8 @@ export function Sidebar({ sidebar }: { sidebar: ProfileSidebar }) {
             {groups.list.map((g) => (
               <div key={g.href} className={`${styles.group} ${g.primary ? styles.primaryGroup : ""}`}>
                 <div className={styles.groupAvatar}>
-                  <a href={g.href} target="_blank" rel="noreferrer">
-                    <img src={g.avatar} alt="" />
+                  <a href={g.href} target="_blank" rel="noreferrer" aria-hidden tabIndex={-1}>
+                    <img loading="lazy" src={g.avatar} alt="" />
                   </a>
                 </div>
                 <a className={styles.whiteLink} href={g.href} target="_blank" rel="noreferrer">
@@ -123,7 +123,7 @@ export function HeaderFavoriteBadge({ badge }: { badge: FavoriteBadge }) {
     <div className={styles.headerBadge}>
       <a className={styles.favoriteBadge} href={badge.href} target="_blank" rel="noreferrer">
         <div className={styles.favoriteBadgeIcon} title={badge.tooltip.join("\n")}>
-          <img src={badge.image} alt="" />
+          <img loading="lazy" src={badge.image} alt="" />
         </div>
         <div className={styles.favoriteBadgeDescription}>
           <div className={styles.favoriteBadgeName}>{badge.name}</div>
@@ -160,7 +160,7 @@ function Friend({ friend }: { friend: SidebarFriend }) {
       )}
       {friend.level !== null && <FriendLevel level={friend.level} />}
       <div className={`${styles.playerAvatar} ${state}`}>
-        {friend.avatar ? <img src={friend.avatar} alt="" /> : <span className={styles.avatarBlank} />}
+        {friend.avatar ? <img loading="lazy" src={friend.avatar} alt="" /> : <span className={styles.avatarBlank} />}
       </div>
       <div className={styles.friendBlockContent}>
         {friend.name}

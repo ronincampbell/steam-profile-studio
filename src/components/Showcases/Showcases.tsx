@@ -255,7 +255,7 @@ function Artwork({ showcase }: { showcase: ArtworkShowcase | ScreenshotShowcase 
   const video = showcase.kind === "video";
   // Steam puts the play icon on the large video only.
   const playIcon = video && (
-    <img
+    <img loading="lazy"
       className={more.playVideoIcon}
       src="https://community.fastly.steamstatic.com/public/shared/images/apphubs/play_icon80.png"
       alt=""
@@ -266,10 +266,10 @@ function Artwork({ showcase }: { showcase: ArtworkShowcase | ScreenshotShowcase 
     <div className={styles.screenshotShowcase}>
       {primary && (
         <div className={`${styles.screenshotPrimary} ${single ? more.single : ""} ${styles.slot}`}>
-          <a className={styles.screenshot} href={primary.href} target="_blank" rel="noreferrer">
+          <a className={styles.screenshot} href={primary.href} target="_blank" rel="noreferrer" aria-label={showcase.title}>
             {playIcon}
             {/* Featured Artwork's image has no width="100%" on Steam: it shows at its own size. */}
-            <img
+            <img loading="lazy"
               width={single ? undefined : "100%"}
               style={{ maxWidth: primary.maxWidth ?? (long ? 506 : 480) }}
               src={primary.image}
@@ -282,7 +282,7 @@ function Artwork({ showcase }: { showcase: ArtworkShowcase | ScreenshotShowcase 
             {primary.stats?.map((st, i) => (
               <span key={i} className={more.screenshotStat} title={st.name}>
                 {st.icon ? (
-                  <img className={more.statIcon} src={st.icon} alt="" />
+                  <img loading="lazy" className={more.statIcon} src={st.icon} alt="" />
                 ) : (
                   <span className={`${more.statIcon} ${more.favoriteIcon}`} />
                 )}{" "}
@@ -296,8 +296,8 @@ function Artwork({ showcase }: { showcase: ArtworkShowcase | ScreenshotShowcase 
         <div className={styles.screenshotRightCol}>
           {small.map((s, i) => (
             <div key={i} className={`${styles.smallScreenshot} ${styles.slot}`}>
-              <a className={styles.screenshot} href={s.href} target="_blank" rel="noreferrer">
-                <img width="100%" style={{ maxWidth: s.maxWidth ?? 100 }} src={s.image} alt="" data-artwork-slot={i} />
+              <a className={styles.screenshot} href={s.href} target="_blank" rel="noreferrer" aria-label={showcase.title}>
+                <img loading="lazy" width="100%" style={{ maxWidth: s.maxWidth ?? 100 }} src={s.image} alt="" data-artwork-slot={i} />
               </a>
             </div>
           ))}
@@ -328,8 +328,8 @@ function GameCollector({ showcase }: { showcase: GameCollectorShowcase }) {
           <div className={styles.gameCollectorGames}>
             {showcase.games.map((g, i) => (
               <div key={i} className={`${styles.slot} ${styles.gameCollectorGame}`}>
-                <a href={g.href} target="_blank" rel="noreferrer">
-                  <img className={styles.gameCapsule} src={g.image} alt="" />
+                <a href={g.href} target="_blank" rel="noreferrer" aria-label="Game hub">
+                  <img loading="lazy" className={styles.gameCapsule} src={g.image} alt="" />
                 </a>
               </div>
             ))}
@@ -350,7 +350,7 @@ function BadgeCollector({ showcase }: { showcase: BadgeCollectorShowcase }) {
           {showcase.badges.map((b, i) => (
             <div key={i} className={`${styles.slot} ${styles.badge}`} title={b.tooltip.join("\n")}>
               <a href={b.href} target="_blank" rel="noreferrer">
-                <img className={styles.badgeIcon} src={b.image} alt={b.tooltip[0] ?? ""} />
+                <img loading="lazy" className={styles.badgeIcon} src={b.image} alt={b.tooltip[0] ?? ""} />
               </a>
             </div>
           ))}
@@ -370,8 +370,8 @@ function FavoriteGuide({ showcase }: { showcase: FavoriteGuideShowcase }) {
     <div className={styles.favoriteGuide}>
       <div className={styles.contentBg}>
         <div className={`${styles.workshopItem} ${styles.slot}`}>
-          <a href={g.href} target="_blank" rel="noreferrer">
-            <img className={styles.workshopItemImage} src={g.image} alt="" />
+          <a href={g.href} target="_blank" rel="noreferrer" aria-hidden tabIndex={-1}>
+            <img loading="lazy" className={styles.workshopItemImage} src={g.image} alt="" />
           </a>
           <div className={styles.guideDetails}>
             <div className={styles.detailTitle} title={g.name}>
@@ -395,13 +395,13 @@ function FavoriteGuide({ showcase }: { showcase: FavoriteGuideShowcase }) {
             <div className={styles.guideAppInfo}>
               {g.stars && (
                 <div className={styles.workshopStars}>
-                  <img src={g.stars.image} alt="" /> {g.stars.text}
+                  <img loading="lazy" src={g.stars.image} alt="" /> {g.stars.text}
                 </div>
               )}
               {g.app && (
                 <div className={styles.workshopApp}>
-                  <a href={g.app.href} target="_blank" rel="noreferrer">
-                    <img src={g.app.icon} alt="" />
+                  <a href={g.app.href} target="_blank" rel="noreferrer" aria-hidden tabIndex={-1}>
+                    <img loading="lazy" src={g.app.icon} alt="" />
                   </a>{" "}
                   <a href={g.app.href} target="_blank" rel="noreferrer">
                     {g.app.name}
@@ -429,7 +429,7 @@ function Completionist({ showcase }: { showcase: CompletionistShowcase }) {
                 className={`${styles.slot} ${styles.completionistGame} ${g.adultContent ? styles.adultContent : ""}`}
               >
                 <a href={g.href} target="_blank" rel="noreferrer">
-                  <img className={styles.completionistCapsule} src={g.image} alt="" />
+                  <img loading="lazy" className={styles.completionistCapsule} src={g.image} alt="" />
                   <div className={styles.completionistBar}>
                     <div className={styles.completionistRibbons}>
                       <span className={styles.ribbons}>
@@ -482,7 +482,7 @@ function Achievement({ showcase }: { showcase: AchievementShowcase | RareAchieve
                   </div>
                 )}
                 <a href={a.href} target="_blank" rel="noreferrer">
-                  <img src={a.image} alt={a.name ?? ""} />
+                  <img loading="lazy" src={a.image} alt={a.name ?? ""} />
                 </a>
               </div>
             ))}
@@ -504,7 +504,7 @@ function Replay({ showcase }: { showcase: ReplayShowcase }) {
       <div className={replay.background_ctn}>
         <div className={replay.background_img_ctn}>
           {showcase.background.images.map((src, i) => (
-            <img key={i} className={sizeClass} src={src} alt="" />
+            <img loading="lazy" key={i} className={sizeClass} src={src} alt="" />
           ))}
         </div>
       </div>
@@ -526,7 +526,7 @@ function Replay({ showcase }: { showcase: ReplayShowcase }) {
         <div className={replay.most_played_images_ctn}>
           {showcase.mostPlayed.map((m, i) => (
             <div key={i} className={replay.most_played_app}>
-              <img className={replay.most_played_capsule} src={m.image} alt="" />
+              <img loading="lazy" className={replay.most_played_capsule} src={m.image} alt="" />
               <div className={replay.most_played_percent}>{m.percent}</div>
             </div>
           ))}
