@@ -9,7 +9,7 @@ Try Steam Points Shop items on any public Steam profile before you spend your po
 ## What you can do
 
 - **Try on Points Shop items.** Browse by Popular, New or by game, filter by vibe (Anime, Cute, Horror, Pixel art and more), and see each one on the profile straight away. Your own games come first in "By game".
-- **Preview your own art** as the background or avatar. It stays in your browser and is never uploaded.
+- **Preview your own art** in the Artwork showcase over your background, or as your avatar. It stays in your browser and is never uploaded.
 - **Make artwork that lines up with your background.** Pick the Artwork showcase layout and download a zip with the background pieces cut to the exact slot sizes, a guide image, a layered PSD template and upload steps. Drop your finished art back in to check it before uploading to Steam.
 - **Rearrange showcases** to plan a new layout.
 - **Share a link.** The profile you're viewing is in the page address.

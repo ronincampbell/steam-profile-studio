@@ -224,6 +224,39 @@ export function useArtworkPlanner(source: BackgroundSource | undefined) {
     setRestartKey((k) => k + 1);
   }
 
+  /** Put one picture in one slot, whatever its size: Steam scales artwork to fit the slot's width. */
+  async function setSlotArt(id: ArtworkSlot["id"], file: File) {
+    const url = URL.createObjectURL(file);
+    let art: FinishedArt;
+    try {
+      const img = await loadImage(url);
+      art = { name: file.name, type: file.type, size: file.size, width: img.naturalWidth, height: img.naturalHeight, url };
+    } catch {
+      URL.revokeObjectURL(url);
+      return false;
+    }
+    setFinished((old) => {
+      const next = new Map(old);
+      const prev = next.get(id);
+      if (prev) URL.revokeObjectURL(prev.url);
+      next.set(id, art);
+      return next;
+    });
+    setRestartKey((k) => k + 1);
+    return true;
+  }
+
+  function clearSlot(id: ArtworkSlot["id"]) {
+    setFinished((old) => {
+      const prev = old.get(id);
+      if (!prev) return old;
+      URL.revokeObjectURL(prev.url);
+      const next = new Map(old);
+      next.delete(id);
+      return next;
+    });
+  }
+
   function clearFinished() {
     finished.forEach((f) => URL.revokeObjectURL(f.url));
     setFinished(new Map());
@@ -305,6 +338,8 @@ export function useArtworkPlanner(source: BackgroundSource | undefined) {
     checks,
     unmatched,
     addFinished,
+    setSlotArt,
+    clearSlot,
     clearFinished,
     restartGifs: () => setRestartKey((k) => k + 1),
     withPlanner,

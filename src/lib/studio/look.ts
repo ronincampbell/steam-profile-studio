@@ -20,9 +20,12 @@ export type Slot = "background" | "avatarFrame" | "animatedAvatar" | "theme";
  */
 export type TryOn = Partial<Record<Slot, Cosmetic | null>>;
 
-/** The user's own pictures. Object URLs, so nothing leaves the browser. */
+/**
+ * The user's own avatar, as an object URL, so nothing leaves the browser.
+ * (No custom background: Steam doesn't allow one. Their own artwork goes in
+ * the Artwork showcase instead, see src/components/Studio/YourArtPanel.tsx.)
+ */
 export interface CustomArt {
-  background?: { url: string; kind: "image" | "video"; mime?: string };
   avatar?: string;
 }
 
@@ -58,18 +61,9 @@ export function buildLook(profile: Profile, tryOn: TryOn = {}, custom: CustomArt
     avatar: custom.avatar ?? profile.avatar,
     animatedAvatar: custom.avatar || !animatedAvatar ? undefined : animatedAvatar,
     frame,
-    background: custom.background
-      ? custom.background.kind === "video"
-        ? { video: customVideo(custom.background.url, custom.background.mime) }
-        : { image: custom.background.url }
-      : background && { image: background.image, video: background.video },
+    background: background && { image: background.image, video: background.video },
     // A theme item carries its id; otherwise fall back to the profile's own
     // free theme (Steel, Midnight …) from GetProfileCustomization.
     themeId: "theme" in tryOn ? theme?.themeId : (theme?.themeId ?? profile.themeId),
   };
-}
-
-/** Object URLs have no extension, so the file's type decides the <source> slot. */
-function customVideo(url: string, mime = "") {
-  return mime.includes("webm") ? { webm: url } : { mp4: url };
 }
