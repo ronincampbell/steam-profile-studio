@@ -1,7 +1,8 @@
 /**
  * guide_full_background.png: the whole background with Steam's profile
  * column shaded and every slot outlined and labelled, so the pieces can be
- * lined up by eye in any editor.
+ * lined up by eye in any editor. The shading and the outlines are drawn
+ * separately too, as layers of the .psd template.
  */
 import { STEAM_BG_WIDTH, type ArtworkSlot } from "./layouts";
 import { displayHeight, type BackgroundFrame } from "./crop";
@@ -9,18 +10,14 @@ import { displayHeight, type BackgroundFrame } from "./crop";
 /** Steam's 976px profile column, centred: x 472–1448, from y 224 down. */
 const COLUMN = { x: 472, width: 976, top: 224 };
 
-export function drawGuide(frame: BackgroundFrame, slots: ArtworkSlot[]): HTMLCanvasElement {
+/** The guide is the background's height, or taller if a slot runs past it. */
+export function guideHeight(frame: BackgroundFrame, slots: ArtworkSlot[]): number {
   const bottom = Math.max(...slots.map((s) => s.y + s.height));
-  const height = Math.max(displayHeight(frame), bottom + 40);
-  const canvas = document.createElement("canvas");
-  canvas.width = STEAM_BG_WIDTH;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d")!;
-  ctx.fillStyle = "#000";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(frame.source, 0, 0, STEAM_BG_WIDTH, displayHeight(frame));
+  return Math.max(displayHeight(frame), bottom + 40);
+}
 
-  // The profile column, dimmed except where the art goes.
+/** The profile column, dimmed except where the art goes. */
+export function drawColumnShade(ctx: CanvasRenderingContext2D, slots: ArtworkSlot[], height: number) {
   ctx.save();
   ctx.beginPath();
   ctx.rect(COLUMN.x, COLUMN.top, COLUMN.width, height - COLUMN.top);
@@ -28,7 +25,11 @@ export function drawGuide(frame: BackgroundFrame, slots: ArtworkSlot[]): HTMLCan
   ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
   ctx.fill("nonzero");
   ctx.restore();
+}
 
+/** Dashed outlines, labels and the note above the column. */
+export function drawGuideOverlay(ctx: CanvasRenderingContext2D, slots: ArtworkSlot[]) {
+  ctx.save();
   ctx.font = "bold 14px Arial, Helvetica, sans-serif";
   ctx.textBaseline = "top";
   for (const s of slots) {
@@ -57,5 +58,19 @@ export function drawGuide(frame: BackgroundFrame, slots: ArtworkSlot[]): HTMLCan
     COLUMN.x + 8,
     COLUMN.top - 25,
   );
+  ctx.restore();
+}
+
+export function drawGuide(frame: BackgroundFrame, slots: ArtworkSlot[]): HTMLCanvasElement {
+  const height = guideHeight(frame, slots);
+  const canvas = document.createElement("canvas");
+  canvas.width = STEAM_BG_WIDTH;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d")!;
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(frame.source, 0, 0, STEAM_BG_WIDTH, displayHeight(frame));
+  drawColumnShade(ctx, slots, height);
+  drawGuideOverlay(ctx, slots);
   return canvas;
 }

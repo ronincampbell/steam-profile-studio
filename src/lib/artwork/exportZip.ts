@@ -62,6 +62,13 @@ export async function buildZip(input: ExportInput): Promise<Blob> {
   return new Blob([zipped as BlobPart], { type: "application/zip" });
 }
 
+/** Zip already-compressed files (PNGs) as they are. */
+export async function zipFiles(files: { name: string; blob: Blob }[]): Promise<Blob> {
+  const entries: Zippable = {};
+  for (const f of files) entries[f.name] = [new Uint8Array(await f.blob.arrayBuffer()), { level: 0 }];
+  return new Blob([zipSync(entries) as BlobPart], { type: "application/zip" });
+}
+
 export function download(blob: Blob, name: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");

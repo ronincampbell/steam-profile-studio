@@ -11,7 +11,8 @@ import { useState, type DragEvent } from "react";
 import { LONG, STEAM_BG_HEIGHT, overflowBelow } from "@/lib/artwork/layouts";
 import { canvasToPng } from "@/lib/artwork/crop";
 import { drawGuide } from "@/lib/artwork/guideImage";
-import { buildZip, download, zipName } from "@/lib/artwork/exportZip";
+import { buildZip, download, zipFiles, zipName } from "@/lib/artwork/exportZip";
+import { PSD_FILE_NAME, buildPsdTemplate } from "@/lib/artwork/psdTemplate";
 import { canRecordClips, recordClips } from "@/lib/artwork/clips";
 import type { BackgroundSource } from "@/lib/artwork/crop";
 import type { ArtworkPlanner } from "./useArtworkPlanner";
@@ -92,6 +93,31 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
     } finally {
       setBusy(null);
     }
+  }
+
+  async function exportPsd() {
+    if (!planner.frame) return;
+    setError(null);
+    try {
+      setBusy("Building the layered .psd…");
+      // Let the note paint before the (synchronous) encoding starts.
+      await new Promise((r) => setTimeout(r, 30));
+      const psd = buildPsdTemplate(planner.frame, slots, drawGuide(planner.frame, slots));
+      download(psd, zipName(backgroundName, state.layout).replace(/\.zip$/, `_${PSD_FILE_NAME}`));
+    } catch (e) {
+      setError((e as Error).message || "The .psd didn't work.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  const cutPieces = slots.flatMap((s) => {
+    const blob = planner.finished.get(s.id)?.blob;
+    return blob ? [{ name: s.fileName, blob }] : [];
+  });
+
+  async function downloadCutPieces() {
+    download(await zipFiles(cutPieces), zipName(backgroundName, state.layout).replace(/\.zip$/, "_finished.zip"));
   }
 
   function onDrop(e: DragEvent) {
@@ -236,6 +262,9 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
             <button className={styles.primaryButton} onClick={exportZip} disabled={!canExport}>
               {busy ? "Working…" : "Download zip"}
             </button>
+            <button className={styles.secondaryButton} onClick={exportPsd} disabled={!planner.frame || Boolean(busy)}>
+              Layered .psd
+            </button>
             <label className={styles.check}>
               <input type="checkbox" checked={state.outlines} onChange={(e) => update({ outlines: e.target.checked })} />
               Outline the slots in the preview
@@ -247,6 +276,11 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
           <span className={styles.note}>
             The zip has the pieces as PNGs at the exact size Steam shows them, a full-size guide image with the slots marked,
             the numbers as layout.json, and these instructions as README.txt. Nothing is uploaded anywhere.
+          </span>
+          <span className={styles.note}>
+            Prefer painting on the whole background? The layered .psd opens in Photoshop, Photopea, GIMP and Krita, with
+            every slot as its own group at the exact pixels. Paint, hide the Guides group, export the whole picture as a
+            PNG, and drop it in below: the app cuts it into the pieces for you.
           </span>
         </div>
       </div>
@@ -275,7 +309,8 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
                 e.target.value = "";
               }}
             />
-            Drop the edited files here, or click to choose them. Keep the 01_, 02_… names so each goes back in its slot.
+            Drop the edited files here, or click to choose them. Keep the 01_, 02_… names so each goes back in its slot. Or
+            drop one whole 1920px-wide picture (from the .psd) and it&rsquo;s cut into the pieces.
           </label>
           {(planner.checks.length > 0 || planner.unmatched.length > 0) && (
             <ul className={styles.checks}>
@@ -302,6 +337,11 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
           )}
           {planner.finished.size > 0 && (
             <div className={styles.row}>
+              {cutPieces.length > 0 && (
+                <button className={styles.primaryButton} onClick={downloadCutPieces}>
+                  Download the cut pieces
+                </button>
+              )}
               <button className={styles.linkButton} onClick={planner.restartGifs}>
                 Restart GIFs together
               </button>
