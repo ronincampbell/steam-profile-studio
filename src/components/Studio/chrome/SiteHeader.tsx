@@ -6,7 +6,8 @@
  */
 import Link from "next/link";
 import { useState, type FormEvent, type ReactNode } from "react";
-import { Icon, LogoMark } from "./Icons";
+import { BrandIcon, Icon, LogoMark } from "./Icons";
+import { KOFI_URL, REPO_URL } from "./links";
 import styles from "./Chrome.module.css";
 
 export interface ProfileFormProps {
@@ -36,7 +37,29 @@ export function SiteHeader({ form, subject, tools }: Props) {
           </span>
         </Link>
         <ProfileForm {...form} />
-        <CopyLink />
+        <div className={styles.headerLinks}>
+          <CopyLink />
+          <a
+            className={styles.iconLink}
+            href={REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="GitHub"
+            aria-label="GitHub"
+          >
+            <BrandIcon name="github" size={18} />
+          </a>
+          <a
+            className={styles.kofi}
+            href={KOFI_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Support me on Ko-fi"
+          >
+            <BrandIcon name="kofi" size={17} />
+            <span className={styles.kofiLabel}>Ko-fi</span>
+          </a>
+        </div>
         <span className={styles.rowRule} aria-hidden />
         <div className={styles.subject}>{subject}</div>
         <div className={styles.toolCell}>{tools}</div>
