@@ -84,9 +84,9 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
       }
       let clips: Map<string, Blob> | undefined;
       if (animated && withClips && clipsPossible && source) {
-        setBusy("Recording one loop of the background for the source clips… 0%");
+        setBusy("Recording the video clips… 0%");
         clips = await recordClips(source.url, slots, (f) =>
-          setBusy(`Recording one loop of the background for the source clips… ${Math.round(f * 100)}%`),
+          setBusy(`Recording the video clips… ${Math.round(f * 100)}%`),
         );
       }
       setBusy("Zipping…");
@@ -150,7 +150,7 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
         </h2>
         <span className={styles.note}>for &ldquo;{backgroundName}&rdquo;</span>
         <button className={styles.linkButton} onClick={() => update({ enabled: false })}>
-          {inPanel ? "Take it off the preview" : "Close"}
+          {inPanel ? "Turn off" : "Close"}
         </button>
       </div>
 
