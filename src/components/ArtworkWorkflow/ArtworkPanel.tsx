@@ -55,8 +55,8 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
         </div>
         <p className={styles.note}>
           {source
-            ? `Cut "${backgroundName}" into the pieces that sit behind each image of an Artwork showcase. Paint over them in any editor, upload them, and they line up with the background on your profile.`
-            : "Pick a background first (from your profile, the Points Shop or your own file), then cut it into artwork pieces here."}
+            ? `Cut "${backgroundName}" into Artwork showcase pieces that line up with it.`
+            : "Pick a background first."}
         </p>
       </section>
     );
@@ -166,13 +166,13 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
               checked={state.layout === "normal"}
               onSelect={() => update({ layout: "normal" })}
               title="Big image + 3 tiles"
-              detail="480×480 and three 100×80. Works with a normal upload."
+              detail="480×480 and three 100×80."
             />
             <Choice
               checked={state.layout === "long"}
               onSelect={() => update({ layout: "long" })}
               title="Long"
-              detail="506 wide + a 100px strip, as tall as you like. Needs a console trick when uploading."
+              detail="506 wide + a 100px strip, any height. Needs a console trick to upload."
             />
           </div>
           {state.layout === "long" && (
@@ -187,7 +187,7 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
               />
               <span className={styles.value}>{planner.longHeight}px</span>
               <button className={styles.linkButton} onClick={() => update({ longHeight: planner.maxHeight })}>
-                To the bottom of the background
+                Full height
               </button>
             </label>
           )}
@@ -198,25 +198,25 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
       <div className={styles.step}>
         <span className={styles.stepNumber}>2</span>
         <div className={styles.stepBody}>
-          <span className={styles.stepTitle}>Position on your profile</span>
+          <span className={styles.stepTitle}>Position</span>
           <select
             className={styles.select}
             value={Math.min(state.position, otherShowcases.length)}
             onChange={(e) => update({ position: Number(e.target.value) })}
             aria-label="Position on your profile"
           >
-            <option value={0}>First showcase (recommended)</option>
+            <option value={0}>First showcase</option>
             {otherShowcases.map((title, i) => (
               <option key={i} value={i + 1}>
                 {`After ${title || "showcase " + (i + 1)}`}
               </option>
             ))}
           </select>
-          <span className={styles.note}>
-            {showcaseFirst
-              ? "On top, the pieces line up every time."
-              : "Showcases above it decide how far down it sits, and the pieces follow it here. If one of them changes height on Steam (a longer title, a new stat), the art will slip. Re-export if that happens."}
-          </span>
+          {!showcaseFirst && (
+            <span className={styles.note}>
+              If a showcase above it changes height on Steam, the art slips. First is safest.
+            </span>
+          )}
         </div>
       </div>
 
@@ -225,7 +225,7 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
         <div className={styles.step}>
           <span className={styles.stepNumber}>3</span>
           <div className={styles.stepBody}>
-            <span className={styles.stepTitle}>Animated background: pick a frame</span>
+            <span className={styles.stepTitle}>Still frame</span>
             <label className={styles.slider}>
               <span>Frame</span>
               <input
@@ -239,21 +239,20 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
               />
               <span className={styles.value}>{state.frameTime.toFixed(2)}s</span>
             </label>
-            <span className={styles.note}>
-              Steam artwork can&rsquo;t be a video. The pieces in the preview are a still from this moment, for painting
-              over. The preview&rsquo;s background keeps moving behind them, which is how a still looks on Steam too.
-            </span>
             <label className={styles.check}>
               <input type="checkbox" checked={withGifs} onChange={(e) => setWithGifs(e.target.checked)} />
-              Also make each piece an animated GIF of one loop, ready to upload (kept under Steam&rsquo;s size limit)
+              Animated GIFs of one loop, under the upload limit
             </label>
             {clipsPossible ? (
               <label className={styles.check}>
                 <input type="checkbox" checked={withClips} onChange={(e) => setWithClips(e.target.checked)} />
-                Also include full-quality video clips (WebM), to make your own GIFs in an editor
+                Full-quality WebM clips, to make your own GIFs
               </label>
-            ) : (
-              <span className={styles.note}>This browser can&rsquo;t record video clips, so only stills are included.</span>
+            ) : null}
+            {withGifs && (
+              <span className={styles.note}>
+                GIFs loop on their own on Steam, so they won&rsquo;t stay exactly in step with the background.
+              </span>
             )}
           </div>
         </div>
@@ -263,7 +262,7 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
       <div className={styles.step}>
         <span className={styles.stepNumber}>{animated ? 4 : 3}</span>
         <div className={styles.stepBody}>
-          <span className={styles.stepTitle}>Download the pieces</span>
+          <span className={styles.stepTitle}>Download</span>
           <ul className={styles.sizes}>
             {slots.map((s) => (
               <li key={s.id}>
@@ -273,8 +272,7 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
           </ul>
           {overflow > 0 && (
             <p className={styles.warning}>
-              The bottom {overflow}px of the art runs past the end of the background, where Steam&rsquo;s page is black. The
-              pieces are black there too.
+              The bottom {overflow}px runs past the background, so it&rsquo;s black.
             </p>
           )}
           <div className={styles.row}>
@@ -286,7 +284,7 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
             </button>
             <label className={styles.check}>
               <input type="checkbox" checked={state.outlines} onChange={(e) => update({ outlines: e.target.checked })} />
-              Outline the slots in the preview
+              Outline slots
             </label>
           </div>
           {busy && <span className={styles.note}>{busy}</span>}
@@ -301,21 +299,6 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
               ))}
             </ul>
           )}
-          {animated && withGifs && (
-            <span className={styles.note}>
-              Making the GIFs reads every frame of one loop, then shrinks each GIF until it fits: fewer frames per second
-              first, then fewer colours. It takes a few seconds per piece.
-            </span>
-          )}
-          <span className={styles.note}>
-            The zip has the pieces as PNGs{animated && withGifs ? " and animated GIFs" : ""} at the exact size Steam shows them, a full-size guide image with the slots marked,
-            the numbers as layout.json, and these instructions as README.txt. Nothing is uploaded anywhere.
-          </span>
-          <span className={styles.note}>
-            Prefer painting on the whole background? The layered .psd opens in Photoshop, Photopea, GIMP and Krita, with
-            every slot as its own group at the exact pixels. Paint, hide the Guides group, export the whole picture as a
-            PNG, and drop it in below: the app cuts it into the pieces for you.
-          </span>
         </div>
       </div>
 
@@ -323,7 +306,7 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
       <div className={styles.step}>
         <span className={styles.stepNumber}>{animated ? 5 : 4}</span>
         <div className={styles.stepBody}>
-          <span className={styles.stepTitle}>Drop your finished art back in to check it</span>
+          <span className={styles.stepTitle}>Check your finished art</span>
           <label
             className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ""}`}
             onDragOver={(e) => {
@@ -343,8 +326,7 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
                 e.target.value = "";
               }}
             />
-            Drop the edited files here, or click to choose them. Keep the 01_, 02_… names so each goes back in its slot. Or
-            drop one whole 1920px-wide picture (from the .psd) and it&rsquo;s cut into the pieces.
+            Drop the pieces (keep the 01_, 02_… names), or the whole 1920px picture from the .psd.
           </label>
           {(planner.checks.length > 0 || planner.unmatched.length > 0) && (
             <ul className={styles.checks}>
@@ -384,11 +366,6 @@ export function ArtworkPanel({ planner, source, backgroundName, otherShowcases, 
               </button>
             </div>
           )}
-          <span className={styles.note}>
-            Each GIF on Steam starts when it loads and loops on its own clock, separately from an animated background, so
-            moving parts will drift out of step. Motion that doesn&rsquo;t need to match exactly (glitches, sparkles,
-            overlays) works best.
-          </span>
         </div>
       </div>
 

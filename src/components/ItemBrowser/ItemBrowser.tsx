@@ -125,7 +125,7 @@ function ItemCard({ item, selected, onApply }: { item: ShopItem; selected: boole
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
         aria-pressed={selected}
-        title={`Try on ${item.name}`}
+        title={item.name}
       >
         <span className={styles.thumb}>
           {item.thumbnail && (
@@ -155,7 +155,6 @@ function ItemCard({ item, selected, onApply }: { item: ShopItem; selected: boole
           href={item.buyUrl}
           target="_blank"
           rel="noopener noreferrer"
-          title="Opens this item's game page in the Points Shop. Click the item there to buy it."
         >
           Buy in Points Shop
         </a>

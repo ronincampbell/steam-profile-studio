@@ -61,7 +61,7 @@ export function CustomArtPicker({ custom, onChange }: Props) {
         </button>
       )}
       <span className={styles.customNote}>
-        Stays on your device. Steam shows backgrounds at 1920px wide and avatars at 184×184.
+        Backgrounds 1920px wide, avatars 184×184.
       </span>
     </div>
   );
