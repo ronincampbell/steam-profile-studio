@@ -63,6 +63,8 @@ export interface RawPlayerSummary {
   personastate?: number;
   /** Set while the player is in a game. */
   gameid?: string;
+  /** The game's name; can be set without `gameid` for a non-Steam game. */
+  gameextrainfo?: string;
 }
 
 /* ---------- Catalogue ---------- */
@@ -174,7 +176,7 @@ export function normalizeProfile(
     avatar: summary.avatarfull,
     countryCode: summary.loccountrycode || undefined,
     level,
-    status: summary.gameid ? "in-game" : summary.personastate ? "online" : "offline",
+    status: summary.gameid || summary.gameextrainfo ? "in-game" : summary.personastate ? "online" : "offline",
     // 3 = public; 1 = private or friends-only, as far as the Web API says.
     isPublic: summary.communityvisibilitystate === 3,
     themeId: themeId || undefined,

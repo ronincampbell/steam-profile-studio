@@ -23,7 +23,14 @@ export function Sidebar({ sidebar }: { sidebar: ProfileSidebar }) {
       {status && (
         <div className={`${styles.inGameBox} ${STATE_CLASS[status.state]}`}>
           <div className={styles.inGameHeader}>{status.header}</div>
-          {status.detail && <div className={styles.inGameName}>{status.detail}</div>}
+          {status.detail !== undefined && <div className={styles.inGameName}>{status.detail}</div>}
+          {status.joinGame && (
+            <div>
+              <a className={styles.joinGame} href={status.joinGame}>
+                <span>Join Game</span>
+              </a>
+            </div>
+          )}
         </div>
       )}
 
