@@ -26,7 +26,12 @@ interface Loaded {
   busy: { retryAt: number | null } | null;
 }
 
-export function useShowcases(steamId: string | null): ShowcasesState {
+/**
+ * `isPublic` comes from the Web API summary. A private profile's page has no
+ * showcases to scrape, so it isn't fetched: that saves a request against
+ * steamcommunity.com's tight rate limit and avoids a misleading "Steam is busy".
+ */
+export function useShowcases(steamId: string | null, isPublic = true): ShowcasesState {
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   // `auto` counts automatic retries; `total` changes on every retry, so the
   // effect below runs again even when a manual retry resets `auto` to 0.
@@ -36,7 +41,7 @@ export function useShowcases(steamId: string | null): ShowcasesState {
   const total = attempt.steamId === steamId ? attempt.total : 0;
 
   useEffect(() => {
-    if (!steamId) return;
+    if (!steamId || !isPublic) return;
     const controller = new AbortController();
     let timer: ReturnType<typeof setTimeout> | undefined;
     const unavailable: ProfileShowcases = { steamId, visibility: "unavailable", showcases: [] };
@@ -65,7 +70,11 @@ export function useShowcases(steamId: string | null): ShowcasesState {
       controller.abort();
       clearTimeout(timer);
     };
-  }, [steamId, auto, total]);
+  }, [steamId, isPublic, auto, total]);
+
+  if (steamId && !isPublic) {
+    return { showcases: { steamId, visibility: "private", showcases: [] }, busy: null, retry: () => {} };
+  }
 
   const current = steamId && loaded?.steamId === steamId ? loaded : null;
   return {
