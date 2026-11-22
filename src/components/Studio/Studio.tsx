@@ -170,7 +170,17 @@ export function Studio() {
           </p>
         );
       default:
-        return <ItemBrowser inPanel type={id} onTypeChange={() => {}} current={current} onApply={apply} />;
+        return (
+          <ItemBrowser
+            inPanel
+            type={id}
+            onTypeChange={() => {}}
+            current={current}
+            onApply={apply}
+            owner={steamId ?? undefined}
+            avatar={profile.avatar}
+          />
+        );
     }
   }
 

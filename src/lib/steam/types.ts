@@ -64,6 +64,72 @@ export interface ShopItem extends Cosmetic {
    * animated avatar, listed here by defid. Fetch them from /api/bundle.
    */
   bundleDefids?: number[];
+  /** The game (or Steam event) the item comes from, when the store knows it. */
+  game?: string;
+}
+
+/* ---------- Browsing ---------- */
+
+export type SortMode = "popular" | "new";
+export const SORT_MODES: readonly SortMode[] = ["popular", "new"];
+
+/** Backgrounds only: Steam sorts these into animated and still. */
+export type Motion = "animated" | "still";
+
+/**
+ * Quick filters built from the item's game's Steam store tags (only a game's
+ * strongest tags count). `events` is Steam's own sale and festival items.
+ */
+export const VIBES = {
+  anime: { label: "Anime", tags: ["Anime"] },
+  cute: { label: "Cute", tags: ["Cute"] },
+  horror: { label: "Horror", tags: ["Horror", "Psychological Horror", "Survival Horror"] },
+  pixel: { label: "Pixel art", tags: ["Pixel Graphics"] },
+  scifi: { label: "Sci-fi", tags: ["Sci-fi", "Space", "Cyberpunk"] },
+  fantasy: { label: "Fantasy", tags: ["Fantasy", "Dark Fantasy"] },
+  cozy: { label: "Cozy", tags: ["Relaxing", "Cozy", "Wholesome"] },
+  retro: { label: "Retro", tags: ["Retro"] },
+  events: { label: "Steam events", tags: [] },
+} as const satisfies Record<string, { label: string; tags: readonly string[] }>;
+
+export type Vibe = keyof typeof VIBES;
+
+export function isVibe(value: unknown): value is Vibe {
+  return typeof value === "string" && Object.hasOwn(VIBES, value);
+}
+
+/** What the store says about an item's game. */
+export interface GameInfo {
+  appid: number;
+  name: string;
+  /** 231×87 store capsule; Steam events have none. */
+  capsule?: string;
+  /** Store tags, strongest first. */
+  tags: string[];
+  /** A Steam sale or festival rather than a game. */
+  event: boolean;
+}
+
+/** One game's row in the "By game" view. */
+export interface GameGroup {
+  appid: number;
+  name: string;
+  capsule?: string;
+  /** How many of its items match. */
+  count: number;
+  /** Its most popular matching items, for the preview strip. */
+  items: ShopItem[];
+  /** In the loaded profile's library. */
+  mine: boolean;
+}
+
+export interface GamesPage {
+  type: ItemType;
+  groups: GameGroup[];
+  /** Matching games in total, and how many of those the profile owns. */
+  total: number;
+  mineTotal: number;
+  nextCursor?: string;
 }
 
 export interface CataloguePage {

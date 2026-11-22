@@ -18,6 +18,7 @@ export interface RawRewardItem {
   defid: number;
   community_item_class: number;
   point_cost?: string;
+  timestamp_created?: number;
   /** Profile bundles (class 8): the background, mini background, frame and avatar inside. */
   bundle_defids?: number[];
   community_item_data?: {
