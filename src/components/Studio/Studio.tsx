@@ -53,7 +53,7 @@ export function Studio() {
   const profile = state.status === "ready" ? state.profile : PLACEHOLDER_PROFILE;
   const look = useMemo(() => buildLook(profile, tryOn, custom), [profile, tryOn, custom]);
   const steamId = state.status === "ready" ? state.profile.steamId : null;
-  const showcasesState = useShowcases(steamId);
+  const showcasesState = useShowcases(steamId, state.status === "ready" ? state.profile.isPublic : true);
   const showcases = showcasesState.showcases;
 
   // Showcase edits live only in this tab. They belong to one profile: loading

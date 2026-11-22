@@ -43,7 +43,7 @@ export function RecentActivityBox({ activity }: { activity: RecentActivity }) {
                 <div className={styles.gameInfo}>
                   <div className={styles.gameInfoCap}>
                     <a href={game.href} {...ext}>
-                      <img src={game.capsule} alt="" />
+                      <img loading="lazy" src={game.capsule} alt={game.name} />
                     </a>
                   </div>
                   <div className={styles.gameInfoDetails}>
@@ -158,12 +158,12 @@ function Comment({ comment }: { comment: ProfileComment }) {
               <div className={styles.avatarFrame}>
                 <picture>
                   <source media="(prefers-reduced-motion: reduce)" srcSet={author.frame.image} />
-                  <img src={author.frame.animatedImage ?? author.frame.image} alt="" />
+                  <img loading="lazy" src={author.frame.animatedImage ?? author.frame.image} alt="" />
                 </picture>
               </div>
             )}
-            <a href={author.href} {...ext}>
-              <img
+            <a href={author.href} {...ext} aria-hidden tabIndex={-1}>
+              <img loading="lazy"
                 src={author.avatar}
                 srcSet={author.avatar2x ? `${author.avatar} 1x, ${author.avatar2x} 2x` : undefined}
                 alt=""
