@@ -29,67 +29,35 @@ export interface GuideStep {
   unconfirmed?: boolean;
 }
 
-/** Upload order: tiles last to first, then the big image last of all. */
-export function uploadOrder(slots: ArtworkSlot[]): ArtworkSlot[] {
-  const main = slots.filter((s) => s.id === "main");
-  const rest = slots.filter((s) => s.id !== "main").reverse();
-  return [...rest, ...main];
-}
-
 /**
  * @param animated the upload is the animated GIFs (an animated background),
  *   not the PNG pieces
  */
 export function guideSteps(layout: ArtworkLayout, slots: ArtworkSlot[], showcaseFirst: boolean, animated = false): GuideStep[] {
-  const order = uploadOrder(slots);
-  const fileOf = (s: ArtworkSlot) => (animated ? s.fileName.replace(/\.png$/, ".gif") : s.fileName);
   const mb = MAX_UPLOAD_BYTES / 1024 / 1024;
   const steps: GuideStep[] = [
     {
       id: "open",
-      title: "Open Steam's artwork upload page in a web browser",
+      title: "Open Steam's artwork upload page",
       body: [
-        `Sign in to steamcommunity.com, then go to your profile → Artwork → Upload, or straight to ${ARTWORK_UPLOAD_URL}`,
-        layout === "long"
-          ? "Use a desktop browser (Chrome, Firefox, Edge), not the Steam app: the long layout needs the browser's developer console."
-          : "A desktop browser is easiest. The Steam app's built-in browser works too.",
+        ARTWORK_UPLOAD_URL,
+        ...(layout === "long" ? ["Use a desktop browser, not the Steam app: you'll need its console."] : []),
       ],
     },
     {
       id: "files",
-      title: `Upload the ${slots.length} files one at a time, in this order`,
+      title: `Upload the ${slots.length} ${animated ? ".gif" : ".png"} files as they are, set to Public`,
       body: [
-        ...order.map((s, i) => `${i + 1}. ${fileOf(s)} (${s.label.toLowerCase()})`),
-        `The order doesn't decide which slot a picture lands in (you pick that in step ${layout === "long" ? 5 : 4}). It just puts the big image at the top of Steam's picker, where it's easy to find.`,
-        `Upload each file exactly as exported. Any other size gets black bars and is re-saved as a blurry JPEG. Keep each file under ${mb} MB, as PNG, JPG or GIF.`,
-        ...(animated
-          ? [
-              `For an animated background, upload the .gif files, not the .png stills. The GIFs are already sized to fit under ${mb} MB. If you edit one and it grows past that, save it with fewer frames or colours.`,
-              "Steam keeps GIFs animated but re-saves their colours, so a GIF can look a touch grainier on Steam than in your editor.",
-            ]
-          : []),
+        `Don't resize them: any other size gets black bars. Each must be under ${mb} MB.`,
+        "Only the big image's title shows on your profile. Call it _ to hide it.",
       ],
-      unconfirmed: true,
-    },
-    {
-      id: "title",
-      title: "Give each upload a title, set it to Public, and tick the agreement",
-      body: [
-        "Only the big image's title shows on your profile, as a line of text under it. A single underscore ( _ ) keeps it nearly invisible. Tile titles never show, so name them anything you'll recognise, like \"tile 1\".",
-        "Set visibility to Public. Friends-only or hidden artwork probably won't show to visitors.",
-      ],
-      unconfirmed: true,
     },
   ];
   if (layout === "long") {
     steps.push({
       id: "long",
-      title: "Long layout only: paste this into the browser console before you save each file",
-      body: [
-        "Press F12 (or Ctrl+Shift+J), click the Console tab, paste the line below and press Enter. Then click Save.",
-        "It changes two hidden form fields that tell Steam the image's size, so Steam treats it as a wide image and shows it at full height. Without it, the long images show as small letterboxed squares.",
-        "This is an unofficial community trick. Steam can stop it working at any time. This app never runs it for you.",
-      ],
+      title: "Before saving each file, paste this into the console (F12)",
+      body: ["Without it the long images show as small squares. Unofficial, so Steam could stop it working."],
       code: LONG_ARTWORK_SNIPPET,
       unconfirmed: true,
     });
@@ -99,32 +67,17 @@ export function guideSteps(layout: ArtworkLayout, slots: ArtworkSlot[], showcase
       id: "showcase",
       title: "Edit Profile → Featured Showcase → Artwork Showcase",
       body: [
-        "Click the big slot and pick your big image.",
         layout === "long"
-          ? "Click the slot on the right and pick the side strip."
-          : "Click the small slots from top to bottom and pick tiles 1, 2 and 3 in that order.",
+          ? "Pick the big image, then the side strip."
+          : "Pick the big image, then tiles 1, 2 and 3 from top to bottom.",
       ],
     },
     {
       id: "position",
-      title: showcaseFirst ? "Move the Artwork showcase to the top, then save" : "Put the Artwork showcase where you placed it here, then save",
+      title: showcaseFirst ? "Move the showcase to the top and save" : "Put the showcase where you placed it here and save",
       body: [
-        showcaseFirst
-          ? "Anything above it pushes it down, and the art slides off the background. On top, it lines up every time."
-          : "Showcases above it decide how far down it sits. If any of them change height, re-export from here.",
-      ],
-    },
-    {
-      id: "check",
-      title: "Check it as a visitor",
-      body: [
-        "Open your profile in a private window, 910 to 1920 pixels wide. Wider windows stretch the background, so nothing lines up there, on anyone's profile.",
-        "Black bars mean a file isn't the exact size. Everything shifted down means something above the showcase got taller.",
-        ...(animated
-          ? [
-              "Each GIF starts when it loads and loops on its own, so it won't stay exactly in step with the moving background. Each GIF's loop is as long as the background's, so the gap stays the same instead of growing. Reloading the page lines them up differently each time.",
-            ]
-          : []),
+        ...(showcaseFirst ? [] : ["If a showcase above it changes height, re-export."]),
+        "It only lines up in windows 910 to 1920 pixels wide.",
       ],
     },
   );
@@ -151,42 +104,17 @@ export function guideText(
     "  guide_full_background.png  the whole background with each slot outlined",
     "  layout.json  the same numbers, for scripts",
     "",
-    "Paint over the pieces in any editor, keep each one exactly the same size,",
-    "and save as PNG (or GIF for animation). Keep the file names, or at least",
-    "the 01_, 02_ ... prefixes, so the app can put them back in the right slots.",
-    ...(animated
-      ? [
-          "",
-          "The .gif files are one loop of the animated background, cut to each slot",
-          "and ready to upload as they are. Or open them in your editor, add your art",
-          `on top, and keep each under ${MAX_UPLOAD_BYTES / 1024 / 1024} MB when you save.`,
-        ]
-      : []),
+    "Paint over the pieces, keep each the same size and keep the 01_, 02_ ...",
+    "names so the app can put them back in their slots.",
+    ...(animated ? ["The .gif files are ready to upload as they are."] : []),
     "",
-    "LAYERED .PSD (Photoshop, Photopea, GIMP, Krita)",
-    "  The app's \"Layered .psd\" button gives the whole background with each",
-    "  slot as its own group at the exact pixels, an empty \"Your art\" layer in",
-    "  each, a \"Paint here\" layer across the whole background, and the outlines",
-    "  in a Guides group. Paint, then hide the Guides group and get the pieces out",
-    "  one of these ways:",
-    "  - Any editor: export the whole picture as one PNG (1920 wide, don't crop",
-    "    or resize it) and drop it into the app. It cuts the pieces and gives you",
-    "    a zip to upload. Easiest, and the same in every program.",
-    "  - Photoshop: right-click a slot group > Export As, PNG. The group's",
-    "    background piece is exactly the slot, so it exports at the right size",
-    "    as long as your art stays inside it.",
-    "  - GIMP: Rectangle Select, type the slot's x, y, width and height from",
-    "    the list above into Tool Options, Image > Crop to Selection, then",
-    "    File > Export As. Undo and repeat for each slot.",
-    "  - Krita: Rectangular Selection with the numbers above in Tool Options,",
-    "    Image > Crop to Selection, File > Export. Undo and repeat.",
-    "  Animated art (GIF) has to be made per piece: the whole-picture route",
-    "  gives still images.",
+    "Using the layered .psd instead: paint, hide the Guides group, export the",
+    "whole picture as one 1920px-wide PNG and drop it into the app.",
     "",
     "HOW TO PUT THEM ON STEAM",
   ];
   guideSteps(layout, slots, showcaseFirst, animated).forEach((step, i) => {
-    lines.push("", `${i + 1}. ${step.title}${step.unconfirmed ? " (not yet tested by us)" : ""}`);
+    lines.push("", `${i + 1}. ${step.title}${step.unconfirmed ? " (not yet tested)" : ""}`);
     for (const p of step.body) lines.push(`   ${p}`);
     if (step.code) lines.push("", `   ${step.code}`);
   });

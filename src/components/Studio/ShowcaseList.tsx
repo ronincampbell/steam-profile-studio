@@ -16,12 +16,6 @@ const SOURCE_LABEL: Record<ShowcaseSource, string> = {
   placeholder: "placeholder",
 };
 
-const SOURCE_HINT: Record<ShowcaseSource, string> = {
-  profile: "Drawn from this profile's real showcase.",
-  sample: "Steam's real layout, with sample content: this profile doesn't have this showcase.",
-  placeholder: "Steam's layout for this showcase hasn't been captured yet, so it's a marked box.",
-};
-
 interface Props {
   list: EditorShowcase[];
   /** The profile's own showcases, to say which types it has. */
@@ -40,16 +34,13 @@ export function ShowcaseList({ list, profileShowcases, edited, onMove, onRemove,
 
   return (
     <section className={styles.showcasePanel} aria-label="Showcases">
-      <div className={styles.showcasePanelHead}>
-        <span className={styles.customNote}>
-          Drag to reorder, here or on the preview. Changes stay in this browser tab only.
-        </span>
-        {edited && (
+      {edited && (
+        <div className={styles.showcasePanelHead}>
           <button type="button" className={styles.linkButton} onClick={onReset}>
             Reset to profile
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {list.length > 0 && (
         <ol className={styles.slots}>
@@ -73,7 +64,7 @@ export function ShowcaseList({ list, profileShowcases, edited, onMove, onRemove,
                 <span className={styles.slotName} title={item.showcase.title}>
                   {item.showcase.title}
                 </span>
-                <span className={styles.slotSource} title={SOURCE_HINT[item.source]}>
+                <span className={styles.slotSource}>
                   {SOURCE_LABEL[item.source]}
                 </span>
                 <span className={styles.slotActions}>
@@ -125,7 +116,7 @@ export function ShowcaseList({ list, profileShowcases, edited, onMove, onRemove,
               </option>
             ))}
           </optgroup>
-          <optgroup label="Placeholder (Steam's layout not captured yet)">
+          <optgroup label="Placeholder">
             {SHOWCASE_TYPES.filter((t) => !t.kind).map((t) => (
               <option key={t.type} value={t.type}>
                 {t.label}
@@ -137,7 +128,6 @@ export function ShowcaseList({ list, profileShowcases, edited, onMove, onRemove,
         <button type="submit" className={styles.fileButton} disabled={!pick}>
           Add
         </button>
-        <span className={styles.customNote}>New showcases go at the top.</span>
       </form>
     </section>
   );

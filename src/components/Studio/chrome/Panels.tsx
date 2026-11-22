@@ -1,6 +1,6 @@
 "use client";
 /**
- * Pieces every layout shares: the panel frame (title, hint, close) and a
+ * Pieces every layout shares: the panel frame (title, close) and a
  * stack that keeps panels you've opened alive while hidden, so a search you
  * typed or items you scrolled to are still there when you come back.
  */
@@ -52,7 +52,6 @@ export function PanelHead({ id, onClose, extra }: { id: PanelId; onClose: () => 
       </span>
       <div className={styles.panelTitles}>
         <h2 className={styles.panelTitle}>{entry.label}</h2>
-        <p className={styles.panelHint}>{entry.hint}</p>
       </div>
       {extra}
       <button type="button" className={styles.iconButton} onClick={onClose} aria-label="Close panel">

@@ -452,7 +452,7 @@ function ItemCard({
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
         aria-pressed={selected}
-        title={`Try on ${item.name}`}
+        title={item.name}
       >
         <Thumb item={item} avatar={avatar} hover={hover} />
         <span className={styles.name}>{item.name}</span>
@@ -471,7 +471,6 @@ function ItemCard({
           href={item.buyUrl}
           target="_blank"
           rel="noopener noreferrer"
-          title="Opens this item's game page in the Points Shop. Click the item there to buy it."
         >
           Buy in Points Shop
         </a>

@@ -166,7 +166,7 @@ export function Studio() {
           <p className={chrome.empty}>
             {state.status === "ready"
               ? "Fetching this profile's showcases from Steam…"
-              : "Load a public profile to rearrange its showcases."}
+              : "Load a public profile first."}
           </p>
         );
       default:
@@ -230,9 +230,6 @@ function StatusLine({ state }: { state: ProfileState }) {
   if (state.status === "error") return <p className={styles.error}>{state.message}</p>;
   if (state.status === "ready" && !state.profile.isPublic) {
     return <p className={styles.note}>This profile is private, so Steam only shares its name and avatar.</p>;
-  }
-  if (state.status === "idle") {
-    return <p className={styles.note}>Showing a blank profile. Load yours to see it with its current items.</p>;
   }
   return null;
 }
