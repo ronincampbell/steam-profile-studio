@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { artworkSlots } from "./layouts";
 import { checkFile, matchFiles } from "./reimport";
-import { guideSteps, guideText } from "./uploadGuide";
+import { LONG_ARTWORK_SNIPPET, guideSteps, guideText } from "./uploadGuide";
 
 const normal = artworkSlots("normal");
 const file = (name: string, width: number, height: number, extra: Partial<{ size: number; type: string }> = {}) => ({
@@ -66,7 +66,7 @@ describe("upload guide", () => {
   it("only shows the console snippet for the long layout", () => {
     expect(guideSteps("normal", normal, true).some((s) => s.code)).toBe(false);
     const long = guideSteps("long", artworkSlots("long"), true).find((s) => s.code);
-    expect(long?.unconfirmed).toBe(true);
+    expect(long?.code).toBe(LONG_ARTWORK_SNIPPET);
   });
 
   it("writes the same steps into the README", () => {
@@ -74,5 +74,6 @@ describe("upload guide", () => {
     expect(text).toContain('"Glitch Sansui-zu"');
     expect(text).toContain("01_main_480x480.png");
     expect(text).toContain("Edit Profile → Featured Showcase → Artwork Showcase");
+    expect(text).not.toContain("not yet tested");
   });
 });

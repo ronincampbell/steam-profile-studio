@@ -1,7 +1,7 @@
 "use client";
 /**
- * Step-by-step instructions for putting the pieces on Steam, with a tick box
- * per step. The same steps go into README.txt in the download.
+ * Step-by-step instructions for putting the pieces on Steam, as plain
+ * numbered steps. The same steps go into README.txt in the download.
  */
 import { useState } from "react";
 import type { ArtworkLayout, ArtworkSlot } from "@/lib/artwork/layouts";
@@ -21,31 +21,13 @@ export function UploadGuide({
   animated?: boolean;
 }) {
   const steps = guideSteps(layout, slots, showcaseFirst, animated);
-  const [done, setDone] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState(false);
-
-  function toggle(id: string) {
-    setDone((old) => {
-      const next = new Set(old);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
 
   return (
     <ol className={styles.guide}>
       {steps.map((step) => (
-        <li key={step.id} className={done.has(step.id) ? styles.guideDone : undefined}>
-          <label className={styles.guideHead}>
-            <input type="checkbox" checked={done.has(step.id)} onChange={() => toggle(step.id)} />
-            <span>{step.title}</span>
-            {step.unconfirmed && (
-              <span className={styles.tag} title="Community trick, not tested with a real upload">
-                not yet tested
-              </span>
-            )}
-          </label>
+        <li key={step.id}>
+          <span className={styles.guideHead}>{step.title}</span>
           {step.body.map((p) => (
             <p key={p} className={styles.guideText}>
               {linkify(p)}

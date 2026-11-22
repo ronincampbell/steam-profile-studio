@@ -3,8 +3,8 @@
  * steps drive the in-app panel and README.txt in the download, so they can't
  * disagree.
  *
- * Source: reference/ARTWORK_WORKFLOW.md §8. Steps marked `unconfirmed` come
- * from community guides and forum posts, not a test upload; the app says so.
+ * Source: reference/ARTWORK_WORKFLOW.md §8. Ronin tested the whole guide,
+ * long artwork and the GIF sizes included, with a real upload (22 Nov 2026).
  */
 import { MAX_UPLOAD_BYTES, type ArtworkLayout, type ArtworkSlot } from "./layouts";
 
@@ -25,8 +25,6 @@ export interface GuideStep {
   body: string[];
   /** A code snippet to copy. */
   code?: string;
-  /** True when this comes from community lore, not a test upload. */
-  unconfirmed?: boolean;
 }
 
 /**
@@ -57,9 +55,8 @@ export function guideSteps(layout: ArtworkLayout, slots: ArtworkSlot[], showcase
     steps.push({
       id: "long",
       title: "Before saving each file, paste this into the console (F12)",
-      body: ["Without it the long images show as small squares. Unofficial, so Steam could stop it working."],
+      body: ["Without it the long images show as small squares."],
       code: LONG_ARTWORK_SNIPPET,
-      unconfirmed: true,
     });
   }
   steps.push(
@@ -114,7 +111,7 @@ export function guideText(
     "HOW TO PUT THEM ON STEAM",
   ];
   guideSteps(layout, slots, showcaseFirst, animated).forEach((step, i) => {
-    lines.push("", `${i + 1}. ${step.title}${step.unconfirmed ? " (not yet tested)" : ""}`);
+    lines.push("", `${i + 1}. ${step.title}`);
     for (const p of step.body) lines.push(`   ${p}`);
     if (step.code) lines.push("", `   ${step.code}`);
   });
